@@ -1,18 +1,18 @@
 # Vercel deployment runbook
 
-Status: local production build and browser verification are recorded in VERIFICATION. No deployment has been created and no public URL is claimed. The Vercel CLI was not installed and this checkout had no `.vercel/project.json`; account authentication and project access remain unverified. No login, linking, project creation or remote setting mutation was attempted.
+Production: **https://ghostroute-weld.vercel.app**. Vercel project `ghostroute` in the existing Umar Al Mukhtar Hobby team is connected to `UmarAlMukhtar/GhostRoute`; `main` is the production branch. Initial deployed implementation: `cfed4ea9267a5b21e8b7b474af2ec1ab71c7bb77`, deployment `dpl_HyNZ3KE8yiYUbimfPjg5uPsdNBHE`. Build and public desktop/mobile journeys passed on 11 October 2026. See [VERIFICATION](VERIFICATION.md) for evidence and limits.
 
 ## Prepared configuration
 
 - Framework: Next.js App Router, repository root (the folder containing `package.json`; **not** a nested `repository` directory in GitHub).
-- Node: select 22.x on Vercel; the code supports Node 22.13+ or 24. The local verification used Node 22.23.1.
+- Node: the existing project uses 24.x on Vercel; the code supports Node 22.13+ or 24. The local verification used Node 22.23.1.
 - `vercel.json` pins both installation and build to pnpm 11.25.0 through `npx`. This avoids assuming that Vercel's default pnpm detection selects this version. npm here launches pnpm only; it does not install application dependencies or create a second lockfile.
 - Install: `npx --yes pnpm@11.25.0 install --frozen-lockfile`.
 - Build: `npx --yes pnpm@11.25.0 run build`.
 - Output directory: leave the Next.js default. No static-export override, custom server, database or backend API.
 - Environment variables: **none required**. Do not upload credentials or use public variables for secrets. `.vercel/` is ignored.
 
-Next.js is supported directly by [Vercel](https://vercel.com/docs/frameworks/full-stack/nextjs). Explicit commands are supported by its [package-manager configuration](https://vercel.com/docs/package-managers). These documents were checked while preparing this runbook; hosted availability of the pinned framework/toolchain still requires a real build after authorization.
+Next.js is supported directly by [Vercel](https://vercel.com/docs/frameworks/full-stack/nextjs). Explicit commands are supported by its [package-manager configuration](https://vercel.com/docs/package-managers). These documents were checked while preparing this runbook; the pinned framework/toolchain also passed the real Vercel production build.
 
 ## Assets and browser behavior
 
@@ -24,13 +24,28 @@ No custom CSP is imposed. If a hosting policy is added later, test module worker
 
 Optional raster tiles use `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, visible OSM attribution and normal browser caching/referrers. Do not bulk download, prefetch a tile archive, suppress the Referer header, or run automated public-tile scans. Automated tests abort tile requests and use bundled roads. Standard tiles have no availability guarantee; use an appropriate provider before scaling public traffic. See the [OSMF tile policy](https://operations.osmfoundation.org/policies/tiles/).
 
-## Publish only after explicit approval
+## GitHub production and preview workflow
 
-1. Review the final local commit, participant details, license scope and screenshots. Authorize the exact branch push separately; example: `git push origin codex-foundation` (never force).
-2. Confirm the Vercel account/team and whether to use an existing project or create GhostRoute. Importing GitHub can immediately deploy and enable automatic deployments, so it is itself a remote publishing action requiring approval.
-3. Either import the official GitHub repository with the root/settings above, or install the Vercel CLI, authenticate, and run `vercel deploy` from this directory for a preview. Do not run `--prod` until that action is approved. Do not run `vercel link --yes` against an unspecified account/project.
-4. Inspect the actual hosted build logs and returned preview URL. Test the entire Demo Mode, manual endpoints, reset, static assets, mobile layout and tile failure on that URL. Verify judge access without an account; do not disable project protection without approval.
-5. After a successful preview and explicit production approval, promote that tested deployment or run `vercel deploy --prod`. Record the real URL and exact implementation commit in SUBMISSION. Never invent the URL or claim local verification proves hosted behavior.
+1. Contributors keep using forks and pull requests targeting official `main`. Run the existing GitHub CI and review the contribution before merging; do not force-push or deploy forks as production.
+2. The connected GitHub integration creates Preview deployments for eligible branches/PRs and adds PR comments and commit status. External-fork contributions can require the project owner's authorization; Hobby account collaboration and Vercel's existing preview access controls still apply. Do not share credentials or disable protection to work around them.
+3. Every merge into official `main` automatically builds a Production deployment and assigns the production domain after a successful build. Failed builds remain failed deployments and do not replace the last Ready production deployment. No extra Deployment Checks gate is configured; GitHub review/CI before merging remains the team's responsibility.
+4. Inspect the Vercel deployment Source SHA, logs and Ready status, then test the public production domain. A successful local build alone does not prove hosted behavior. No environment variables or paid resources are needed.
+5. To reproduce setup in another authorized Vercel account, import the official GitHub repository, name the project `ghostroute`, keep root `./`, Next.js preset, Node 24.x and default output; use the tracked pnpm commands above. Importing starts a deployment. Existing authenticated CLI users may link the exact project and deploy a preview; production changes use the reviewed Git workflow.
+
+Observed preview proof: [documentation PR #8](https://github.com/UmarAlMukhtar/GhostRoute/pull/8) received an automatic Ready preview and Vercel bot comment: [preview deployment](https://vercel.com/umar-al-mukhtar-s-projects/ghostroute/HqxVFimaZXHX3rr6Hg13yoUuKs5F). External fork authorization is still separate.
+
+## Troubleshooting and reliability
+
+- **Install/build fails:** inspect logs and pinned Node/pnpm versions; use the frozen lockfile. Never promote a failed build. Local Turbopack can fail with a sandbox port-binding error; clearing only generated `.next` and rerunning with required local access resolved the verification run.
+- **Map fails:** verify worker/shared `.mjs` files return JavaScript, all four `/data/ernakulam/` assets return JSON, and WebGL is available. Do not rewrite asset URLs to HTML. The build prepares worker assets automatically.
+- **Slow initial map:** the hosted four datasets transferred about 9 MB with Brotli; raw JSON remains about 68 MB. The graph loads and validates before routing. Laptop mobile viewport checks do not establish physical low-memory phone performance.
+- **Tiles fail:** bundled local roads and routes remain available with attribution. Public OSM tiles have no uptime guarantee; automated hosted journeys deliberately block them rather than scan the public tile service.
+- **Refresh/404:** `/` and `/demo` are Next.js prerendered routes and return HTTP 200 directly. Keep the origin root configuration.
+- **Caching:** deployed datasets and versioned worker return Vercel CDN HIT and ETags with `public, max-age=0, must-revalidate`. Browser revalidation is expected; no immutable caching is imposed on mutable dataset filenames.
+- **Reports differ across devices/previews:** reporting is browser-local, scoped to the origin. No shared backend or verification service is configured.
+- **Preview cannot be opened:** retain existing deployment protection. The owner can use Vercel's supported access/sharing controls or authorize a fork deployment. Public production access does not require login.
+
+No organizer Google Form has been submitted. Participant details, final submitted SHA and human rehearsals remain team-owned.
 
 ## Local production fallback
 

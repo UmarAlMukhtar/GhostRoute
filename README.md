@@ -108,7 +108,7 @@ The local dataset has 1,719 nodes, 3,712 directed edges and 12 components. Run `
 3. Change either endpoint to clear the previous route, calculate again, or **Reset**. On mobile, expand/collapse the routing sheet with its header button. Presets work without map clicks.
 4. If remote street tiles fail or take over 12 seconds, local roads and routing remain usable. WebGL failure leaves named route controls/results available, with a clear error. This is not a complete offline web app: app assets must be served locally or loaded beforehand.
 
-`dev` and `build` copy the installed MapLibre worker and shared module into ignored, versioned local assets; no CDN worker is required. The optional OSM street tiles use normal browser caching, visible attribution and no prefetch. See the [OSMF tile policy](https://operations.osmfoundation.org/policies/tiles/) and [map architecture](docs/ARCHITECTURE.md#map-02-browser-integration). Automated browser tests abort external tile requests. No hosted deployment is claimed. The implemented guided walkthrough is in [DEMO_PLAN](docs/DEMO_PLAN.md).
+`dev` and `build` copy the installed MapLibre worker and shared module into ignored, versioned local assets; no CDN worker is required. The optional OSM street tiles use normal browser caching, visible attribution and no prefetch. See the [OSMF tile policy](https://operations.osmfoundation.org/policies/tiles/) and [map architecture](docs/ARCHITECTURE.md#map-02-browser-integration). Automated browser tests abort external tile requests. The public Vercel deployment is verified below. The implemented guided walkthrough is in [DEMO_PLAN](docs/DEMO_PLAN.md).
 
 **Simulation only. Hazards and destinations are demonstration data. Routes are not verified safe. Follow local authorities.** The graph is a small, potentially stale extract; the flood model is two-dimensional. Neither an unblocked road nor a synthetic destination establishes actual access, capacity or safety.
 
@@ -148,7 +148,7 @@ Desktop and mobile captures below use the actual local graph/router with optiona
 
 ### Deployment and submission status
 
-Vercel configuration is prepared locally; no public URL or hosted build is claimed. No environment variables are required. Follow DEPLOYMENT.md only after approving the target account/project and publishing actions. The submitted implementation SHA, participant handles/contributions, two timed human rehearsals and venue submission confirmations remain human-owned. New code is MIT; OSM data is ODbL with separate attribution, and inherited organizer-text redistribution terms still need clarification.
+Public production: [ghostroute-weld.vercel.app](https://ghostroute-weld.vercel.app), Vercel project `ghostroute`, connected to the official repository with `main` as production. No environment variables are required. Approved merges trigger production builds; pull requests receive Vercel previews, subject to fork authorization and preview protection. See [DEPLOYMENT](docs/DEPLOYMENT.md) for setup, verification, and troubleshooting. The submitted implementation SHA, participant handles/contributions, two timed human rehearsals and venue submission confirmations remain human-owned. New code is MIT; OSM data is ODbL with separate attribution, and inherited organizer-text redistribution terms still need clarification.
 
 ### Interactive multi-disaster platform
 

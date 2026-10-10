@@ -1,5 +1,16 @@
 # AI usage record
 
+## GitHub preview evidence — 2026-10-11T02:07:25+05:30
+
+Recorded the actual Ready Vercel preview, successful commit status and bot comment for documentation PR #8 in DEPLOYMENT/VERIFICATION. Checked links and whitespace; external-fork authorization remains unverified. Codex assistance, human review pending.
+
+## Vercel production deployment — 2026-10-11T02:05:50+05:30
+
+- Changed: imported official GitHub `main` into the existing Hobby project `ghostroute`; documented public production URL, exact initial source SHA, GitHub production/preview workflow, environment requirements, caching and troubleshooting in README/DEPLOYMENT/SUBMISSION. Added hosted desktop/mobile screenshots; organizer requirements and participant submission fields are preserved.
+- Why: provide a publicly accessible demo and automatic builds for approved official-repository merges.
+- Checks: fresh official fetch confirms `main` contains the complete application with identical tree to the completed development branch. Lint/types, 174 tests and production build passed; failed local Turbopack cache was cleared before the passing build. Vercel's exact pinned pnpm build passed. Six real public desktop/mobile browser journeys passed, including local deletion persistence, multiple hazards, rerouting, themes and `/demo`. All four hosted datasets match source bytes; worker JavaScript and direct `/demo` HTTP 200, CDN HIT/ETag checks passed. High-confidence tracked credential-pattern scan had no candidates.
+- Limits: local reports are browser/origin scoped; frozen OSM and simulations do not establish safe routes. ~9.48 MB compressed / 68.13 MB decoded initial dataset cost remains; physical phone testing and human rehearsal pending. Fork previews may require owner authorization and retain existing access protection. No Google Form submission, paid resources, repository permission changes or protection weakening.
+
 ## Collaboration publishing assistance — 2026-10-11T01:27:15+05:30
 
 Codex audited tracked assets/history for publishing without printing secret values, verified an independent fresh clone with a real pinned install, ran lint/types/174 tests/build/format, corrected branch-specific onboarding/review/permissions instructions and created two nonduplicate remaining human-review issues with existing labels. The sandbox denied dependency network/store access and compiler worker ports; the install used a new temporary store and the build passed after removing only the failed temporary compiler cache and running with required access. Fresh-clone production browser rerun passed all 42 tests (21 desktop, 21 mobile) in 3.5 minutes. Human review is pending. Publishing is explicitly authorized; no force push, history rewrite, main overwrite, settings change, deployment or submission.
