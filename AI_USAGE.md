@@ -1,5 +1,9 @@
 # AI usage record
 
+## Windows verification repair — 2026-10-11T04:10:47+05:30
+
+Codex diagnosed a failing frozen-data assertion as a Git Windows CRLF checkout mismatch, not a source-data or route change, and made the hash assertion normalize only JSON line endings. The focused dataset test then passed. It also started the production browser suite: the app built, but all Chromium cases were blocked by a missing Playwright browser binary. A browser download was initiated but did not finish; browser verification remains pending.
+
 ## Simulated evacuation fallback — 2026-10-11T03:14:23+05:30
 
 Codex inspected the existing selector, deterministic router, flood closures and MapLibre overlay contracts; then added a small synthetic shelter catalog, closure-aware reachable-shelter ranking, purple map markers, a destination-selection action and focused unit tests. The team should review the evacuation copy and visual behavior before presenting. TypeScript, ESLint, production build and the focused shelter/map tests passed. Full formatting reports existing repository-wide drift; an earlier unfiltered Vitest run also exposed an existing dataset reproducibility failure. No shelter data, capacity, facilities, safety claim, live feed, account or external service was invented as real.

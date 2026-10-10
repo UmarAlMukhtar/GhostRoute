@@ -1,5 +1,12 @@
 # Change log
 
+## Windows dataset-test portability — 2026-10-11T04:10:47+05:30
+
+- Changed: normalized checked-out JSON line endings before comparing generated asset hashes in the frozen-dataset test.
+- Why: Git checks the versioned JSON assets out as CRLF on this Windows machine, while the generated source hashes correctly record LF bytes. Semantic graph and GeoJSON equality checks remain unchanged.
+- Checks: focused dataset test passed (6 tests); production build, TypeScript and ESLint passed. The complete unit suite was started after the repair and produced no failure report before the runner session ended without a final summary.
+- Limits: the production browser suite built successfully but could not launch because Playwright Chromium is not installed. Its 197.5 MiB browser download began but did not complete in this environment; no browser-pass claim is made.
+
 ## Simulated evacuation fallback — 2026-10-11T03:14:23+05:30
 
 - Changed: when a simulated disaster leaves the selected destination unreachable, the navigation panel now displays and maps reachable illustrative relief points, ranks them by the same closure-aware walking route, and lets the user replace the destination with a selected point. Added a deterministic unit test and a MapLibre shelter-marker layer.
