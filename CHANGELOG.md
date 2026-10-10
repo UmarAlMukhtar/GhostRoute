@@ -1,5 +1,11 @@
 # Change log
 
+## Portable loader regression check — 2026-10-11T04:58:58+05:30
+
+- Changed: the deliberately throttled loader test allows slower shared-runner readiness and detects monopolizing preparation with a relative frame-gap assertion plus distinct painted animation states.
+- Evidence: GitHub CI passed 47/48 cases; the desktop loader case timed out at 25 seconds, while mobile passed. All four corrected desktop/mobile animation and reduced-motion cases passed locally against the unchanged production build.
+- Limits: absolute performance remains documented in matched measurements; no product or geographic data changed. Human review pending.
+
 ## Lossless responsive map loading — 2026-10-11T04:44:13+05:30
 
 - Changed: generated a compact segment transport, bundled worker decoding/full validation with bounded result messages, and cooperative router/connectivity/hazard/catalog initialization. Reused the initialized hazard engine in Dashboard; preserved synchronous route/hazard APIs and private snapshots. Added full-network equivalence, reverse-only geometry, worker failure/retry and animation/reduced-motion tests, reproducible benchmarks and current architecture/data documentation.

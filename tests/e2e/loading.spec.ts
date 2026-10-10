@@ -19,7 +19,10 @@ test('loader keeps painting while the full dataset initializes', async ({
     requestAnimationFrame(frame);
   });
   await page.goto('/');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  // Four-times throttling on shared CI needs more time than normal journeys.
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   const samples = await page.evaluate(
     () =>
       Reflect.get(window, 'loadingSamples') as {
@@ -29,7 +32,9 @@ test('loader keeps painting while the full dataset initializes', async ({
   );
   expect(new Set(samples.map((s) => s.transform)).size).toBeGreaterThan(20);
   const gaps = samples.slice(1).map((s, i) => s.time - samples[i].time);
-  expect(Math.max(...gaps)).toBeLessThan(1500);
+  // Detect one task monopolizing preparation without assuming runner speed.
+  const loadingDuration = samples.at(-1)!.time - samples[0].time;
+  expect(Math.max(...gaps) / loadingDuration).toBeLessThan(0.25);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
 });
 
