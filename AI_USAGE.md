@@ -1,5 +1,9 @@
 # AI usage record
 
+## Collaboration publishing assistance — 2026-10-11T01:27:15+05:30
+
+Codex audited tracked assets/history for publishing without printing secret values, verified an independent fresh clone with a real pinned install, ran lint/types/174 tests/build/format, corrected branch-specific onboarding/review/permissions instructions and created two nonduplicate remaining human-review issues with existing labels. The sandbox denied dependency network/store access and compiler worker ports; the install used a new temporary store and the build passed after removing only the failed temporary compiler cache and running with required access. Fresh-clone production browser rerun passed all 42 tests (21 desktop, 21 mobile) in 3.5 minutes. Human review is pending. Publishing is explicitly authorized; no force push, history rewrite, main overwrite, settings change, deployment or submission.
+
 ## Expanded UI and verification assistance — 2026-10-11T01:19:34+05:30
 
 Codex implemented separate workflows/themes/local deletion and meaningful failure/regression tests, inspected real screenshots and corrected drawer overlap, map-label overflow, contrast and reset test assumptions. Actual final checks passed: 174 unit tests and 42 browser tests plus lint/types/build/format/regeneration. Measurements and source/phone/storage limitations are recorded in VERIFICATION. Human review pending; no push/deployment or fabricated security/physical validation.

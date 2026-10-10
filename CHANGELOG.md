@@ -1,5 +1,12 @@
 # Change log
 
+## Collaboration publishing readiness — 2026-10-11T01:27:15+05:30
+
+- Changed: README/CONTRIBUTING now clone `codex-foundation`, pin Node 22.13+ (22 line) or 24 and pnpm 11.25.0, explain public clone/write permissions, human `feature/<task>` branches and reviewer/CI gates for stable `main`. Updated contributor guide and linked remaining human-review issues #1/#2.
+- Why: Make teammate onboarding reach the implemented app while preserving organizer files, history and stable main.
+- Checks: Fresh independent clone from local Git history; real frozen-lockfile install downloaded 437 packages into a new temporary store with Node 22.23.1/pnpm 11.25.0. Lint/types, 174 unit tests, production build and format check passed. Fresh-clone production browser rerun passed all 42 tests (21 desktop, 21 mobile) in 3.5 minutes. Tracked/history credential-pattern scan found no candidates; runtime assets/source/lock are tracked, generated/private paths excluded; RULES remains byte-identical to initial template. Local changed-doc links and diff whitespace passed.
+- Limits: Hosted CI, publishing SHA and PR will be checked after authorized non-force push. Human accessibility review/timed rehearsal, deployment and venue submission remain separate. No repository settings changed.
+
 ## Expanded workflows and final verification — 2026-10-11T01:19:34+05:30
 
 Separated navigation, simulation and reports; added `/demo`, Light/Dark/System, confirmed browser-local report deletion and full regression/visual evidence. Validation: 174 unit tests, 42 production browser tests, lint/types/build/format and byte-identical regeneration passed. Larger initial asset/memory costs and physical phone validation remain documented; human review pending. Local commits only.

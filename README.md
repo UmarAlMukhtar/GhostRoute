@@ -69,12 +69,16 @@ A client dashboard renders local road GeoJSON with MapLibre; framework-independe
 Use Node.js 22.13+ in the Node 22 line, or Node 24 and the exact pnpm version in `package.json` (`11.25.0`). `.nvmrc` selects Node 22. Install pnpm through your preferred supported method, for example `npm install --global pnpm@11.25.0` if you manage this Node installation yourself.
 
 ```bash
-git clone git@github.com:UmarAlMukhtar/GhostRoute.git
+git clone --branch codex-foundation https://github.com/UmarAlMukhtar/GhostRoute.git
 cd GhostRoute
 pnpm install --frozen-lockfile
 pnpm exec playwright install chromium
 pnpm dev
 ```
+
+This repository is public: HTTPS cloning needs no GitHub sign-in. SSH cloning (`git clone --branch codex-foundation git@github.com:UmarAlMukhtar/GhostRoute.git`) requires a configured GitHub SSH key. Direct pushes require collaborator write access; other contributors can fork and open a PR.
+
+`codex-foundation` contains the implemented application and is the current integration branch. `main` stays stable until a reviewed PR passes CI and is merged by a maintainer. Human contributors branch from `codex-foundation` using `feature/<task>`. At least one human reviewer and passing CI are required before merge. This is the team workflow; branch protection has not been configured. Until the foundation PR is merged, target contributor PRs at `codex-foundation` to keep each diff focused. After integration, update branches from `main` and target `main`.
 
 In the original Codex workspace, run `cd repository` first; the official clone is nested beneath the initial empty Git shell. Open [localhost:3000](http://localhost:3000). No environment variables or API keys are required; `.env.example` records that explicitly. On supported Linux CI hosts, `pnpm exec playwright install --with-deps chromium` installs browser system libraries too. Fedora users may need equivalent native libraries; see [TESTING](docs/TESTING.md).
 

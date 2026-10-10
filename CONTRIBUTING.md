@@ -1,16 +1,23 @@
 # Contributing to GhostRoute
 
-Thank you for helping build a clear, reproducible simulation. Read [RULES](RULES.md), [AGENTS](AGENTS.md), [PRD](docs/PRD.md), [architecture](docs/ARCHITECTURE.md) and the relevant [ADR](docs/adr/README.md) before a significant change. Phase 0 is a foundation; avoid presenting planned features as implemented.
+Thank you for helping build a clear, reproducible simulation. Read [RULES](RULES.md), [AGENTS](AGENTS.md), [PRD](docs/PRD.md), [architecture](docs/ARCHITECTURE.md) and the relevant [ADR](docs/adr/README.md) before a significant change. The integration branch contains the implemented simulation; distinguish local evidence from human review and hosted verification.
 
 ## Local setup
 
-Clone the official repository; use Node 22.13+ (22 line) or Node 24 and pnpm 11.25.0. Run `pnpm install --frozen-lockfile`, `pnpm exec playwright install chromium`, then `pnpm dev`. No secrets are needed. See [README](README.md) for every command and [TESTING](docs/TESTING.md) for browser prerequisites.
+Clone the implemented integration branch:
+
+```bash
+git clone --branch codex-foundation https://github.com/UmarAlMukhtar/GhostRoute.git
+cd GhostRoute
+```
+
+Use Node 22.13+ (22 line) or Node 24 and pnpm 11.25.0. Run `pnpm install --frozen-lockfile`, `pnpm exec playwright install chromium`, then `pnpm dev`. No secrets are needed. See [README](README.md) for every command and [TESTING](docs/TESTING.md) for browser prerequisites.
 
 ## Select and coordinate work
 
-Choose one ready task in [TASKS](docs/TASKS.md). Confirm dependencies are complete and ask the maintainer to assign it before overlapping another contributor's work. Until issues are explicitly created, coordinate using task IDs and record ownership in the team's conversation; the task catalog is not an assignment claim. Beginner tasks are labeled in that document. Do not create remote issues or change repository settings on behalf of someone else without permission.
+Choose one ready task in [TASKS](docs/TASKS.md). Confirm dependencies are complete and ask the maintainer to assign it before overlapping another contributor's work. Use open GitHub issues alongside task IDs and record ownership with the maintainer; the task catalog is not an assignment claim. Beginner tasks are labeled in that document. Do not create remote issues or change repository settings on behalf of someone else without permission.
 
-Use `codex-<task-id>-<short-description>` for agent branches and `feat/<task-id>-<description>` or `docs/<task-id>-<description>` for human branches. Start from the team's current integration branch. Check `git status` first, preserve uncommitted work and never rewrite shared history or force-push. In this foundation session, no push is authorized.
+Use `codex-<task-id>-<short-description>` for agent branches and `feature/<task>` for human branches. Start from `codex-foundation`, the current integration branch. Keep `main` stable: merge through a PR only after at least one human reviewer approves and CI passes. This is the team workflow; branch protection has not been configured. Until the foundation PR is merged, target contributor PRs at `codex-foundation` to keep each diff focused. After integration, update branches from `main` and target `main`. Check `git status` first, preserve uncommitted work and never rewrite shared history or force-push.
 
 ## Code and commits
 
