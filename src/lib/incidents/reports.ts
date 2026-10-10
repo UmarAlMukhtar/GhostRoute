@@ -158,3 +158,16 @@ export function filterReports(
           : r.status !== 'Resolved' && r.status !== 'Rejected')),
   );
 }
+
+export function deleteReport(
+  storage: Pick<Storage, 'setItem'>,
+  reports: readonly IncidentReport[],
+  id: string,
+) {
+  const report = reports.find((value) => value.id === id);
+  if (!report || report.seeded)
+    throw new Error('Only reports created in this browser can be deleted.');
+  const next = reports.filter((value) => value.id !== id);
+  storage.setItem(REPORT_KEY, JSON.stringify(next));
+  return next;
+}

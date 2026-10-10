@@ -15,9 +15,8 @@ import {
   X,
 } from 'lucide-react';
 import MapView from './MapView';
+import ThemeToggle from './ThemeToggle';
 import PlaceSearch from './PlaceSearch';
-import gazetteer from '../../data/places/ernakulam.json';
-import { validatePlaces } from '../lib/map/places';
 import { HazardControls, ReportControls, hazardNames } from './ExploreControls';
 import {
   hazardInputs,
@@ -30,7 +29,7 @@ import {
   loadReports,
   saveReport,
   validateReport,
-  reportClosures,
+  deleteReport,
   REPORT_KEY,
   type IncidentReport,
   type ReportFilters,
@@ -62,7 +61,7 @@ import {
 } from '../lib/map/selection';
 import type { GeoPoint } from '../lib/geo/types';
 
-export default function Dashboard() {
+export default function Dashboard({ demo = false }: { demo?: boolean }) {
   const locationRequest = useRef(0);
   const [data, setData] = useState<MapData | null>(null);
   const [searching, setSearching] = useState(false);
@@ -71,18 +70,10 @@ export default function Dashboard() {
     coordinate: GeoPoint;
     sequence: number;
   }>();
-  const catalog = useMemo(() => {
-    if (!data) return { places: [], error: '' };
-    try {
-      return { places: validatePlaces(gazetteer, data), error: '' };
-    } catch {
-      return {
-        places: [],
-        error:
-          'Local place catalog unavailable. Use map selection or demo endpoints.',
-      };
-    }
-  }, [data]);
+  const catalog = {
+    places: data?.searchPlaces ?? [],
+    error: data?.searchError ?? '',
+  };
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [state, dispatchSelection] = useReducer(
@@ -98,9 +89,7 @@ export default function Dashboard() {
   const [tab, setTab] = useState<'Navigate' | 'Simulate' | 'Reports' | 'Demo'>(
     'Navigate',
   );
-  const [mode, setMode] = useState<'normal' | 'simulation' | 'incidents'>(
-    'normal',
-  );
+  const [mode, setMode] = useState<'normal' | 'simulation'>('normal');
   const [hazards, setHazards] = useState<SimulatedHazard[]>([]);
   const [coordinateRole, setCoordinateRole] = useState<Role>('origin');
   const [latitude, setLatitude] = useState('');
@@ -117,7 +106,6 @@ export default function Dashboard() {
     segmentId?: string;
   } | null>(null);
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
-  const [exploreReports, setExploreReports] = useState(false);
   const [filters, setFilters] = useState<ReportFilters>({
     type: '',
     status: '',
@@ -239,6 +227,26 @@ export default function Dashboard() {
     } catch (error) {
       setReportError(
         error instanceof Error ? error.message : 'Could not save report',
+      );
+      return false;
+    }
+  }
+  function removeReport(id: string) {
+    if (!data || !reportsReady) return false;
+    try {
+      setReports(
+        deleteReport(
+          localStorage,
+          loadReports(localStorage, data.bounds, segments),
+          id,
+        ),
+      );
+      setSelectedReport(null);
+      setReportError('');
+      return true;
+    } catch (error) {
+      setReportError(
+        error instanceof Error ? error.message : 'Could not delete report',
       );
       return false;
     }
@@ -430,24 +438,13 @@ export default function Dashboard() {
       const input = hazardInputs(hazards);
       return engine.evaluate(input.zones, input.segments);
     }
-    if (mode === 'incidents')
-      return engine.evaluate([], reportClosures(reports, exploreReports));
     return scenario.graphVersion === data.graph.version
       ? engine.evaluate(scenario.steps[simulation.stage])
       : {
           status: 'invalid' as const,
           reason: 'Scenario does not match this dataset version.',
         };
-  }, [
-    engine,
-    data,
-    simulation.scenarioId,
-    simulation.stage,
-    mode,
-    hazards,
-    reports,
-    exploreReports,
-  ]);
+  }, [engine, data, simulation.scenarioId, simulation.stage, mode, hazards]);
   const impactActive = mode !== 'normal' || simulation.stage > 0;
   const baseline = useMemo(
     () =>
@@ -528,13 +525,35 @@ export default function Dashboard() {
           <span className="region-tag">DEMO REGION</span>
         </div>
         <div className="header-actions">
+          <Link className="demo-entry" href={demo ? '/' : '/demo'}>
+            {demo ? 'Navigation' : 'Demo'}
+          </Link>
+          {demo && (
+            <button
+              className="secondary"
+              disabled={!data}
+              onClick={() => changeTab('Demo')}
+            >
+              Demo scenarios
+            </button>
+          )}
+          <ThemeToggle />
           <button
-            className="demo-entry"
-            disabled={!data}
-            aria-pressed={demoStep !== null}
-            onClick={() => showDemoStep(0)}
+            className="secondary"
+            onClick={() =>
+              changeTab(tab === 'Simulate' ? 'Navigate' : 'Simulate')
+            }
+            aria-expanded={tab === 'Simulate'}
           >
-            Demo Mode
+            Simulation
+          </button>
+          <button
+            className="primary report-entry"
+            onClick={() =>
+              changeTab(tab === 'Reports' ? 'Navigate' : 'Reports')
+            }
+          >
+            Report Incident
           </button>
           <span className="demo-status">
             <span />
@@ -621,37 +640,11 @@ export default function Dashboard() {
             tabIndex={-1}
             className={`panel-content ${demoStep !== null ? 'guided' : ''}`}
           >
-            {demoStep !== null ? (
-              <DemoGuide
-                step={demoStep}
-                baseline={baseline}
-                current={current}
-                blockedCount={
-                  flood?.status === 'ready' ? flood.metadata.segmentCount : 0
-                }
-                onStep={showDemoStep}
-                onExit={() => setDemoStep(null)}
-              />
-            ) : (
-              <div className="panel-heading">
-                <p className="eyebrow">ERNAKULAM EXPLORER</p>
-                <h2>A clearer way forward.</h2>
-                <p>Explore routes through the local road network.</p>
-              </div>
-            )}
-            <nav className="workspace-tabs" aria-label="Workspace">
-              {(['Navigate', 'Simulate', 'Reports', 'Demo'] as const).map(
-                (value) => (
-                  <button
-                    key={value}
-                    aria-current={tab === value ? 'page' : undefined}
-                    onClick={() => changeTab(value)}
-                  >
-                    {value}
-                  </button>
-                ),
-              )}
-            </nav>
+            <div className="panel-heading">
+              <p className="eyebrow">ERNAKULAM EXPLORER</p>
+              <h2>A clearer way forward.</h2>
+              <p>Explore routes through the local road network.</p>
+            </div>
             {loadError ? (
               <div className="notice error" role="alert">
                 {loadError}
@@ -671,60 +664,12 @@ export default function Dashboard() {
               </p>
             ) : (
               <>
-                <label className="routing-mode">
-                  Routing mode
-                  <select
-                    aria-label="Routing mode"
-                    value={
-                      mode === 'normal' && simulation.stage > 0 ? 'demo' : mode
-                    }
-                    onChange={(e) => {
-                      setMode(e.target.value as typeof mode);
-                      dispatchSimulation({ type: 'clear' });
-                      setDemoStep(null);
-                    }}
-                  >
-                    {mode === 'normal' && simulation.stage > 0 && (
-                      <option value="demo" disabled>
-                        Demo simulation · preset flood
-                      </option>
-                    )}
-                    <option value="normal">Normal · mapped roads</option>
-                    <option value="simulation">
-                      Simulation · custom hazards
-                    </option>
-                    <option value="incidents">
-                      Incident-aware · local exploration
-                    </option>
-                  </select>
-                </label>
-                {mode === 'incidents' && (
-                  <div className="notice">
-                    <p>
-                      No trusted verification feed is connected. Local reports
-                      do not establish confirmed closures.
-                    </p>
-                    <label className="check-label">
-                      <input
-                        type="checkbox"
-                        checked={exploreReports}
-                        onChange={(e) => setExploreReports(e.target.checked)}
-                      />
-                      Explore unverified reports as hypothetical road closures
-                    </label>
-                    <p>
-                      Not verified safe. Only associated roads in non-seed
-                      unverified reports are excluded. Filters change visibility
-                      only.
-                    </p>
-                  </div>
-                )}
                 {intent && (
                   <button className="secondary" onClick={() => setIntent(null)}>
                     Cancel map placement
                   </button>
                 )}
-                <div hidden={tab !== 'Navigate' && tab !== 'Demo'}>
+                <div>
                   <div className="endpoint-fields">
                     {(['origin', 'destination'] as const).map((role, index) => (
                       <div
@@ -764,7 +709,10 @@ export default function Dashboard() {
                       </div>
                     ))}
                   </div>
-                  <details className="demo-endpoints coordinate-entry">
+                  <details
+                    className="demo-endpoints coordinate-entry"
+                    hidden={!demo}
+                  >
                     <summary>Demo endpoint shortcuts</summary>
                     {(['origin', 'destination'] as const).map((role) => (
                       <label key={role}>
@@ -917,7 +865,7 @@ export default function Dashboard() {
                     {state.result ? 'Recalculate route' : 'Find route'}
                     <ArrowRight size={18} />
                   </button>
-                  <div className="preset-row">
+                  <div className="preset-row" hidden={!demo}>
                     <button
                       className="demo-preset"
                       onClick={() =>
@@ -930,121 +878,6 @@ export default function Dashboard() {
                     </button>
                   </div>
                 </div>
-                {tab === 'Simulate' && (
-                  <HazardControls
-                    hazards={hazards}
-                    setHazards={updateHazards}
-                    place={placeHazard}
-                    selected={selectedHazard}
-                    select={setSelectedHazard}
-                  />
-                )}
-                <div hidden={tab !== 'Reports'}>
-                  <ReportControls
-                    reports={visibleReports}
-                    coordinate={reportLocation?.coordinate ?? null}
-                    segmentId={reportLocation?.segmentId}
-                    onPlace={() => {
-                      setIntent('report');
-                      dispatchSelection({ type: 'active', role: null });
-                      setSheetOpen(false);
-                    }}
-                    onSubmit={submitReport}
-                    filters={filters}
-                    setFilters={setFilters}
-                    selected={selectedReport}
-                    select={setSelectedReport}
-                    error={reportError}
-                    ready={reportsReady}
-                  />
-                </div>
-                {tab === 'Demo' && (
-                  <SimulationPanel
-                    state={simulation}
-                    dispatch={(action) => {
-                      setMode('normal');
-                      simulate(action);
-                    }}
-                    flood={flood}
-                    baseline={baseline}
-                    current={current}
-                    canStart={Boolean(state.origin && state.destination)}
-                  />
-                )}
-                {mode !== 'normal' && (
-                  <section
-                    className="impact-summary"
-                    aria-label="Route comparison"
-                    aria-live="polite"
-                  >
-                    <h3>
-                      {mode === 'simulation'
-                        ? 'Simulated impacts'
-                        : 'Exploratory report impacts'}
-                    </h3>
-                    <p>
-                      <strong data-testid="custom-blocked">
-                        {flood?.status === 'ready'
-                          ? flood.metadata.segmentCount
-                          : 0}
-                      </strong>{' '}
-                      blocked physical segments ·{' '}
-                      {mode === 'simulation'
-                        ? `${hazards.filter((h) => h.enabled).length} enabled hazards`
-                        : 'unverified observations'}
-                    </p>
-                    {flood?.status === 'invalid' && (
-                      <p role="alert">{flood.reason}</p>
-                    )}
-                    {mode === 'simulation' && (
-                      <p>
-                        Hazards affecting the original route:{' '}
-                        {affectingHazards.join(', ') || 'None'}
-                      </p>
-                    )}
-                    <dl>
-                      <div>
-                        <dt>Original</dt>
-                        <dd>
-                          {baseline?.status === 'found'
-                            ? formatDistance(baseline.distanceMeters)
-                            : 'Select endpoints'}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>Updated</dt>
-                        <dd>
-                          {found
-                            ? formatDistance(found.distanceMeters)
-                            : baseline
-                              ? 'Unavailable'
-                              : 'Select endpoints'}
-                        </dd>
-                      </div>
-                    </dl>
-                    {comparison?.additionalMeters !== null && comparison && (
-                      <p>
-                        Additional distance:{' '}
-                        {formatDistance(comparison.additionalMeters)}{' '}
-                        {comparison.percentageIncrease !== null
-                          ? `(${comparison.percentageIncrease.toFixed(1)}%)`
-                          : ''}
-                      </p>
-                    )}
-                    <p>
-                      {baseline?.status === 'found' && flood?.status === 'ready'
-                        ? `${baseline.segmentIds.filter((id) => flood.blockedSegmentIds.has(id)).length} segments of the original route affected`
-                        : ''}
-                    </p>
-                    <p>
-                      {found
-                        ? 'Route available in this model'
-                        : baseline
-                          ? 'No available route'
-                          : 'Choose endpoints in Navigate'}
-                    </p>
-                  </section>
-                )}
                 <div
                   className="result-area"
                   aria-live="polite"
@@ -1129,14 +962,11 @@ export default function Dashboard() {
                   <button
                     onClick={() => {
                       dispatch({ type: 'reset' });
-                      simulate({ type: 'clear' });
-                      setHazards([]);
-                      setMode('normal');
                       setIntent(null);
                     }}
                   >
                     <RotateCcw size={14} />
-                    Reset
+                    Reset route
                   </button>
                 </div>
               </>
@@ -1151,6 +981,165 @@ export default function Dashboard() {
             </p>
           </div>
         </aside>
+        {data && tab !== 'Navigate' && (
+          <aside
+            className={`side-panel ${intent ? 'placing' : ''}`}
+            aria-label={
+              tab === 'Reports' ? 'Reporting panel' : 'Simulation panel'
+            }
+          >
+            <div className="dialog-header">
+              <h2>
+                {tab === 'Reports'
+                  ? 'Incident reports'
+                  : tab === 'Demo'
+                    ? 'Guided demo'
+                    : 'Simulation'}
+              </h2>
+              <button
+                className="icon-button"
+                aria-label="Close side panel"
+                onClick={() => changeTab('Navigate')}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            {demoStep !== null && (
+              <DemoGuide
+                step={demoStep}
+                baseline={baseline}
+                current={current}
+                blockedCount={
+                  flood?.status === 'ready' ? flood.metadata.segmentCount : 0
+                }
+                onStep={showDemoStep}
+                onExit={() => setDemoStep(null)}
+              />
+            )}
+            {tab === 'Simulate' && (
+              <HazardControls
+                hazards={hazards}
+                setHazards={updateHazards}
+                place={placeHazard}
+                selected={selectedHazard}
+                select={setSelectedHazard}
+              />
+            )}
+            <div hidden={tab !== 'Reports'}>
+              <ReportControls
+                reports={visibleReports}
+                coordinate={reportLocation?.coordinate ?? null}
+                segmentId={reportLocation?.segmentId}
+                onPlace={() => {
+                  setIntent('report');
+                  dispatchSelection({ type: 'active', role: null });
+                  setSheetOpen(false);
+                }}
+                onSubmit={submitReport}
+                filters={filters}
+                setFilters={setFilters}
+                selected={selectedReport}
+                select={setSelectedReport}
+                error={reportError}
+                ready={reportsReady}
+                onDelete={removeReport}
+              />
+            </div>
+            {tab === 'Demo' && (
+              <SimulationPanel
+                state={simulation}
+                dispatch={(action) => {
+                  setMode('normal');
+                  simulate(action);
+                }}
+                flood={flood}
+                baseline={baseline}
+                current={current}
+                canStart={Boolean(state.origin && state.destination)}
+              />
+            )}
+
+            {mode !== 'normal' && (
+              <section
+                className="impact-summary"
+                aria-label="Route comparison"
+                aria-live="polite"
+              >
+                <h3>
+                  {mode === 'simulation'
+                    ? 'Simulated impacts'
+                    : 'Exploratory report impacts'}
+                </h3>
+                <p>
+                  <strong data-testid="custom-blocked">
+                    {flood?.status === 'ready'
+                      ? flood.metadata.segmentCount
+                      : 0}
+                  </strong>{' '}
+                  blocked physical segments ·{' '}
+                  {mode === 'simulation'
+                    ? `${hazards.filter((h) => h.enabled).length} enabled hazards`
+                    : 'unverified observations'}
+                </p>
+                {flood?.status === 'invalid' && (
+                  <p role="alert">{flood.reason}</p>
+                )}
+                {mode === 'simulation' && (
+                  <p>
+                    Hazards affecting the original route:{' '}
+                    {affectingHazards.join(', ') || 'None'}
+                  </p>
+                )}
+                <dl>
+                  <div>
+                    <dt>Original</dt>
+                    <dd>
+                      {baseline?.status === 'found'
+                        ? formatDistance(baseline.distanceMeters)
+                        : 'Select endpoints'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Updated</dt>
+                    <dd>
+                      {found
+                        ? formatDistance(found.distanceMeters)
+                        : baseline
+                          ? 'Unavailable'
+                          : 'Select endpoints'}
+                    </dd>
+                  </div>
+                </dl>
+                {comparison?.additionalMeters !== null && comparison && (
+                  <p>
+                    Additional distance:{' '}
+                    {formatDistance(comparison.additionalMeters)}{' '}
+                    {comparison.percentageIncrease !== null
+                      ? `(${comparison.percentageIncrease.toFixed(1)}%)`
+                      : ''}
+                  </p>
+                )}
+                <p>
+                  {baseline?.status === 'found' && flood?.status === 'ready'
+                    ? `${baseline.segmentIds.filter((id) => flood.blockedSegmentIds.has(id)).length} segments of the original route affected`
+                    : ''}
+                </p>
+                <p>
+                  {found
+                    ? 'Route available in this model'
+                    : baseline
+                      ? 'No available route'
+                      : 'Choose endpoints in Navigate'}
+                </p>
+              </section>
+            )}
+            {tab === 'Demo' && demoStep === null && (
+              <button className="primary" onClick={() => showDemoStep(0)}>
+                Start guided demo
+              </button>
+            )}
+          </aside>
+        )}
         <div className="map-legend" aria-label="Map legend">
           <span title="Dataset geographic extent, not guaranteed road connectivity">
             <i className="legend-coverage" />
@@ -1194,7 +1183,7 @@ export default function Dashboard() {
         </p>
         <div>
           <span className="coverage-meta">
-            Central Ernakulam · OSM extract 10 Oct 2026
+            Kochi–Ernakulam · frozen OSM snapshot
           </span>
           <a
             href="https://www.openstreetmap.org/copyright"
@@ -1241,11 +1230,14 @@ export default function Dashboard() {
           road components are disconnected.
         </p>
         <p>
-          The frozen dataset contains 1,719 nodes and 1,856 road segments in
-          central Ernakulam. Start a simulated flood after selecting endpoints.
-          Use the stage arrows to expand or reverse the urban scenario; Reset
-          simulation restores the original route. No live hazards, shelter
-          availability or travel-time estimates are provided.
+          The frozen dataset contains{' '}
+          {data
+            ? Object.keys(data.graph.nodes).length.toLocaleString()
+            : 'loading'}{' '}
+          nodes across Kochi–Ernakulam. Start a simulated flood after selecting
+          endpoints. Use the stage arrows to expand or reverse the urban
+          scenario; Reset simulation restores the original route. No live
+          hazards, shelter availability or travel-time estimates are provided.
         </p>
         <p>
           Remote street tiles are optional. Local roads and routing remain

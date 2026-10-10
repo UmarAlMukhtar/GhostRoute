@@ -47,10 +47,12 @@ test('coverage, offline defaults, keyboard routes, swapping and clearing', async
     path: info.outputPath('popular-places.png'),
     fullPage: true,
   });
+  await page.waitForTimeout(220);
   await start.press('ArrowDown');
   await start.press('Enter');
   await expect(start).toHaveValue('Marine Drive');
-  await end.fill('M G Road');
+  await end.fill('MG Road — Jos Junction');
+  await page.waitForTimeout(220);
   await end.press('ArrowDown');
   await end.press('Enter');
   await expect(end).toHaveValue('MG Road — Jos Junction');
@@ -99,7 +101,7 @@ test('coverage, offline defaults, keyboard routes, swapping and clearing', async
   await start.press('Enter');
   await expect(start).toHaveValue('High Court Junction');
   await start.fill('unfinished query');
-  await page.getByRole('button', { name: 'Reset', exact: true }).click();
+  await page.getByRole('button', { name: 'Reset route', exact: true }).click();
   await expect(start).toHaveValue('');
   await expect(end).toHaveValue('');
   expect(geocoding).toEqual([]);
@@ -108,14 +110,20 @@ test('coverage, offline defaults, keyboard routes, swapping and clearing', async
 test('mouse and touch suggestions fit the sheet and remain usable during simulation', async ({
   page,
 }, info) => {
+  await page.goto('/demo');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
-  await page.getByRole('button', { name: 'Demo', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Demo scenarios', exact: true })
+    .click();
   await page
     .getByRole('button', { name: 'Start simulation', exact: true })
     .click();
-  await page.getByRole('button', { name: 'Navigate', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Close side panel', exact: true })
+    .click();
   const input = page.getByRole('combobox', {
     name: 'Starting point',
     exact: true,
@@ -158,7 +166,7 @@ test('mouse and touch suggestions fit the sheet and remain usable during simulat
   await expect(page.getByTestId('map')).toHaveAttribute('data-hazards', 'true');
   await page
     .getByRole('combobox', { name: 'Destination', exact: true })
-    .fill('South');
+    .fill('Ernakulam South Railway Station');
   await expect(
     page.getByRole('option', { name: /Ernakulam South Railway Station/ }),
   ).toBeVisible();

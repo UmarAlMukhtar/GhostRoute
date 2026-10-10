@@ -1,5 +1,9 @@
 # AI usage record
 
+## Navigation, themes and local report management — 2026-10-11T01:06:18+05:30
+
+Implemented separate left navigation/right workflows, `/demo`, persisted Light/Dark/System and confirmed local report deletion. Corrected actual browser drawer overlap, off-screen map overflow and dark contrast; preserve independent navigation/simulation reset. Validation: 174 unit tests, all 21 final desktop browser cases, lint/types/build/format and deterministic data regeneration passed. Final mobile suite/evidence is still running. Human review pending; no push or deployment.
+
 ## Expansion assistance — 2026-10-11T00:48:58+05:30
 
 Codex inspected organizer/project rules and existing geographic/routing/map/report systems, acquired and merged public OSM data after Overpass failures, preserved real geometry/access and Hospital Road, implemented a broad offline index, snapping optimization, separate workflows, themes and local deletion, and updated tests/docs. Unit failures identified changed connectivity, quadratic oracle cost and snap eligibility fallback; these were corrected and 174 tests passed. Production build passed after clearing failed generated compiler cache. Browser/visual verification remains in progress. Human review pending; no roads, participant credentials, reports or deployment evidence fabricated. No external resource, push or deployment created.

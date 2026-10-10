@@ -1741,3 +1741,339 @@ svg {
     font-size: 16px;
   }
 }
+
+/* Navigation and simulation stay independently available on desktop. */
+.side-panel {
+  position: absolute;
+  right: 20px;
+  top: 24px;
+  width: 320px;
+  max-height: calc(100% - 48px);
+  overflow: auto;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface);
+  box-shadow: 0 6px 30px #23362d12;
+  z-index: 2;
+}
+.side-panel .dialog-header {
+  margin-bottom: 16px;
+}
+.side-panel .dialog-header h2 {
+  font-size: 18px;
+  margin: 0;
+}
+.side-panel .explore-controls > h2 {
+  display: none;
+}
+.theme-control select {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.topbar .header-actions {
+  gap: 10px;
+}
+.header-actions .primary,
+.header-actions .secondary {
+  width: auto;
+  padding: 9px 12px;
+  margin: 0;
+}
+.header-actions .demo-status {
+  display: none;
+}
+.demo-entry {
+  text-decoration: none;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ink: #e3eef3;
+  --muted: #a3b5bf;
+  --blue: #91b9ff;
+  --line: #364954;
+  --surface: #172831;
+}
+[data-theme='dark'] body {
+  background: #102028;
+}
+[data-theme='dark']
+  :is(
+    .topbar,
+    .route-panel,
+    .side-panel,
+    .statusbar,
+    .help-dialog,
+    .place-dropdown,
+    .map-legend,
+    .coverage-label,
+    .map-instruction,
+    .map-tools button,
+    .maplibregl-ctrl,
+    .demo-area-map-label
+  ) {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+[data-theme='dark']
+  :is(
+    input,
+    textarea,
+    select,
+    .secondary,
+    .search-input-row,
+    .endpoint,
+    .route-result,
+    .empty-route,
+    .notice,
+    .panel-note,
+    .hazard-list li,
+    .hazard-editor,
+    .coordinate-entry,
+    .place-option,
+    .demo-guide,
+    .simulation-panel,
+    .stage-controls,
+    .report-filters,
+    .impact-summary,
+    .demo-preset
+  ) {
+  background: #1e3540;
+  color: var(--ink);
+  border-color: var(--line);
+}
+[data-theme='dark']
+  :is(
+    .place-option:hover,
+    .place-option[aria-selected='true'],
+    .hazard-types button[aria-pressed='true']
+  ) {
+  background: #294e60;
+  color: #f2f7fa;
+}
+[data-theme='dark']
+  :is(
+    .selection-hint,
+    .search-hint,
+    .search-scope,
+    .panel-heading p,
+    .route-detail,
+    .route-endpoints,
+    .snap-note,
+    .panel-note p,
+    .eyebrow,
+    .result-header,
+    .profile,
+    .coverage-label p,
+    .panel-bottom,
+    .report-filters label,
+    .suggestion-heading
+  ) {
+  color: var(--muted);
+}
+[data-theme='dark'] .primary {
+  background: #245eea;
+  color: white;
+}
+[data-theme='dark'] .availability {
+  color: #83e2a6;
+}
+[data-theme='dark'] .error,
+.place-unavailable {
+  color: #f9a5a5;
+}
+[data-theme='dark'] .brand-icon {
+  background: #d9e8ee;
+  color: #172831;
+}
+[data-theme='dark'] .hazard-types button {
+  background: #1e3540;
+  border-color: var(--line);
+  color: var(--ink);
+}
+[data-theme='dark'] .maplibregl-ctrl button .maplibregl-ctrl-icon {
+  filter: invert(1);
+}
+@media (max-width: 1050px) and (min-width: 760px) {
+  .side-panel {
+    width: 285px;
+    right: 12px;
+  }
+  .region {
+    display: none;
+  }
+}
+@media (max-width: 759px) {
+  .topbar {
+    height: 108px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    gap: 4px;
+    align-content: center;
+  }
+  .topbar .header-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 5px;
+  }
+  .header-actions .primary,
+  .header-actions .secondary {
+    font-size: 11px;
+    min-height: 36px;
+    padding: 5px 8px;
+  }
+  .theme-control select {
+    font-size: 11px;
+    padding: 5px;
+  }
+  .side-panel {
+    inset: auto 8px 8px;
+    width: auto;
+    max-height: 58%;
+    padding: 16px;
+    z-index: 5;
+  }
+  .side-panel.placing {
+    display: none;
+  }
+  .workspace:has(.side-panel) .route-panel {
+    visibility: hidden;
+  }
+  .map-instruction {
+    max-width: calc(100% - 28px);
+  }
+  .report-entry {
+    display: inline-flex;
+  }
+}
+[hidden] {
+  display: none !important;
+}
+.side-panel {
+  z-index: 4;
+}
+@media (max-width: 759px) {
+  .topbar .header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    gap: 4px;
+  }
+  .header-actions .demo-entry {
+    padding: 6px 8px;
+    font-size: 11px;
+    min-height: 36px;
+  }
+  .header-actions .help-button {
+    display: none;
+  }
+  .header-actions .secondary {
+    padding: 5px 6px;
+  }
+  .topbar {
+    height: 116px;
+  }
+}
+.side-panel .simulation-panel {
+  position: static;
+  width: auto;
+  max-height: none;
+  overflow: visible;
+  box-shadow: none;
+}
+.map-canvas {
+  overflow: hidden;
+}
+[data-theme='dark']
+  :is(
+    .endpoint-label,
+    .simulation-disclaimer,
+    .simulation-panel p,
+    .demo-guide p,
+    .simulation-heading,
+    .guide-heading,
+    .reset-demo,
+    .region,
+    .region-tag,
+    .coordinate-entry summary
+  ) {
+  color: #b7cbd4;
+}
+[data-theme='dark'] :is(.icon-button, .help-button, .stage-controls button) {
+  background: #294552;
+  color: #e2edf2;
+  border-color: var(--line);
+}
+[data-theme='dark'] .guide-summary {
+  background: #243e48;
+  color: #e2edf2;
+}
+[data-theme='dark'] .map-pin.destination {
+  color: #10232d;
+}
+[data-theme='dark'] :is(.endpoint label, .guide-reset) {
+  color: #b7cbd4;
+}
+[data-theme='dark'] .guide-metrics {
+  background: #243e48;
+  color: #e2edf2;
+}
+[data-theme='dark'] .guide-metrics span {
+  color: #b7cbd4;
+}
+[data-theme='dark'] .endpoint-letter {
+  background: #294552;
+  color: #e2edf2;
+}
+[data-theme='dark'] .endpoint-letter.destination {
+  background: #e2edf2;
+  color: #10232d;
+}
+[data-theme='dark'] .region-tag {
+  background: #294552;
+}
+[data-theme='dark'] :is(input, textarea)::placeholder {
+  color: #b7cbd4;
+  opacity: 1;
+}
+[data-theme='dark']
+  :is(
+    .selection-hint button,
+    .search-clear,
+    .coordinate-entry summary,
+    .help-dialog a,
+    .coverage-label a,
+    .statusbar a
+  ) {
+  color: #9fc8ff;
+}
+[data-theme='dark'] :is(.hazard-title, .hazard-editor button, .report-symbol) {
+  background: #294552;
+  color: #e2edf2;
+  border-color: var(--line);
+}
+[data-theme='dark']
+  :is(
+    .explore-controls p,
+    .impact-summary p,
+    .impact-summary dt,
+    .hazard-editor p,
+    .hazard-title small
+  ) {
+  color: #b7cbd4;
+}

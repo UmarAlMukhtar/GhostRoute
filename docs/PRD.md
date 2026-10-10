@@ -1,5 +1,13 @@
 # GhostRoute product requirements
 
+## Kochi expansion requirements — current implementation
+
+The primary experience is user-controlled walking navigation across Kochi–Ernakulam. Origin and destination use a real local OSM name index and coordinate input; both selections automatically recalculate routes. Popular defaults are suggestions only. Desktop navigation stays left, independent simulated disasters open right, Report Incident opens a dedicated reporting panel, and predefined scenarios live at `/demo`. Mobile uses a dismissible bottom drawer.
+
+Light, Dark and System preferences persist locally. Reports remain unverified browser-local observations; user-created local reports can be deleted after confirmation. No shared ownership/authentication or authoritative closure feed exists. The map boundary is the actual graph extent, not an assertion that every enclosed location is mapped or connected.
+
+49,740 nodes / 115,412 directed edges / 57,706 physical segments. Actual whole-way graph extent is `[76.2148797, 9.8510819, 76.4365348, 10.1499696]` (west, south, east, north). Search indexes 12,409 real OSM-derived names, including Edappally Market, Vyttila Mobility Hub, Kakkanad Water Metro, Fort Kochi landmarks, Aluva, localities and named roads. Broad cross-region routing and Hospital Road regression are required checks. Older MVP sections below describe the original baseline and historical prioritization.
+
 Status: interactive multi-hazard routing and explicitly browser-local unverified reporting extend the completed map/routing/flood demonstration; final deployment and human acceptance remain separate. See VERIFICATION for executed evidence.
 
 ## Executive summary

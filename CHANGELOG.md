@@ -1,5 +1,9 @@
 # Change log
 
+## Navigation, themes and local report management — 2026-10-11T01:06:18+05:30
+
+Implemented separate left navigation/right workflows, `/demo`, persisted Light/Dark/System and confirmed local report deletion. Corrected actual browser drawer overlap, off-screen map overflow and dark contrast; preserve independent navigation/simulation reset. Validation: 174 unit tests, all 21 final desktop browser cases, lint/types/build/format and deterministic data regeneration passed. Final mobile suite/evidence is still running. Human review pending; no push or deployment.
+
 ## Kochi geographic expansion and search — 2026-10-11T00:48:58+05:30
 
 - Changed: Acquired 44 bounded real OSM responses, merged source/provenance, preserved access/topology, retained full geometry with shape-node compaction, regenerated graph/roads/fixtures and a 12,409-name local index. Added snapping grid, directed index validation, debounce/ranking and coordinate search; updated data/architecture/README/ADR and regression tests.

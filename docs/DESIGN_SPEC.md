@@ -1,5 +1,13 @@
 # Product design specification
 
+## Revised navigation and themes
+
+The map remains the primary canvas. Desktop route planning stays left; the collapsible simulation panel opens right. The top bar provides a small Demo link, a Light/Dark/System selector, Simulation and Report Incident actions. The main route has no predefined scenario selector or routing mode. `/demo` provides Hospital Road, expanding flood, unavailable-route scenarios and the guide using the same engines. Mobile switches between the route sheet and the active right-panel bottom drawer; placement dismisses the drawer temporarily to expose the map.
+
+Search suggestions show name, locality and category with keyboard and touch selection, popular empty defaults and explicit no-result/coverage messages. Selection triggers routing automatically. Unverified report markers remain purple and cannot become confirmed closures. Report details offer deletion only for non-seed browser reports, with confirmation, cancellation, persistence errors, list/count refresh and success feedback.
+
+Theme preferences persist; System follows media changes. UI surfaces, inputs, reports, dialogs, drawers and MapLibre overlays use readable dark palettes. Dark maps use local road geometry instead of filtered/inverted imagery. Attribution and the simulation safety notice remain visible in both themes. Final visual findings belong in VERIFICATION.
+
 Status: MAP-02 and SIM-01/INT-01 implemented; actual simulation behavior is documented in FLOOD_SIMULATION.md.
 
 ## Principles and composition

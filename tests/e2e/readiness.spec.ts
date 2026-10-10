@@ -9,9 +9,14 @@ test('guided presentation uses real routes and one-click reset', async ({
 }, info) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
-  await page.getByRole('button', { name: 'Demo Mode', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Demo scenarios', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Start guided demo', exact: true })
+    .click();
   const guide = page.getByRole('region', { name: 'Guided demo' });
   for (let step = 0; step < demoSteps.length; step++) {
     await expect(guide.getByRole('heading')).toHaveText(demoSteps[step].title);
@@ -27,7 +32,7 @@ test('guided presentation uses real routes and one-click reset', async ({
         .getByRole('button', { name: 'Reset demo', exact: true })
         .boundingBox();
       const panelBox = await page
-        .getByRole('complementary', { name: 'Routing controls' })
+        .getByRole('complementary', { name: 'Simulation panel' })
         .boundingBox();
       expect(resetBox!.y + resetBox!.height).toBeLessThanOrEqual(
         panelBox!.y + panelBox!.height,
@@ -69,7 +74,7 @@ test('guided presentation uses real routes and one-click reset', async ({
 test('keyboard walkthrough, manual handoff and reduced motion', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
   await page.keyboard.press('Tab');
   await expect(
@@ -77,7 +82,13 @@ test('keyboard walkthrough, manual handoff and reduced motion', async ({
   ).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.locator('#route-controls')).toBeFocused();
-  const entry = page.getByRole('button', { name: 'Demo Mode', exact: true });
+  await page
+    .getByRole('button', { name: 'Demo scenarios', exact: true })
+    .click();
+  const entry = page.getByRole('button', {
+    name: 'Start guided demo',
+    exact: true,
+  });
   await entry.focus();
   await page.keyboard.press('Enter');
   const next = page.getByRole('button', {
@@ -105,11 +116,13 @@ test('keyboard walkthrough, manual handoff and reduced motion', async ({
 test('rapid switching, repeated reset, viewport resize and refresh', async ({
   page,
 }, info) => {
-  await page.goto('/');
+  await page.goto('/demo');
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
-  await page.getByRole('button', { name: 'Demo', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Demo scenarios', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Start simulation' }).click();
   const start = Date.now();
   for (let i = 0; i < 10; i++) {
@@ -126,7 +139,9 @@ test('rapid switching, repeated reset, viewport resize and refresh', async ({
       .getByRole('button', { name: 'Reset simulation', exact: true })
       .click();
     await expect(page.getByTestId('route-distance')).toContainText('944.3 m');
-    await page.getByRole('button', { name: 'Demo', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Demo scenarios', exact: true })
+      .click();
     await page.getByRole('button', { name: 'Start simulation' }).click();
   }
   console.log(
@@ -153,7 +168,9 @@ test('rapid switching, repeated reset, viewport resize and refresh', async ({
   await page.reload();
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
   await expect(page.getByTestId('route-distance')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Demo', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Demo scenarios', exact: true })
+    .click();
   await expect(
     page.getByRole('button', { name: 'Start simulation' }),
   ).toBeDisabled();
@@ -170,12 +187,12 @@ test('slow local assets recover and production worker assets are served', async 
     await hold;
     await r.continue();
   });
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(
     page.getByText('Loading and validating local roads…'),
   ).toBeVisible();
   await expect(
-    page.getByRole('button', { name: 'Demo Mode', exact: true }),
+    page.getByRole('button', { name: 'Demo scenarios', exact: true }),
   ).toBeDisabled();
   release();
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
@@ -192,7 +209,12 @@ test('slow local assets recover and production worker assets are served', async 
     expect(response.status()).toBe(200);
     expect(response.headers()['content-type']).not.toContain('text/html');
   }
-  await page.getByRole('button', { name: 'Demo Mode', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Demo scenarios', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Start guided demo', exact: true })
+    .click();
   await page
     .getByRole('button', { name: 'Load Hospital Road route', exact: true })
     .click();

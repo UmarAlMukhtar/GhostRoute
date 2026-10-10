@@ -196,6 +196,7 @@ export function ReportControls({
   select,
   error,
   ready,
+  onDelete,
 }: {
   reports: IncidentReport[];
   coordinate: GeoPoint | null;
@@ -212,12 +213,15 @@ export function ReportControls({
   select: (id: string) => void;
   error: string;
   ready: boolean;
+  onDelete: (id: string) => boolean;
 }) {
   const [type, setType] = useState<IncidentReport['type']>('Flooded road');
   const [severity, setSeverity] =
     useState<IncidentReport['severity']>('Unspecified');
   const [description, setDescription] = useState('');
-  const [form, setForm] = useState(false);
+  const [form, setForm] = useState(true);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState('');
   return (
     <section className="explore-controls" aria-label="Incident reports">
       <h2>Community reports</h2>
@@ -230,7 +234,7 @@ export function ReportControls({
         disabled={!ready}
         onClick={() => setForm(!form)}
       >
-        {form ? 'Close report form' : 'Report Incident'}
+        {form ? 'Close report form' : 'New report'}
       </button>
       {form && (
         <form
@@ -239,6 +243,9 @@ export function ReportControls({
             if (onSubmit(type, description, severity)) {
               setDescription('');
               setForm(false);
+              setFeedback(
+                'Report saved in this browser. It remains unverified.',
+              );
             }
           }}
         >
@@ -335,7 +342,43 @@ export function ReportControls({
           </label>
         ))}
       </div>
+      {feedback && (
+        <p role="status" className="notice">
+          {feedback}
+        </p>
+      )}
       <p role="status">{reports.length} visible local reports</p>
+      {!reports.length && (
+        <p>No reports match these filters. Reports you submit appear here.</p>
+      )}
+      {confirmDelete && (
+        <div
+          className="notice"
+          role="alertdialog"
+          aria-label="Confirm report deletion"
+        >
+          <p>Delete this local report permanently?</p>
+          <div className="control-row">
+            <button
+              className="secondary"
+              onClick={() => setConfirmDelete(null)}
+            >
+              Cancel deletion
+            </button>
+            <button
+              className="primary"
+              onClick={() => {
+                if (onDelete(confirmDelete)) {
+                  setConfirmDelete(null);
+                  setFeedback('Local report deleted.');
+                }
+              }}
+            >
+              Confirm deletion
+            </button>
+          </div>
+        </div>
+      )}
       <ul className="hazard-list">
         {reports.map((report) => (
           <li
@@ -372,6 +415,17 @@ export function ReportControls({
                     ? `Associated road: ${report.segmentId}`
                     : 'No associated road'}
                 </p>
+                {!report.seeded && (
+                  <button
+                    className="secondary"
+                    onClick={() => {
+                      setConfirmDelete(report.id);
+                      setFeedback('');
+                    }}
+                  >
+                    Delete report
+                  </button>
+                )}
               </div>
             )}
           </li>

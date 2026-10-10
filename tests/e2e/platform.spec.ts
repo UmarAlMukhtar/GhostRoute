@@ -48,7 +48,7 @@ async function clickCoordinate(page: Page, coordinate: [number, number]) {
 }
 test.beforeEach(async ({ page }) => {
   await page.route('https://tile.openstreetmap.org/**', (r) => r.abort());
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
 });
 test('custom multi-hazard routing and separate persistent local report', async ({
@@ -75,7 +75,7 @@ test('custom multi-hazard routing and separate persistent local report', async (
     .getByRole('button', { name: 'Set coordinate', exact: true })
     .click();
   await expect(page.getByTestId('route-distance')).toContainText('944.3 m');
-  await page.getByRole('button', { name: 'Simulate', exact: true }).click();
+  await page.getByRole('button', { name: 'Simulation', exact: true }).click();
   await page.getByLabel('New hazard radius').fill('20');
   await page
     .getByRole('button', { name: 'Place flood on map', exact: true })
@@ -137,7 +137,6 @@ test('custom multi-hazard routing and separate persistent local report', async (
     path: info.outputPath('multi-hazard.png'),
     fullPage: true,
   });
-  await page.getByRole('button', { name: 'Reports', exact: true }).click();
   await page
     .getByRole('button', { name: 'Report Incident', exact: true })
     .click();
@@ -175,21 +174,16 @@ test('custom multi-hazard routing and separate persistent local report', async (
     .selectOption('Verified');
   await expect(page.getByText('0 visible local reports')).toBeVisible();
   await page.getByLabel('Filter status', { exact: true }).selectOption('');
-  await page
-    .getByLabel('Routing mode', { exact: true })
-    .selectOption('incidents');
-  await expect(page.getByTestId('custom-blocked')).toHaveText('0');
-  await page
-    .getByLabel('Explore unverified reports as hypothetical road closures')
-    .check();
-  await expect(page.getByTestId('custom-blocked')).toHaveText('1');
-  await page.getByRole('button', { name: 'Simulate', exact: true }).click();
+  await expect(page.getByLabel('Routing mode')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Simulation', exact: true }).click();
   await page
     .getByRole('button', { name: 'Clear simulated hazards', exact: true })
     .click();
   await expect(page.getByTestId('custom-blocked')).toHaveText('0');
   await page.reload();
-  await page.getByRole('button', { name: 'Reports', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Report Incident', exact: true })
+    .click();
   await page.getByRole('button', { name: '! Flooded road Unverified' }).click();
   await expect(
     page.getByText('Observed obstruction; browser demonstration report.'),

@@ -97,7 +97,7 @@ export default function MapView({
             },
             attributionControl: false,
             maxZoom: 19,
-            minZoom: 11,
+            minZoom: 9,
             renderWorldCopies: false,
             dragRotate: false,
             pitchWithRotate: false,
@@ -234,6 +234,61 @@ export default function MapView({
       mapRef.current = null;
     };
   }, [data]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    function applyTheme() {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      if (container.current)
+        container.current.dataset.theme = dark ? 'dark' : 'light';
+      map!.setPaintProperty(
+        'background',
+        'background-color',
+        dark ? '#102028' : '#edf1ef',
+      );
+      map!.setPaintProperty(
+        'road-casing',
+        'line-color',
+        dark ? '#355363' : '#c3cecb',
+      );
+      map!.setPaintProperty(
+        'roads',
+        'line-color',
+        dark ? '#668a99' : '#ffffff',
+      );
+      map!.setPaintProperty(
+        'route',
+        'line-color',
+        dark ? '#78aaff' : '#2563eb',
+      );
+      map!.setPaintProperty(
+        'alternative',
+        'line-color',
+        dark ? '#71de9c' : '#15803d',
+      );
+      map!.setPaintProperty(
+        'blockedRoads',
+        'line-color',
+        dark ? '#ff7474' : '#dc2626',
+      );
+      for (const layer of ['route-casing', 'alternative-casing'])
+        map!.setPaintProperty(layer, 'line-color', dark ? '#102028' : '#fff');
+      if (map!.getLayer('basemap'))
+        map!.setLayoutProperty(
+          'basemap',
+          'visibility',
+          dark ? 'none' : 'visible',
+        );
+    }
+    applyTheme();
+    const observer = new MutationObserver(applyTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    return () => observer.disconnect();
+  }, [ready]);
 
   useEffect(() => {
     const map = mapRef.current;

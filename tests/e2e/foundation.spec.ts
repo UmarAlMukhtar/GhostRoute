@@ -23,7 +23,7 @@ test('real map, Hospital Road route, reset and responsive controls', async ({
 }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(
     page.getByRole('heading', { name: 'GhostRoute.' }),
   ).toBeVisible();
@@ -82,7 +82,7 @@ test('real map, Hospital Road route, reset and responsive controls', async ({
     });
     await sheet.click();
   }
-  await page.getByRole('button', { name: 'Reset', exact: true }).click();
+  await page.getByRole('button', { name: 'Reset route', exact: true }).click();
   await expect(page.getByTestId('route-distance')).toHaveCount(0);
   await expect(
     page.getByRole('img', { name: 'origin marker', exact: true }),
@@ -100,7 +100,7 @@ test('real map, Hospital Road route, reset and responsive controls', async ({
 test('named selections and real map clicks snap endpoints', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
   await chooseDemoEndpoint(page, 'origin', fixture.origin.nodeId);
   await chooseDemoEndpoint(page, 'destination', fixture.destination.nodeId);
@@ -148,7 +148,7 @@ test('disconnected real node yields no route', async ({ page }) => {
       },
     }),
   );
-  await page.goto('/');
+  await page.goto('/demo');
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
@@ -165,7 +165,7 @@ test('invalid dataset is actionable and retries successfully', async ({
   await page.route('**/graph.json', (route) =>
     route.fulfill({ json: { version: 'broken' } }),
   );
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(
     page
       .getByRole('alert')
@@ -179,7 +179,7 @@ test('invalid dataset is actionable and retries successfully', async ({
 });
 
 test('out-of-range map click reports snapping failure', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
   await page
     .getByRole('button', { name: 'Select origin on map', exact: true })
@@ -219,7 +219,7 @@ test('WebGL unavailable keeps named routing usable', async ({ page }) => {
       return original.apply(this, args);
     } as typeof original;
   });
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(
     page.getByRole('alert').filter({ hasText: 'WebGL map unavailable' }),
   ).toBeVisible();
@@ -233,7 +233,7 @@ test('WebGL unavailable keeps named routing usable', async ({ page }) => {
 test('identical endpoints show zero distance without a line', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/demo');
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
   await chooseDemoEndpoint(page, 'origin', fixture.origin.nodeId);
   await chooseDemoEndpoint(page, 'destination', fixture.origin.nodeId);
@@ -265,7 +265,7 @@ test('identical endpoints show zero distance without a line', async ({
 test('viewport changes preserve visible route and narrow reflow', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/demo');
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
