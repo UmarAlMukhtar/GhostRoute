@@ -134,6 +134,7 @@ export default function MapView({
                 'hazards',
                 'blockedRoads',
                 'alternative',
+                'shelters',
                 'reports',
                 'demo-boundary',
               ])
@@ -311,7 +312,12 @@ export default function MapView({
           : EMPTY,
       )
       .catch(handleError);
-    for (const id of ['hazards', 'blockedRoads', 'alternative'] as const) {
+    for (const id of [
+      'hazards',
+      'blockedRoads',
+      'alternative',
+      'shelters',
+    ] as const) {
       (map.getSource(id) as GeoJSONSource)
         .setData(overlays?.[id] ?? EMPTY)
         .catch(handleError);
@@ -335,6 +341,8 @@ export default function MapView({
             ? f.geometry.coordinates.flat()
             : f.geometry.coordinates.flat(2),
         ) ?? []),
+        ...(overlays?.shelters?.features.map((f) => f.geometry.coordinates) ??
+          []),
       ];
       if (coordinates?.length) {
         const xs = coordinates.map((p) => p[0]),

@@ -1,5 +1,12 @@
 # Change log
 
+## Simulated evacuation fallback — 2026-10-11T03:14:23+05:30
+
+- Changed: when a simulated disaster leaves the selected destination unreachable, the navigation panel now displays and maps reachable illustrative relief points, ranks them by the same closure-aware walking route, and lets the user replace the destination with a selected point. Added a deterministic unit test and a MapLibre shelter-marker layer.
+- Why: complete the route-to-safety flow without claiming that an actual camp is open, safe, or has the stated facilities.
+- Checks: TypeScript, ESLint, production build, the new shelter-ranking test and the MapLibre style regression test passed. The full format check reports pre-existing formatting differences throughout the repository. An earlier unfiltered Vitest attempt also exposed an existing dataset reproducibility failure; focused tests passed after correcting the invocation. Human browser review remains pending.
+- Limits: relief-point names, capacity and facilities are synthetic demonstration data. The feature has no live shelter feed, verification, booking, accessibility certification, or emergency-service integration.
+
 ## GitHub preview evidence — 2026-10-11T02:07:25+05:30
 
 Recorded the actual Ready Vercel preview, successful commit status and bot comment for documentation PR #8 in DEPLOYMENT/VERIFICATION. Checked links and whitespace; external-fork authorization remains unverified. Codex assistance, human review pending.
