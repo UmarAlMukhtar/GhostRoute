@@ -6,6 +6,7 @@ import type {
 } from 'geojson';
 import type { StyleSpecification } from 'maplibre-gl';
 import type { RoadGeoJSON } from '../geo/types';
+import { coverageGeometry } from './coverage';
 export const EMPTY: FeatureCollection = {
   type: 'FeatureCollection',
   features: [],
@@ -15,10 +16,16 @@ export interface MapOverlays {
   blockedRoads?: FeatureCollection<LineString>;
   alternative?: FeatureCollection<LineString>;
 }
-export function localStyle(roads: RoadGeoJSON): StyleSpecification {
+export function localStyle(
+  roads: RoadGeoJSON,
+  bounds: readonly number[],
+): StyleSpecification {
+  const coverage = coverageGeometry(bounds);
   return {
     version: 8,
     sources: {
+      'demo-area': { type: 'geojson', data: coverage.area },
+      'demo-boundary': { type: 'geojson', data: coverage.outline },
       roads: { type: 'geojson', data: roads },
       reports: { type: 'geojson', data: EMPTY },
       route: { type: 'geojson', data: EMPTY },
@@ -31,6 +38,12 @@ export function localStyle(roads: RoadGeoJSON): StyleSpecification {
         id: 'background',
         type: 'background',
         paint: { 'background-color': '#edf1ef' },
+      },
+      {
+        id: 'demo-area',
+        type: 'fill',
+        source: 'demo-area',
+        paint: { 'fill-color': '#0f766e', 'fill-opacity': 0.045 },
       },
       {
         id: 'hazards',
@@ -96,6 +109,17 @@ export function localStyle(roads: RoadGeoJSON): StyleSpecification {
             19,
             10,
           ],
+        },
+      },
+      {
+        id: 'demo-boundary',
+        type: 'line',
+        source: 'demo-boundary',
+        paint: {
+          'line-color': '#0f766e',
+          'line-width': 2.5,
+          'line-dasharray': [4, 3],
+          'line-opacity': 0.9,
         },
       },
       {

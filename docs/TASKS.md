@@ -255,7 +255,13 @@ Remaining release tasks, in order: human keyboard/200%-zoom/target-device access
 - HAZ-01: user-created flood/landslide/fire circles and direct roadblocks, multiple editable enabled/disabled hazards, immutable shared impact/rerouting — implemented.
 - REPORT-01: validated unverified report form, separate purple markers/list, filters, browser-local persistence and explicit exploratory routing — implemented local adapter only.
 - REPORT-02 (P1, open): approved shared Supabase backend, RLS/server endpoints, abuse controls and audited verification/expiry policy. No remote resources created.
-- NAV-03 (P1, open): provider-compliant address search; no fake search UI.
+- NAV-03 (P1, implemented): offline verified popular-place search; live provider-based address search remains deferred.
 - REPORT-03 (P2, open): photos and moderator UI after policy/storage work.
 
 Dependencies/acceptance and stop conditions: [PLATFORM](PLATFORM.md). No verified/shared reporting is complete.
+
+## Coverage and search milestone — implemented
+
+- **MAP-03 — Visible dataset extent:** exact graph bounds, dashed teal GeoJSON line/subtle fill, label/legend and View Demo Area control. Kept below route/closure visualization.
+- **NAV-03 — Offline popular-place search:** seven OSM-evidenced, graph-validated locations; names/aliases/category/locality filtering, keyboard/mouse/touch selection, individual clear, swap, reset, camera feedback and automatic real routing. Existing arbitrary map/coordinate input and demo shortcuts retained. Live address geocoding remains deferred pending an appropriate provider; this is a finite local catalog.
+- **QA-04 — Search/coverage regressions:** real-data catalog/pair validation and desktop/mobile journeys, including active flood search and existing platform/report regressions. Actual results are recorded in VERIFICATION.

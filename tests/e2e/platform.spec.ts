@@ -1,3 +1,4 @@
+import { chooseDemoEndpoint } from './helpers';
 import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { validateGraph } from '../../src/lib/geo/validate';
@@ -207,19 +208,17 @@ test('swap, marker drag, current location and out-of-region coordinates', async 
   await context.grantPermissions(['geolocation']);
   await context.setGeolocation({ latitude: origin[1], longitude: origin[0] });
   await page.getByRole('button', { name: 'Use my location' }).click();
-  await expect(page.getByLabel('Starting point', { exact: true })).toHaveValue(
-    '271145615',
-  );
-  await page
-    .getByLabel('Destination', { exact: true })
-    .selectOption('1906667447');
+  await expect(
+    page.getByLabel('Demo starting point', { exact: true }),
+  ).toHaveValue('271145615');
+  await chooseDemoEndpoint(page, 'destination', '1906667447');
   await page.getByRole('button', { name: 'Swap endpoints' }).click();
-  await expect(page.getByLabel('Starting point', { exact: true })).toHaveValue(
-    '1906667447',
-  );
-  await expect(page.getByLabel('Destination', { exact: true })).toHaveValue(
-    '271145615',
-  );
+  await expect(
+    page.getByLabel('Demo starting point', { exact: true }),
+  ).toHaveValue('1906667447');
+  await expect(
+    page.getByLabel('Demo destination', { exact: true }),
+  ).toHaveValue('271145615');
   if (infoMobile(page))
     await page
       .getByRole('button', { name: /Route available/ })

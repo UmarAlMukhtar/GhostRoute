@@ -421,3 +421,27 @@ Physical device GPS, Safari/Firefox, screen readers, live tiles and hosted deplo
 ### File inventory
 
 New: `ExploreControls.tsx`, `simulation/hazards.ts`, `incidents/reports.ts`, `platform.test.ts`, `platform.spec.ts`, `benchmark-platform.ts`, `docs/PLATFORM.md`, ADR-010 and four screenshots. Extended: Dashboard, MapView, map style/selection, DisasterZone kind contract and the existing flood impact engine; prior map/browser tests; README, PRD, architecture, roadmap, design, tasks, testing, deployment, verification, ADR index and required AI/changelog records. No dependencies were added.
+
+## Dataset extent and offline place search — 2026-10-11T00:26:02+05:30
+
+Scope: existing `codex-foundation` at `43b2d03`, initially clean. Added a dashed teal extent/fit control and seven OSM-sourced popular places to the existing map/selection flow. Graph bounds remain `[76.2732579, 9.9638296, 76.2936855, 9.9897189]`; the rectangle does not guarantee connectivity. Place coordinates/source versions are preserved in `data/places`; offsets range from 0 to 42.358 m. All 49 ordered pairs route through the unchanged real Dijkstra engine. A disconnected Broadway candidate was rejected rather than relocated.
+
+Executed locally with Node 22.23.1 and pnpm 11.25.0:
+
+| Check                               | Result                                                                                                                                          |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm lint`                         | Passed                                                                                                                                          |
+| `pnpm typecheck`                    | Passed                                                                                                                                          |
+| `pnpm test`                         | 169 passed, 13 files                                                                                                                            |
+| `pnpm build`                        | Production Next.js build passed; also rebuilt by browser command                                                                                |
+| `pnpm test:e2e`                     | 36 passed: 18 desktop + 18 mobile Chromium journeys                                                                                             |
+| `pnpm format` / `pnpm format:check` | Executed; formatting passed                                                                                                                     |
+| `pnpm places:verify`                | Seven catalog entries validated against exact current graph                                                                                     |
+| `pnpm data:prepare`                 | Passed; tracked frozen/runtime geographic files unchanged                                                                                       |
+| Preservation / whitespace           | Organizer instructions, workflows, README organizer prefix, routing/simulation/report engines and lockfile unchanged; `git diff --check` passed |
+
+Actual production browser screenshots inspected at 1440×900 and 360×800: [desktop search](screenshots/search-desktop.png), [mobile search](screenshots/search-mobile.png), [desktop extent + real route](screenshots/coverage-desktop.png), [mobile extent + real route](screenshots/coverage-mobile.png). Tile requests were deliberately aborted; the local road fallback, label, dashed boundary and route remained visible. Keyboard arrows/Enter, mouse selection, touch selection, clear/swap/reset and active-flood search were exercised. Existing arbitrary selection, simulations, unreachable scenarios, report persistence, refresh and reduced-motion journeys passed. Search journeys recorded no browser page errors and no geocoder requests.
+
+Browser feedback fixed a hyphenated DOM dataset attribute error, mobile blur resizing before Reset clicks, draft text surviving reset, and scale-control stacking above the expanded search sheet. Default dropdowns scroll into the sheet's visible area. Tests scope suggestion counts to their listbox rather than unrelated native selects.
+
+Limits: finite seven-place catalog, no general/live address geocoder, no on-the-ground entrance/access verification. Nearest-node snapping is not an accessible approach guarantee; reports remain local/unverified. Physical mobile keyboards, Safari/Firefox, live tile availability, hosted deployment and human accessibility review were not verified. No push, deployment, external project creation or remote settings changes.

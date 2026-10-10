@@ -20,7 +20,8 @@
     "format:check": "prettier --check .",
     "data:acquire": "node --experimental-strip-types scripts/acquire-roads.ts",
     "data:prepare": "node --experimental-strip-types scripts/prepare-roads.ts",
-    "routes:benchmark": "node --experimental-strip-types scripts/benchmark-routing.ts"
+    "routes:benchmark": "node --experimental-strip-types scripts/benchmark-routing.ts",
+    "places:verify": "node --experimental-strip-types scripts/verify-places.ts"
   },
   "dependencies": {
     "@turf/boolean-intersects": "7.4.0",

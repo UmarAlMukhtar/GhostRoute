@@ -11,6 +11,7 @@ import { EMPTY, localStyle, type MapOverlays } from '../lib/map/style';
 interface Props {
   data: MapData;
   overview?: boolean;
+  focusPlace?: { coordinate: GeoPoint; sequence: number };
   origin: Selection | null;
   destination: Selection | null;
   result: RouteResult | null;
@@ -40,6 +41,7 @@ function padding(sheetOpen: boolean) {
 export default function MapView({
   data,
   overview,
+  focusPlace,
   origin,
   destination,
   result,
@@ -73,6 +75,7 @@ export default function MapView({
       .then(
         ({
           Map,
+          Marker,
           NavigationControl,
           ScaleControl,
           setWorkerUrl,
@@ -84,7 +87,7 @@ export default function MapView({
           );
           instance = new Map({
             container: container.current,
-            style: localStyle(data.roads),
+            style: localStyle(data.roads, data.bounds),
             bounds: data.bounds,
             fitBoundsOptions: {
               padding: padding(
@@ -102,6 +105,19 @@ export default function MapView({
           });
           const map = instance;
           mapRef.current = map;
+          const label = document.createElement('div');
+          label.className = 'demo-area-map-label';
+          label.textContent = 'GhostRoute Demo Area — Ernakulam';
+          label.title =
+            'Dataset extent only. Roads inside may be disconnected or unmapped.';
+          const areaLabel = new Marker({
+            element: label,
+            anchor: 'top',
+            offset: [0, 8],
+          })
+            .setLngLat([(data.bounds[0] + data.bounds[2]) / 2, data.bounds[3]])
+            .addTo(map);
+          map.once('remove', () => areaLabel.remove());
           map.touchZoomRotate.disableRotation();
           map.addControl(
             new NavigationControl({ showCompass: false }),
@@ -118,8 +134,11 @@ export default function MapView({
                 'blockedRoads',
                 'alternative',
                 'reports',
+                'demo-boundary',
               ])
-                container.current.dataset[layer] = String(
+                container.current.dataset[
+                  layer === 'demo-boundary' ? 'demoBoundary' : layer
+                ] = String(
                   map.queryRenderedFeatures({ layers: [layer] }).length > 0,
                 );
               container.current.dataset.routeVisible = String(
@@ -183,7 +202,7 @@ export default function MapView({
                 source: 'basemap',
                 paint: { 'raster-saturation': -0.7, 'raster-opacity': 0.65 },
               },
-              'hazards',
+              'demo-area',
             );
             timeout = setTimeout(fallback, 12000);
           });
@@ -349,6 +368,26 @@ export default function MapView({
       markers.forEach((marker) => marker.remove());
     };
   }, [ready, origin, destination]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (
+      !ready ||
+      !map ||
+      !focusPlace ||
+      (origin && destination) ||
+      ![origin, destination].some(
+        (selection) => selection?.coordinate === focusPlace.coordinate,
+      )
+    )
+      return;
+    map.fitBounds([focusPlace.coordinate, focusPlace.coordinate], {
+      padding: padding(sheetOpen),
+      maxZoom: 16,
+      duration: matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 0
+        : 400,
+    });
+  }, [ready, focusPlace, origin, destination, sheetOpen]);
   function fitCoverage() {
     mapRef.current?.fitBounds(data.bounds, {
       padding: padding(sheetOpen),
@@ -365,12 +404,13 @@ export default function MapView({
       />
       <div className="map-tools">
         <button
-          className="icon-button"
+          className="view-demo-area"
           onClick={fitCoverage}
           disabled={!ready}
-          aria-label="Fit road network"
+          aria-label="View Demo Area"
         >
           <Expand size={18} />
+          <span>View Demo Area</span>
         </button>
       </div>
       <div className="map-status" role="status">

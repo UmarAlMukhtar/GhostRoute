@@ -149,3 +149,13 @@ See [platform workflows, policies and cloud migration](docs/PLATFORM.md), [curre
 ![Interactive hazards and real rerouting](docs/screenshots/platform-desktop.png)
 
 [Mobile platform screenshot](docs/screenshots/platform-mobile.png) · [Local incident report screenshot](docs/screenshots/reports-desktop.png)
+
+### Offline place search and demo coverage
+
+**Starting point** and **Destination** now search a verified local catalog. Focus an empty field for seven popular Ernakulam places; type a name, locality or category, then use arrow keys/Enter or click/tap a result. Routes update automatically. Clear either field, swap endpoints, or use map selection/coordinates as before. **Demo endpoint shortcuts** retains the original fixture selectors.
+
+A dashed teal boundary marks the road dataset's geographic extent. **View Demo Area** fits that region; roads inside may be disconnected or unmapped. Search only offers reviewed points that can connect to the other endpoint, without silently relocating them to a farther node. Search works offline; it is not a general address geocoder. Snapping within 100 m is an approximation, not a verified accessible entrance.
+
+[Place sources, licensing and maintenance](data/places/README.md) · Validate with `pnpm places:verify`. Existing simulation and local incident-reporting workflows are unchanged.
+
+[Desktop coverage and route](docs/screenshots/coverage-desktop.png) · [Mobile search](docs/screenshots/search-mobile.png)

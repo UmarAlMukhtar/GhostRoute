@@ -1,3 +1,4 @@
+import { chooseDemoEndpoint } from './helpers';
 import { expect, test } from '@playwright/test';
 test.beforeEach(async ({ page }) => {
   await page.route('https://tile.openstreetmap.org/**', (route) =>
@@ -106,13 +107,9 @@ test('nested stages, endpoint changes, unavailable destination and replay', asyn
     path: info.outputPath('unavailable-flood.png'),
     fullPage: true,
   });
-  await page
-    .getByLabel('Destination', { exact: true })
-    .selectOption('271145615');
+  await chooseDemoEndpoint(page, 'destination', '271145615');
   await expect(page.getByTestId('updated-distance')).toHaveText('0.0 m');
-  await page
-    .getByLabel('Starting point', { exact: true })
-    .selectOption('1906667447');
+  await chooseDemoEndpoint(page, 'origin', '1906667447');
   await expect(page.getByTestId('simulation-availability')).toHaveText(
     'No available route',
   );

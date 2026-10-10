@@ -130,15 +130,17 @@ describe('selection and presentation', () => {
     expect(routeMessage(result)).toContain('No available route');
   });
   it('builds a tile-independent style with independent route and simulation layers', () => {
-    const style = localStyle(data.roads);
+    const style = localStyle(data.roads, data.bounds);
     expect(style.sources.roads.type).toBe('geojson');
     expect(style.sources).not.toHaveProperty('basemap');
     expect(style.layers.map((layer) => layer.id)).toEqual([
       'background',
+      'demo-area',
       'hazards',
       'hazard-boundary',
       'road-casing',
       'roads',
+      'demo-boundary',
       'route-casing',
       'route',
       'alternative-casing',

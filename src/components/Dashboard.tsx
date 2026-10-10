@@ -15,6 +15,9 @@ import {
   X,
 } from 'lucide-react';
 import MapView from './MapView';
+import PlaceSearch from './PlaceSearch';
+import gazetteer from '../../data/places/ernakulam.json';
+import { validatePlaces } from '../lib/map/places';
 import { HazardControls, ReportControls, hazardNames } from './ExploreControls';
 import {
   hazardInputs,
@@ -62,6 +65,24 @@ import type { GeoPoint } from '../lib/geo/types';
 export default function Dashboard() {
   const locationRequest = useRef(0);
   const [data, setData] = useState<MapData | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [searchReset, setSearchReset] = useState(0);
+  const [focusPlace, setFocusPlace] = useState<{
+    coordinate: GeoPoint;
+    sequence: number;
+  }>();
+  const catalog = useMemo(() => {
+    if (!data) return { places: [], error: '' };
+    try {
+      return { places: validatePlaces(gazetteer, data), error: '' };
+    } catch {
+      return {
+        places: [],
+        error:
+          'Local place catalog unavailable. Use map selection or demo endpoints.',
+      };
+    }
+  }, [data]);
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [state, dispatchSelection] = useReducer(
@@ -153,6 +174,7 @@ export default function Dashboard() {
     };
   }, [data, segments]);
   function changeTab(value: typeof tab) {
+    setSearching(false);
     setTab(value);
     setIntent(null);
     setSheetOpen(true);
@@ -260,6 +282,10 @@ export default function Dashboard() {
   }
   const panel = useRef<HTMLElement>(null);
   function dispatch(action: SelectionAction) {
+    if (action.type === 'reset') {
+      setSearchReset((value) => value + 1);
+      setSearching(false);
+    }
     if (action.type !== 'error') locationRequest.current++;
     setDemoStep(null);
     dispatchSelection(action);
@@ -278,8 +304,11 @@ export default function Dashboard() {
     setDemoStep(index);
     setSheetOpen(true);
     dispatchSimulation({ type: 'clear' });
-    if (index === 0) dispatchSelection({ type: 'reset' });
-    else {
+    if (index === 0) {
+      setSearchReset((value) => value + 1);
+      setSearching(false);
+      dispatchSelection({ type: 'reset' });
+    } else {
       dispatchSelection({ type: 'preset', places: data.places });
       dispatchSelection({
         type: 'result',
@@ -525,6 +554,7 @@ export default function Dashboard() {
           <MapView
             data={data}
             overview={demoStep === 0}
+            focusPlace={focusPlace}
             origin={state.origin}
             destination={state.destination}
             result={baseline}
@@ -566,7 +596,7 @@ export default function Dashboard() {
         </div>
         <aside
           ref={panel}
-          className={`route-panel ${sheetOpen ? 'expanded' : 'collapsed'}`}
+          className={`route-panel ${sheetOpen ? 'expanded' : 'collapsed'} ${searching ? 'searching' : ''}`}
           aria-label="Routing controls"
         >
           <button
@@ -704,45 +734,25 @@ export default function Dashboard() {
                         <span className={`endpoint-letter ${role}`}>
                           {index === 0 ? 'A' : 'B'}
                         </span>
-                        <div className="endpoint-input">
-                          <label htmlFor={role}>
-                            {role === 'origin'
-                              ? 'Starting point'
-                              : 'Destination'}
-                          </label>
-                          <select
-                            id={role}
-                            value={state[role]?.nodeId ?? ''}
-                            onChange={(e) => {
-                              const place = data.places.find(
-                                (p) => p.nodeId === e.target.value,
-                              );
-                              if (place)
-                                dispatch({
-                                  type: 'select',
-                                  role,
-                                  selection: place,
-                                });
-                            }}
-                          >
-                            <option value="" disabled>
-                              Choose a demo location
-                            </option>
-                            {state[role] &&
-                              !data.places.some(
-                                (p) => p.nodeId === state[role]?.nodeId,
-                              ) && (
-                                <option value={state[role]!.nodeId}>
-                                  {state[role]!.label}
-                                </option>
-                              )}
-                            {data.places.map((place) => (
-                              <option key={place.nodeId} value={place.nodeId}>
-                                {place.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                        <PlaceSearch
+                          key={searchReset}
+                          role={role}
+                          selection={state[role]}
+                          other={
+                            state[role === 'origin' ? 'destination' : 'origin']
+                          }
+                          data={data}
+                          places={catalog.places}
+                          error={catalog.error}
+                          onAction={dispatch}
+                          onOpen={setSearching}
+                          onFocusPlace={(coordinate) =>
+                            setFocusPlace((previous) => ({
+                              coordinate,
+                              sequence: (previous?.sequence ?? 0) + 1,
+                            }))
+                          }
+                        />
                         <button
                           className="pick-button"
                           aria-label={`Select ${role} on map`}
@@ -754,6 +764,52 @@ export default function Dashboard() {
                       </div>
                     ))}
                   </div>
+                  <details className="demo-endpoints coordinate-entry">
+                    <summary>Demo endpoint shortcuts</summary>
+                    {(['origin', 'destination'] as const).map((role) => (
+                      <label key={role}>
+                        {role === 'origin'
+                          ? 'Demo starting point'
+                          : 'Demo destination'}
+                        <select
+                          aria-label={
+                            role === 'origin'
+                              ? 'Demo starting point'
+                              : 'Demo destination'
+                          }
+                          value={state[role]?.nodeId ?? ''}
+                          onChange={(e) => {
+                            const place = data.places.find(
+                              (p) => p.nodeId === e.target.value,
+                            );
+                            if (place)
+                              dispatch({
+                                type: 'select',
+                                role,
+                                selection: place,
+                              });
+                          }}
+                        >
+                          <option value="" disabled>
+                            Choose a demo location
+                          </option>
+                          {state[role] &&
+                            !data.places.some(
+                              (p) => p.nodeId === state[role]?.nodeId,
+                            ) && (
+                              <option value={state[role]!.nodeId}>
+                                {state[role]!.label}
+                              </option>
+                            )}
+                          {data.places.map((place) => (
+                            <option key={place.nodeId} value={place.nodeId}>
+                              {place.label}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    ))}
+                  </details>
                   <details className="coordinate-entry">
                     <summary>Enter coordinates</summary>
                     <form
@@ -833,7 +889,7 @@ export default function Dashboard() {
                     </button>
                   </div>
                   <p className="selection-hint">
-                    Choose locations above, or{' '}
+                    Search local places above, or{' '}
                     <button
                       onClick={() =>
                         selectOnMap(state.origin ? 'destination' : 'origin')
@@ -1096,6 +1152,10 @@ export default function Dashboard() {
           </div>
         </aside>
         <div className="map-legend" aria-label="Map legend">
+          <span title="Dataset geographic extent, not guaranteed road connectivity">
+            <i className="legend-coverage" />
+            Demo area · extent only
+          </span>
           <span>
             <i className="legend-road" />
             Local roads
@@ -1122,8 +1182,8 @@ export default function Dashboard() {
           )}
         </div>
         <div className="coverage-label">
-          <span>01 / CENTRAL ERNAKULAM</span>
-          <p>Real roads. Transparent routing.</p>
+          <span>GhostRoute Demo Area — Ernakulam</span>
+          <p>Dataset extent, not guaranteed connectivity.</p>
         </div>
       </section>
       <footer className="statusbar">

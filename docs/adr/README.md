@@ -15,3 +15,5 @@ Accepted means the implementation direction is selected, not that it is implemen
 - [ADR-009: Flood integration](009-flood-integration.md) supersedes ADR-005's single-stage scope and ADR-007's single-reducer choice for the implemented three-scenario dashboard.
 
 - [ADR-010: Interactive hazards and separately sourced reports](010-interactive-hazards-reports.md) — accepted local adapter; shared verification proposed.
+
+- [ADR-011: Offline verified place search and explicit dataset extent](011-local-place-search.md) — accepted; seven-place local catalog, live geocoder deferred.

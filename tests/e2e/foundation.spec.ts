@@ -1,3 +1,4 @@
+import { chooseDemoEndpoint } from './helpers';
 import { readFileSync } from 'node:fs';
 import { createRouter } from '../../src/lib/routing/shortest-path';
 import { validateGraph } from '../../src/lib/geo/validate';
@@ -36,12 +37,12 @@ test('real map, Hospital Road route, reset and responsive controls', async ({
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
-  await expect(page.getByLabel('Starting point', { exact: true })).toHaveValue(
-    fixture.origin.nodeId,
-  );
-  await expect(page.getByLabel('Destination', { exact: true })).toHaveValue(
-    fixture.destination.nodeId,
-  );
+  await expect(
+    page.getByLabel('Demo starting point', { exact: true }),
+  ).toHaveValue(fixture.origin.nodeId);
+  await expect(
+    page.getByLabel('Demo destination', { exact: true }),
+  ).toHaveValue(fixture.destination.nodeId);
   await page.getByRole('button', { name: 'Find route', exact: true }).click();
   await expect(page.getByTestId('route-distance')).toContainText('944.3 m');
   await expect(page.getByText('21 traversed road segments')).toBeVisible();
@@ -101,12 +102,8 @@ test('named selections and real map clicks snap endpoints', async ({
 }) => {
   await page.goto('/');
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
-  await page
-    .getByLabel('Starting point', { exact: true })
-    .selectOption(fixture.origin.nodeId);
-  await page
-    .getByLabel('Destination', { exact: true })
-    .selectOption(fixture.destination.nodeId);
+  await chooseDemoEndpoint(page, 'origin', fixture.origin.nodeId);
+  await chooseDemoEndpoint(page, 'destination', fixture.destination.nodeId);
   await page.getByRole('button', { name: 'Find route', exact: true }).click();
   await expect(page.getByTestId('route-distance')).toContainText('944.3 m');
   await page
@@ -124,10 +121,10 @@ test('named selections and real map clicks snap endpoints', async ({
   await page.getByRole('button', { name: 'Find route', exact: true }).click();
   const expected = createRouter(validateGraph(graph)).findRoute({
     originNodeId: await page
-      .getByLabel('Starting point', { exact: true })
+      .getByLabel('Demo starting point', { exact: true })
       .inputValue(),
     destinationNodeId: await page
-      .getByLabel('Destination', { exact: true })
+      .getByLabel('Demo destination', { exact: true })
       .inputValue(),
   });
   expect(expected.status).toBe('found');
@@ -238,12 +235,8 @@ test('identical endpoints show zero distance without a line', async ({
 }) => {
   await page.goto('/');
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
-  await page
-    .getByLabel('Starting point', { exact: true })
-    .selectOption(fixture.origin.nodeId);
-  await page
-    .getByLabel('Destination', { exact: true })
-    .selectOption(fixture.origin.nodeId);
+  await chooseDemoEndpoint(page, 'origin', fixture.origin.nodeId);
+  await chooseDemoEndpoint(page, 'destination', fixture.origin.nodeId);
   await page.getByRole('button', { name: 'Find route', exact: true }).click();
   await expect(page.getByTestId('route-distance')).toContainText('0.0 m');
   await expect(

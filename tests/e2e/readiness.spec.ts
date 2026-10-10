@@ -1,3 +1,4 @@
+import { chooseDemoEndpoint } from './helpers';
 import { expect, test } from '@playwright/test';
 import { demoSteps } from '../../src/lib/map/demo';
 test.beforeEach(async ({ page }) => {
@@ -93,16 +94,12 @@ test('keyboard walkthrough, manual handoff and reduced motion', async ({
       () => matchMedia('(prefers-reduced-motion: reduce)').matches,
     ),
   ).toBe(true);
-  await page
-    .getByLabel('Destination', { exact: true })
-    .selectOption('271145615');
+  await chooseDemoEndpoint(page, 'destination', '271145615');
   await expect(page.getByRole('region', { name: 'Guided demo' })).toHaveCount(
     0,
   );
   await expect(page.getByTestId('updated-distance')).toHaveText('0.0 m');
-  await page
-    .getByLabel('Starting point', { exact: true })
-    .selectOption('1906667447');
+  await chooseDemoEndpoint(page, 'origin', '1906667447');
   await expect(page.getByTestId('updated-distance')).toHaveText('1.41 km');
 });
 test('rapid switching, repeated reset, viewport resize and refresh', async ({

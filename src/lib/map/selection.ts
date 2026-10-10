@@ -1,4 +1,4 @@
-import { withinCoverage } from '../simulation/hazards';
+import { withinCoverage } from '../simulation/hazards.ts';
 import type { GeoPoint, RouteResult } from '../geo/types';
 import type { MapData, Place } from './data';
 export type Selection = Place & { clicked?: GeoPoint; snapMeters?: number };
@@ -23,12 +23,21 @@ export type SelectionAction =
   | { type: 'preset'; places: Place[] }
   | { type: 'result'; result: RouteResult }
   | { type: 'error'; message: string }
+  | { type: 'clear'; role: Role }
   | { type: 'reset' };
 export function selectionReducer(
   state: SelectionState,
   action: SelectionAction,
 ): SelectionState {
   switch (action.type) {
+    case 'clear':
+      return {
+        ...state,
+        [action.role]: null,
+        result: null,
+        message: '',
+        active: action.role,
+      };
     case 'reset':
       return initialSelection;
     case 'error':
@@ -65,7 +74,7 @@ export function selectCoordinate(
     return {
       type: 'error',
       message:
-        'Location is outside the supported central Ernakulam road network.',
+        'Location is outside the supported central Ernakulam road network. GhostRoute currently supports only the Ernakulam demo network.',
     };
   const snap = data.router.snap(coordinate, { role, maxDistanceMeters: 100 });
   if (snap.status !== 'snapped')
@@ -73,7 +82,7 @@ export function selectCoordinate(
       type: 'error',
       message:
         snap.status === 'snap-distance-exceeded'
-          ? 'That point is too far from the road network. Choose a point within 100 m of a mapped road node.'
+          ? 'That point is too far from the road network. GhostRoute currently supports only the Ernakulam demo network; choose a point within 100 m of a mapped road node.'
           : 'This point cannot be selected. Try a mapped road or a demo location.',
     };
   return {

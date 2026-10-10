@@ -33,7 +33,7 @@ No project Supabase configuration was present. The authorized fallback is theref
 4. Add authenticated reviewer roles and audited transitions: Unverified → Under review → Verified/Rejected; Verified → Resolved. Verified needs documented reviewer evidence and expiry/freshness rules before affecting routing. Human approval of policy is required before activating this mode.
 5. Expose only sanitized public fields from a read endpoint. Test RLS bypass attempts, status spoofing, abuse limits, stale closure expiry and concurrent writes against an isolated database. Replace the adapter only after these checks pass; retain local fallback as explicitly separate data.
 
-Credentials alone do not enable shared storage in this version: the server adapter and moderation policy still need implementation. No unused cloud dependencies or fake API endpoints are included. Photo uploads require separate MIME/content/size validation, private storage rules and privacy review. Address geocoding is deferred pending a suitable provider, attribution/privacy and enforceable usage policy; coordinate entry and geolocation work without a search service.
+Credentials alone do not enable shared storage in this version: the server adapter and moderation policy still need implementation. No unused cloud dependencies or fake API endpoints are included. Photo uploads require separate MIME/content/size validation, private storage rules and privacy review. Address geocoding is deferred pending a suitable provider, attribution/privacy and enforceable usage policy; coordinate entry, geolocation and the seven-place offline gazetteer work without a search service. See [place evidence and scope](../data/places/README.md).
 
 ## Priorities and stop conditions
 

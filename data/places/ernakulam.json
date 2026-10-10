@@ -1,0 +1,95 @@
+{
+  "graphVersion": "ernakulam-walking-v1-c5690329d952ed13",
+  "anchorNodeId": "271145615",
+  "sourceUrl": "https://api.openstreetmap.org/api/0.6/map.json?bbox=76.273,9.963,76.294,9.991",
+  "acquiredAt": "2026-10-10T18:41:05.544808+00:00",
+  "rawResponseSha256": "55ea74b8d4bdd8898f990712e8d4247c57c90c273028eeb3c2e9f898e5e71aab",
+  "attribution": "© OpenStreetMap contributors",
+  "license": "ODbL-1.0",
+  "places": [
+    {
+      "id": "marine-drive",
+      "name": "Marine Drive",
+      "category": "Waterfront",
+      "locality": "Marine Drive, central Ernakulam",
+      "coordinate": [76.2757727, 9.9784782],
+      "nodeId": "7016742693",
+      "snapMeters": 0,
+      "aliases": ["Marine Drive Kochi", "APJ Abdul Kalam Marg"],
+      "sourceNodeId": "7016742693",
+      "sourceWayId": null
+    },
+    {
+      "id": "mg-road",
+      "name": "MG Road — Jos Junction",
+      "category": "Road",
+      "locality": "Jos Junction, central Ernakulam",
+      "coordinate": [76.2860629, 9.9684255],
+      "nodeId": "1906667447",
+      "snapMeters": 0,
+      "aliases": ["Mahatma Gandhi Road", "M G Road"],
+      "sourceNodeId": "1906667447",
+      "sourceWayId": "1038662801"
+    },
+    {
+      "id": "south-station",
+      "name": "Ernakulam South Railway Station",
+      "category": "Railway station",
+      "locality": "Ernakulam Junction (ERS)",
+      "coordinate": [76.2909524, 9.9690003],
+      "nodeId": "11235421033",
+      "snapMeters": 42.358,
+      "aliases": ["Ernakulam Junction", "ERS", "South station"],
+      "sourceNodeId": "4760378949",
+      "sourceWayId": null
+    },
+    {
+      "id": "maharajas",
+      "name": "Maharaja’s College — Park Avenue entrance",
+      "category": "College",
+      "locality": "Park Avenue, central Ernakulam",
+      "coordinate": [76.2805299, 9.9705151],
+      "nodeId": "271151789",
+      "snapMeters": 24.236,
+      "aliases": ["Maharaja's College", "Maharajas College"],
+      "sourceNodeId": "7057719920",
+      "sourceWayId": "264720319"
+    },
+    {
+      "id": "general-hospital",
+      "name": "General Hospital Ernakulam — main entrance",
+      "category": "Hospital",
+      "locality": "Hospital Road, central Ernakulam",
+      "coordinate": [76.2810656, 9.9715556],
+      "nodeId": "271145617",
+      "snapMeters": 4.099,
+      "aliases": ["General Hospital", "Government Hospital"],
+      "sourceNodeId": "7057737620",
+      "sourceWayId": "755600802"
+    },
+    {
+      "id": "broadway",
+      "name": "Broadway — northern section",
+      "category": "Shopping street",
+      "locality": "Broadway, central Ernakulam",
+      "coordinate": [76.2769757, 9.9803003],
+      "nodeId": "1906467050",
+      "snapMeters": 0,
+      "aliases": ["Broadway Market"],
+      "sourceNodeId": "1906467050",
+      "sourceWayId": "1230913299"
+    },
+    {
+      "id": "high-court",
+      "name": "High Court Junction",
+      "category": "Junction",
+      "locality": "High Court Junction, central Ernakulam",
+      "coordinate": [76.2739283, 9.9837451],
+      "nodeId": "271146530",
+      "snapMeters": 0,
+      "aliases": ["High Court"],
+      "sourceNodeId": "271146530",
+      "sourceWayId": null
+    }
+  ]
+}

@@ -61,3 +61,11 @@ Record each meaningful project change during the event, newest first. Update thi
 - Reports persist only in this browser. Supabase is unconfigured; shared API/RLS/moderation requirements are documented, not falsely presented as working. No photo uploads or geocoder.
 - Verified lint/types, 153 unit tests, production build, 32 desktop/mobile browser tests, formatting, unchanged geographic regeneration, actual screenshots and measured impact/routing performance (VERIFICATION).
 - Preserved organizer instructions/workflows, source geography and routing algorithm. Local commit only; human review pending. No push, deployment, remote settings or external resources.
+
+## Dataset extent and offline search — 2026-10-11T00:26:02+05:30
+
+- Added exact graph extent as a dashed teal map boundary/fill, label, legend and View Demo Area control.
+- Replaced primary fixture selectors with offline searchable start/destination fields, seven sourced/validated popular places, keyboard/touch selection, clear/swap/reset and automatic real routing. Preserved fixture shortcuts and arbitrary map/coordinate input.
+- Added OSM source evidence, ODbL attribution, catalog validation command, tests, documentation and real browser screenshots. No new dependencies or geographic/routing-engine modifications.
+- Validated 169 unit tests, 36 production browser journeys, lint/types/build/format, seven place fixtures and unchanged road regeneration. Fixed mobile focus/reset and overlay stacking issues discovered in the browser. See VERIFICATION for scope and limits.
+- Local commit only; no push or deployment. Human review pending.
