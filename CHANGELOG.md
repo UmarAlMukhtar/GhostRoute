@@ -1,5 +1,9 @@
 # Change log
 
+## GitHub preview evidence — 2026-10-11T02:07:25+05:30
+
+Recorded the actual Ready Vercel preview, successful commit status and bot comment for documentation PR #8 in DEPLOYMENT/VERIFICATION. Checked links and whitespace; external-fork authorization remains unverified. Codex assistance, human review pending.
+
 ## Vercel production deployment — 2026-10-11T02:05:50+05:30
 
 - Changed: imported official GitHub `main` into the existing Hobby project `ghostroute`; documented public production URL, exact initial source SHA, GitHub production/preview workflow, environment requirements, caching and troubleshooting in README/DEPLOYMENT/SUBMISSION. Added hosted desktop/mobile screenshots; organizer requirements and participant submission fields are preserved.

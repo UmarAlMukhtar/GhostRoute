@@ -32,6 +32,8 @@ Optional raster tiles use `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, visi
 4. Inspect the Vercel deployment Source SHA, logs and Ready status, then test the public production domain. A successful local build alone does not prove hosted behavior. No environment variables or paid resources are needed.
 5. To reproduce setup in another authorized Vercel account, import the official GitHub repository, name the project `ghostroute`, keep root `./`, Next.js preset, Node 24.x and default output; use the tracked pnpm commands above. Importing starts a deployment. Existing authenticated CLI users may link the exact project and deploy a preview; production changes use the reviewed Git workflow.
 
+Observed preview proof: [documentation PR #8](https://github.com/UmarAlMukhtar/GhostRoute/pull/8) received an automatic Ready preview and Vercel bot comment: [preview deployment](https://vercel.com/umar-al-mukhtar-s-projects/ghostroute/HqxVFimaZXHX3rr6Hg13yoUuKs5F). External fork authorization is still separate.
+
 ## Troubleshooting and reliability
 
 - **Install/build fails:** inspect logs and pinned Node/pnpm versions; use the frozen lockfile. Never promote a failed build. Local Turbopack can fail with a sandbox port-binding error; clearing only generated `.next` and rerunning with required local access resolved the verification run.
