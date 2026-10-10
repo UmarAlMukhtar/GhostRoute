@@ -8,8 +8,8 @@ Complete this file during the hackathon and use it to prepare your submission th
 - **Short description:** An interactive Ernakulam road-network simulation: illustrative floods block real OSM road segments and Dijkstra automatically finds an alternative route or reports unavailable. Includes a guided three-minute Demo Mode.
 - **Code repository URL:** https://github.com/UmarAlMukhtar/GhostRoute
 - **Final submitted implementation commit SHA:** TODO
-- **Working demo URL or local demo steps:** No public deployment yet. Run `pnpm install --frozen-lockfile`, `pnpm build`, then `pnpm start`; open `http://localhost:3000` and choose **Demo Mode**. See [demo plan](docs/DEMO_PLAN.md) and [deployment runbook](docs/DEPLOYMENT.md).
-- **Demo access requirements:** Local Node 22.13+ (22 line) or Node 24, pnpm 11.25.0; no credentials required.
+- **Working demo URL or local demo steps:** [Public GhostRoute demo](https://ghostroute-weld.vercel.app). Local fallback: run `pnpm install --frozen-lockfile`, `pnpm build`, then `pnpm start`; open `http://localhost:3000` and choose **Demo Mode**. See [demo plan](docs/DEMO_PLAN.md) and [deployment runbook](docs/DEPLOYMENT.md).
+- **Demo access requirements:** Public demo requires a WebGL-capable browser, no login. Local fallback requires Node 22.13+ (22 line) or Node 24, pnpm 11.25.0; no credentials required.
 
 ## Participants
 
