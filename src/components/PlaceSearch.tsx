@@ -12,7 +12,12 @@ import {
 } from 'lucide-react';
 import type { MapData } from '../lib/map/data';
 import type { Role, Selection, SelectionAction } from '../lib/map/selection';
-import { choosePlace, filterPlaces, type SearchPlace } from '../lib/map/places';
+import {
+  choosePlace,
+  coordinatePlace,
+  filterPlaces,
+  type SearchPlace,
+} from '../lib/map/places';
 const icons = {
   Waterfront: Waves,
   Road: Route,
@@ -21,6 +26,8 @@ const icons = {
   Hospital,
   'Shopping street': Store,
   Junction: Signpost,
+  Landmark: Signpost,
+  Locality: Signpost,
 };
 interface Props {
   role: Role;
@@ -52,15 +59,23 @@ export default function PlaceSearch({
     text: string;
   } | null>(null);
   const [active, setActive] = useState(-1);
+  const [settledQuery, setSettledQuery] = useState('');
   const query =
     draft?.selection === selection ? draft.text : (selection?.label ?? '');
+  useEffect(() => {
+    const timer = setTimeout(() => setSettledQuery(query), 180);
+    return () => clearTimeout(timer);
+  }, [query]);
   const matches = useMemo(
     () =>
-      filterPlaces(places, query).map((place) => ({
+      (coordinatePlace(settledQuery, data)
+        ? [coordinatePlace(settledQuery, data)!]
+        : filterPlaces(places, settledQuery)
+      ).map((place) => ({
         place,
         action: choosePlace(data, place, role, other),
       })),
-    [places, query, data, role, other],
+    [places, settledQuery, data, role, other],
   );
   const enabled = matches.flatMap((match, index) =>
     match.action.type === 'select' ? [index] : [],
@@ -78,7 +93,8 @@ export default function PlaceSearch({
   }
   function choose(index: number) {
     const match = matches[index];
-    if (!match || match.action.type !== 'select') return;
+    if (!match || match.action.type !== 'select' || query !== settledQuery)
+      return;
     // Revalidate at selection time; never reuse stale route eligibility.
     const action = choosePlace(data, match.place, role, other);
     onAction(action);
@@ -176,7 +192,7 @@ export default function PlaceSearch({
         )}
       </div>
       <span id={`${id}-hint`} className="search-hint">
-        {error || 'Offline place catalog · © OpenStreetMap'}
+        {error || 'Offline OSM search · names or latitude, longitude'}
       </span>
       {open && !error && (
         <div className="place-dropdown">
@@ -212,7 +228,7 @@ export default function PlaceSearch({
                     </small>
                     {action.type === 'error' && (
                       <small className="place-unavailable">
-                        Not connected to the other endpoint
+                        {action.message}
                       </small>
                     )}
                   </span>

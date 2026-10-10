@@ -1,3 +1,4 @@
+import expandedFixture from '../../public/data/ernakulam/demo-paths.json';
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { parseMapData } from '../../src/lib/map/data';
@@ -18,8 +19,9 @@ const data = parseMapData(graph, roads, fixture);
 afterEach(() => vi.unstubAllGlobals());
 describe('browser data boundary', () => {
   it('loads real road geometry and initializes the actual router', () => {
-    expect(data.roads.features).toHaveLength(1856);
-    expect(data.bounds).toEqual([76.2732579, 9.9638296, 76.2936855, 9.9897189]);
+    expect(data.roads.features.length).toBeGreaterThan(50000);
+    expect(data.bounds[0]).toBeLessThan(76.24);
+    expect(data.bounds[3]).toBeGreaterThan(10.13);
     const result = data.router.findRoute({
       originNodeId: data.places[0].nodeId,
       destinationNodeId: data.places[1].nodeId,
@@ -62,7 +64,7 @@ describe('browser data boundary', () => {
     const { loadMapData } = await import('../../src/lib/map/data');
     const [a, b] = await Promise.all([loadMapData(), loadMapData()]);
     expect(a).toBe(b);
-    expect(fetcher).toHaveBeenCalledTimes(3);
+    expect(fetcher).toHaveBeenCalledTimes(4);
     expect(await loadMapData()).toBe(a);
   });
   it('reports HTTP failures and permits retry', async () => {
@@ -125,7 +127,7 @@ describe('selection and presentation', () => {
   it('keeps unreachable outcomes explicit', () => {
     const result = data.router.findRoute({
       originNodeId: data.places[0].nodeId,
-      destinationNodeId: '11189614551',
+      destinationNodeId: expandedFixture.disconnectedNodeId,
     });
     expect(routeMessage(result)).toContain('No available route');
   });

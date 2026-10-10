@@ -1,3 +1,4 @@
+import { preparePlaces } from './prepare-places.ts';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
@@ -15,13 +16,14 @@ const manifest = record(
 );
 if (sha256(source) !== text(manifest.normalizedSourceSha256, 'source hash'))
   throw new Error('Frozen source checksum mismatch');
-const version = `ernakulam-walking-v1-${sha256(source).slice(0, 16)}`;
+const version = `ernakulam-walking-v2-${sha256(source).slice(0, 16)}`;
 const { graph, roads, exclusions } = convertOsm(
   JSON.parse(source.toString()),
   version,
+  true,
 );
 // Whole ways extend beyond the query; this reviewed envelope bounds every retained source road.
-const report = validateDataset(graph, roads, [76.273, 9.963, 76.294, 9.99]);
+const report = validateDataset(graph, roads, [76.1, 9.8, 76.6, 10.3]);
 const originNodeId = '271145615',
   destinationNodeId = '1906667447',
   blockedSegmentId = '768625211:4';
@@ -85,15 +87,23 @@ const files: Record<string, string> = {
   'roads.geojson': JSON.stringify(roads) + '\n',
   'demo-paths.json': JSON.stringify(fixture, null, 2) + '\n',
 };
+await preparePlaces(JSON.parse(source.toString()), graph);
+files['places.json'] = await readFile(
+  'public/data/ernakulam/places.json',
+  'utf8',
+);
 const metadata = {
   graphVersion: version,
   source: manifest,
-  converter: 'walking-v1',
+  converter: 'walking-v2-shape-compaction',
   converterSha256: sha256(
     (
       await Promise.all(
         [
           'scripts/prepare-roads.ts',
+          'scripts/prepare-places.ts',
+          'src/lib/routing/shortest-path.ts',
+          'src/lib/map/places.ts',
           'src/lib/geo/convert.ts',
           'src/lib/geo/distance.ts',
           'src/lib/geo/validate.ts',

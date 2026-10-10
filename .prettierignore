@@ -14,3 +14,5 @@ public/data/ernakulam/*.json
 public/data/ernakulam/*.geojson
 
 public/vendor/maplibre/
+
+data/places/ernakulam.json

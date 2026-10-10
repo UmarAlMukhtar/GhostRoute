@@ -1,5 +1,9 @@
 # AI usage record
 
+## Expansion assistance — 2026-10-11T00:48:58+05:30
+
+Codex inspected organizer/project rules and existing geographic/routing/map/report systems, acquired and merged public OSM data after Overpass failures, preserved real geometry/access and Hospital Road, implemented a broad offline index, snapping optimization, separate workflows, themes and local deletion, and updated tests/docs. Unit failures identified changed connectivity, quadratic oracle cost and snap eligibility fallback; these were corrected and 174 tests passed. Production build passed after clearing failed generated compiler cache. Browser/visual verification remains in progress. Human review pending; no roads, participant credentials, reports or deployment evidence fabricated. No external resource, push or deployment created.
+
 Use Codex during the hackathon and briefly document its actual contribution here. Add a row after each meaningful task or milestone. Keep summaries concise and omit secrets, private data, and full chat transcripts.
 
 ## Event build log

@@ -1,4 +1,5 @@
 import type {
+  GeoPoint,
   RoadGraph,
   RoadEdge,
   RoadNode,
@@ -26,6 +27,16 @@ export function createRouter(input: RoadGraph) {
   const graph = structuredClone(input);
   const nodeIds = Object.keys(graph.nodes).sort();
   if (!nodeIds.length) throw new Error('Routing graph: empty nodes');
+  const cells = new Map<string, string[]>();
+  const cellKey = (x: number, y: number) =>
+    `${Math.floor(x / 0.002)}:${Math.floor(y / 0.002)}`;
+  for (const id of nodeIds) {
+    const [x, y] = graph.nodes[id].coordinate;
+    const key = cellKey(x, y),
+      ids = cells.get(key) ?? [];
+    ids.push(id);
+    cells.set(key, ids);
+  }
   const outgoing = new Map(nodeIds.map((id) => [id, [] as string[]]));
   const incoming = new Map(nodeIds.map((id) => [id, [] as string[]]));
   const segments = new Set<string>();
@@ -172,7 +183,7 @@ export function createRouter(input: RoadGraph) {
   function snap(coordinate: unknown, options: SnapOptions = {}): SnapResult {
     const invalid = validateOptions(options);
     if (invalid) return invalid;
-    let inputPoint;
+    let inputPoint: GeoPoint;
     try {
       // Materialize array holes so the geographic validator checks them too.
       inputPoint = point(
@@ -201,22 +212,43 @@ export function createRouter(input: RoadGraph) {
       };
     let nearest: string | undefined,
       nearestDistance = Infinity;
-    for (const id of nodeIds) {
-      if (
-        options.blockedNodeIds?.has(id) ||
-        (options.largestComponentOnly && !largestComponent.has(id))
-      )
-        continue;
-      const incident =
-        options.role === 'destination' ? incoming.get(id)! : outgoing.get(id)!;
-      if (!incident.some((edgeId) => available(graph.edges[edgeId], options)))
-        continue;
-      const distance = distanceMeters(inputPoint, graph.nodes[id].coordinate);
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearest = id;
+    const latitudeRadius = maxDistanceMeters / 110000;
+    const longitudeRadius =
+      latitudeRadius /
+      Math.max(0.01, Math.cos((inputPoint[1] * Math.PI) / 180));
+    const candidates: string[] = [];
+    const minX = Math.floor((inputPoint[0] - longitudeRadius) / 0.002),
+      maxX = Math.floor((inputPoint[0] + longitudeRadius) / 0.002);
+    const minY = Math.floor((inputPoint[1] - latitudeRadius) / 0.002),
+      maxY = Math.floor((inputPoint[1] + latitudeRadius) / 0.002);
+    if ((maxX - minX + 1) * (maxY - minY + 1) <= 10000)
+      for (let x = minX; x <= maxX; x++)
+        for (let y = minY; y <= maxY; y++)
+          candidates.push(...(cells.get(`${x}:${y}`) ?? []));
+    // Outside the indexed radius, retain the exact nearest-distance failure contract.
+    const nearby = candidates.length ? candidates.sort() : nodeIds;
+    function inspect(ids: readonly string[]) {
+      for (const id of ids) {
+        if (
+          options.blockedNodeIds?.has(id) ||
+          (options.largestComponentOnly && !largestComponent.has(id))
+        )
+          continue;
+        const incident =
+          options.role === 'destination'
+            ? incoming.get(id)!
+            : outgoing.get(id)!;
+        if (!incident.some((edgeId) => available(graph.edges[edgeId], options)))
+          continue;
+        const distance = distanceMeters(inputPoint, graph.nodes[id].coordinate);
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearest = id;
+        }
       }
     }
+    inspect(nearby);
+    if (!nearest || nearestDistance > maxDistanceMeters) inspect(nodeIds);
     if (!nearest) return { status: 'no-eligible-node' };
     if (nearestDistance > maxDistanceMeters)
       return {

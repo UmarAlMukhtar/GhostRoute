@@ -22,7 +22,8 @@ const rectangle = (
     ],
   },
 });
-const graphVersion = 'ernakulam-walking-v1-c5690329d952ed13';
+import fixture from '../../../public/data/ernakulam/demo-paths.json' with { type: 'json' };
+const graphVersion = fixture.graphVersion;
 // The west boundary crosses the fixture's 0.548 m segment without flooding its origin.
 const hospital = rectangle('hospital', 76.280142, 9.9712, 76.2809, 9.97165);
 export const scenarios: FloodScenario[] = [

@@ -206,3 +206,84 @@ it('excludes explicit pedestrian turn restrictions instead of misrouting through
     reason: 'unhandled pedestrian turn restriction',
   });
 });
+
+it('compacts only shape nodes while retaining full geometry, reverse traversal and barriers', () => {
+  const raw = {
+    elements: [
+      { type: 'node', id: 901, lon: 76.3, lat: 10.1 },
+      { type: 'node', id: 902, lon: 76.301, lat: 10.101 },
+      { type: 'node', id: 903, lon: 76.302, lat: 10.1 },
+      {
+        type: 'way',
+        id: 990,
+        nodes: [901, 902, 903],
+        tags: { highway: 'residential' },
+      },
+    ],
+  };
+  const normal = convertOsm(raw, 'test').graph,
+    compact = convertOsm(raw, 'test', true).graph;
+  expect(Object.keys(compact.nodes)).toHaveLength(2);
+  const edge = compact.edges['990:0:forward'];
+  expect(edge.geometry.coordinates).toHaveLength(3);
+  expect(compact.edges['990:0:reverse'].geometry.coordinates).toEqual(
+    [...edge.geometry.coordinates].reverse(),
+  );
+  expect(edge.lengthMeters).toBeCloseTo(
+    normal.edges['990:0:forward'].lengthMeters +
+      normal.edges['990:1:forward'].lengthMeters,
+    2,
+  );
+  const ring = convertOsm(
+    {
+      elements: [
+        ...raw.elements.slice(0, 3),
+        {
+          type: 'way',
+          id: 991,
+          nodes: [901, 902, 903, 901],
+          tags: { highway: 'residential' },
+        },
+      ],
+    },
+    'ring',
+    true,
+  ).graph;
+  expect(Object.values(ring.edges).every((e) => e.from !== e.to)).toBe(true);
+  expect(
+    Object.values(ring.edges).flatMap((e) => e.geometry.coordinates),
+  ).toContainEqual([76.301, 10.101]);
+});
+it('allows toll booths on walking roads without overriding explicit access restrictions', () => {
+  const build = (access?: string) =>
+    convertOsm(
+      {
+        elements: [
+          {
+            type: 'node',
+            id: 901,
+            lon: 76.3,
+            lat: 10.1,
+            tags: { barrier: 'toll_booth', ...(access ? { access } : {}) },
+          },
+          { type: 'node', id: 902, lon: 76.301, lat: 10.1 },
+          { type: 'node', id: 903, lon: 76.302, lat: 10.1 },
+          {
+            type: 'way',
+            id: 991,
+            nodes: [901, 902, 903],
+            tags: { highway: 'residential' },
+          },
+        ],
+      },
+      'toll',
+      true,
+    );
+  expect(build().graph.nodes['901']).toBeDefined();
+  expect(build('private').graph.nodes['901']).toBeUndefined();
+  expect(
+    build('private').exclusions.some(
+      (e) => e.reason === 'restricted general access',
+    ),
+  ).toBe(true);
+});

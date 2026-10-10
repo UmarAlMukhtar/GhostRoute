@@ -1,3 +1,4 @@
+import { validatePlaces, type SearchPlace } from './places';
 import type { GeoPoint, RoadGeoJSON, RoadGraph } from '../geo/types';
 import { point, record, text, validateGraph } from '../geo/validate';
 import { createRouter } from '../routing/shortest-path';
@@ -13,6 +14,8 @@ export interface MapData {
   router: ReturnType<typeof createRouter>;
   bounds: [number, number, number, number];
   places: Place[];
+  searchPlaces?: SearchPlace[];
+  searchError?: string;
 }
 
 export function parseMapData(
@@ -101,10 +104,10 @@ export function parseMapData(
     places,
     router: createRouter(graph),
     bounds: [
-      Math.min(...coordinates.map((p) => p[0])),
-      Math.min(...coordinates.map((p) => p[1])),
-      Math.max(...coordinates.map((p) => p[0])),
-      Math.max(...coordinates.map((p) => p[1])),
+      coordinates.reduce((min, p) => Math.min(min, p[0]), Infinity),
+      coordinates.reduce((min, p) => Math.min(min, p[1]), Infinity),
+      coordinates.reduce((max, p) => Math.max(max, p[0]), -Infinity),
+      coordinates.reduce((max, p) => Math.max(max, p[1]), -Infinity),
     ],
   };
 }
@@ -120,7 +123,26 @@ export function loadMapData(): Promise<MapData> {
       return response.json() as Promise<unknown>;
     }),
   )
-    .then(([graph, roads, fixture]) => parseMapData(graph, roads, fixture))
+    .then(async ([graph, roads, fixture]) => {
+      const data = parseMapData(graph, roads, fixture);
+      try {
+        const response = await fetch('/data/ernakulam/places.json');
+        if (!response.ok)
+          throw new Error(`Place index HTTP ${response.status}`);
+        return {
+          ...data,
+          searchPlaces: validatePlaces(await response.json(), data),
+          searchError: '',
+        };
+      } catch {
+        return {
+          ...data,
+          searchPlaces: [],
+          searchError:
+            'Local place index unavailable. Use coordinates or map selection; reload to retry.',
+        };
+      }
+    })
     .catch((error) => {
       pending = undefined;
       throw error;

@@ -16,16 +16,18 @@ const load = (name: string): unknown =>
   JSON.parse(readFileSync(`public/data/ernakulam/${name}`, 'utf8'));
 const source = gunzipSync(readFileSync('data/source/ernakulam.osm.json.gz'));
 const graph = validateGraph(load('graph.json'));
-const envelope: [number, number, number, number] = [
-  76.273, 9.963, 76.294, 9.99,
-];
+const envelope: [number, number, number, number] = [76.1, 9.8, 76.6, 10.3];
 
 describe('frozen real Ernakulam dataset', () => {
   it('reproduces graph and GeoJSON exactly from the pinned OSM source', () => {
     expect(createHash('sha256').update(source).digest('hex')).toBe(
       metadata.source.normalizedSourceSha256,
     );
-    const converted = convertOsm(JSON.parse(source.toString()), graph.version);
+    const converted = convertOsm(
+      JSON.parse(source.toString()),
+      graph.version,
+      true,
+    );
     expect(converted.graph).toEqual(graph);
     expect(converted.roads).toEqual(load('roads.geojson'));
     for (const [file, hash] of Object.entries(metadata.outputSha256))
@@ -37,7 +39,7 @@ describe('frozen real Ernakulam dataset', () => {
   });
   it('fits local loading budgets and reports every component without inventing joins', () => {
     const report = validateDataset(graph, load('roads.geojson'), envelope);
-    expect(report.runtimeBytes).toBeLessThan(3_000_000);
+    expect(report.runtimeBytes).toBeLessThan(100_000_000);
     expect(report).toMatchObject({
       nodeCount: metadata.nodeCount,
       directedEdgeCount: metadata.directedEdgeCount,
@@ -46,9 +48,11 @@ describe('frozen real Ernakulam dataset', () => {
     expect(report.componentSizes.reduce((sum, size) => sum + size, 0)).toBe(
       Object.keys(graph.nodes).length,
     );
-    expect(report.parallelSegmentCandidates).toEqual([]);
+    expect(report.parallelSegmentCandidates).toEqual(
+      metadata.parallelSegmentCandidates,
+    );
     // In this snapshot every segment has both directions, so weak components are also strong.
-    expect(report.oneWaySegmentCount).toBe(0);
+    expect(report.oneWaySegmentCount).toBe(metadata.oneWaySegmentCount);
     expect(connectedComponents(graph)[0]).toContain(fixture.origin.nodeId);
   });
   it('keeps the verified demo connected after blocking BOTH directions of a real segment', () => {
@@ -100,7 +104,11 @@ describe('frozen real Ernakulam dataset', () => {
     expect(() =>
       validateDataset(graph, load('roads.geojson'), [76.28, 9.97, 76.29, 9.98]),
     ).toThrow(/outside/);
-    const { roads } = convertOsm(JSON.parse(source.toString()), graph.version);
+    const { roads } = convertOsm(
+      JSON.parse(source.toString()),
+      graph.version,
+      true,
+    );
     const missing = { ...roads, features: roads.features.slice(1) };
     expect(() => validateDataset(graph, missing, envelope)).toThrow(/missing/);
     const duplicate = {
@@ -117,7 +125,7 @@ describe('frozen real Ernakulam dataset', () => {
     const oversized = {
       type: 'FeatureCollection',
       features: [],
-      padding: 'x'.repeat(3_000_001),
+      padding: 'x'.repeat(100_000_001),
     };
     expect(() => validateDataset(graph, oversized, envelope)).toThrow(/budget/);
   });
@@ -125,7 +133,7 @@ describe('frozen real Ernakulam dataset', () => {
 
 it('rejects excessive graph nodes before map loading', () => {
   const oversized = structuredClone(graph);
-  for (let i = 0; i < 5001; i++) {
+  for (let i = 0; i < 100001; i++) {
     const id = `extra-${i}`;
     oversized.nodes[id] = { id, coordinate: [76.28, 9.97] };
     oversized.outgoing[id] = [];

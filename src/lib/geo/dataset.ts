@@ -16,13 +16,13 @@ export function validateDataset(
     throw new Error('bounds: inverted extent');
   const nodes = Object.values(graph.nodes),
     edges = Object.values(graph.edges);
-  if (nodes.length > 5000 || edges.length > 12000)
+  if (nodes.length > 100000 || edges.length > 250000)
     throw new Error('Dataset exceeds graph size budget');
   const runtimeBytes = new TextEncoder().encode(
     JSON.stringify(graphInput) + '\n' + JSON.stringify(roadsInput) + '\n',
   ).length;
-  if (runtimeBytes > 3_000_000)
-    throw new Error('Dataset exceeds 3 MB runtime budget');
+  if (runtimeBytes > 100_000_000)
+    throw new Error('Dataset exceeds 100 MB runtime budget');
   for (const node of nodes) {
     const [x, y] = node.coordinate;
     if (x < west || x > east || y < south || y > north)
@@ -95,10 +95,10 @@ export function validateDataset(
       (ids) => ids.length > 1,
     ),
     bounds: [
-      Math.min(...nodes.map((n) => n.coordinate[0])),
-      Math.min(...nodes.map((n) => n.coordinate[1])),
-      Math.max(...nodes.map((n) => n.coordinate[0])),
-      Math.max(...nodes.map((n) => n.coordinate[1])),
+      nodes.reduce((min, n) => Math.min(min, n.coordinate[0]), Infinity),
+      nodes.reduce((min, n) => Math.min(min, n.coordinate[1]), Infinity),
+      nodes.reduce((max, n) => Math.max(max, n.coordinate[0]), -Infinity),
+      nodes.reduce((max, n) => Math.max(max, n.coordinate[1]), -Infinity),
     ],
   };
 }

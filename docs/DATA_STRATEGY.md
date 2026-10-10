@@ -1,5 +1,19 @@
 # Geographic data strategy
 
+## Expanded frozen geography — walking-v2
+
+49,740 nodes / 115,412 directed edges / 57,706 physical segments. Actual whole-way graph extent is `[76.2148797, 9.8510819, 76.4365348, 10.1499696]` (west, south, east, north). Runtime graph + road JSON is 64,700,183 bytes. The source contains 30,035 real OSM highway ways and named OSM node POIs. No connections or geometry were fabricated. Central Kochi, Marine Drive, MG Road, Kaloor, Edappally, Palarivattom, Vyttila, Kadavanthra, Panampilly Nagar, Thevara, Fort Kochi, Mattancherry, Kakkanad and Aluva are represented; southern/eastern coverage is bounded, and Tripunithura coverage is partial.
+
+Overpass requests failed (HTTP 406/500); bounded map API cells were acquired sequentially as a development fallback. Forty-four successful responses cover the northern urban rectangle [76.22,9.94,76.42,10.14] plus southern bridge approaches [76.22,9.89,76.32,9.94]. Larger cells exceeding the API limit were subdivided. An empty southwest ocean cell contributes no elements. Complete ways extend outside these cells. The exact URLs, response hashes and download timestamps are in the source manifest. No raw editing identities are retained. This is a one-time fallback; future routine regional refreshes should use a regional extract or Overpass.
+
+Source merging uses OSM type/ID and the highest element version. Preparation is fully offline and deterministic. It generates graph, renderer geometry, fixture, metadata and a compact runtime place index from the frozen source. Source way tags and original shape geometry remain available; intermediate shape vertices outside the regression area become geometry rather than graph junctions. Budgets are now 100,000 nodes, 250,000 directed edges and 100 MB JSON, reflecting the validated expansion.
+
+The local gazetteer derives named highway way points and named OSM nodes. It includes partial names, aliases, road names, landmarks, hospitals and localities, ranked by exact name/alias and prefix before loose matches. Only results within 100 m of an eligible nearest graph node and with directed access to the central anchor are indexed. Large building polygons without a named node are not indexed; this is a frozen local gazetteer, not a global geocoder. Popular defaults retain the original seven source-evidenced suggestions. No remote provider, paid key or prohibited public Nominatim autocomplete is used.
+
+Hospital Road's original witness and shortest distances remain regression requirements. Disconnected components remain in the graph and return explicit unreachable results; newly expanded roads may connect formerly disconnected baseline nodes. Bounding geometry shows the actual graph extent and explicitly warns that the enclosed area does not guarantee connectivity.
+
+The following small-area data notes are retained as historical baseline evidence; their counts/budgets are superseded above.
+
 MAP-01 implemented 10 October 2026. Real local OSM roads are bundled, and ROUTE-01 implements Dijkstra. Map rendering and flood simulation remain upcoming tasks.
 
 ## Selected area and observed coverage

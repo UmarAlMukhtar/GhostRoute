@@ -1,5 +1,15 @@
 # GhostRoute architecture
 
+## Expanded platform — current architecture
+
+`Dashboard` reuses the retained router and flood engine for `/` and `/demo`. The left panel remains navigation; an independent right panel contains custom simulation or local reports. Guided scenarios require the `/demo` composition. Internal routing modes are absent from controls. Unverified reports do not close roads.
+
+`loadMapData` caches validated graph, road geometry, fixtures and the separate static `places.json` index. Index failure leaves map/coordinate navigation usable with a visible search error. Large immutable assets are loaded once, not copied into per-feature React state. `validatePlaces` checks directed anchor reachability using two traversals, not thousands of shortest paths. A 0.002-degree node grid narrows snapping candidates; exact geodesic checks and full-scan failure fallback preserve the snapping contract. Local results debounce 180 ms and cancel stale timers; selection revalidates coverage/connectivity.
+
+Walking-v2 combines untagged degree-two shape nodes outside the original regression envelope, preserving full LineStrings, source node identities at junctions, tagged nodes, access barriers and directionality. Toll booths are recognized as non-physical barriers; explicit foot/general access remains enforced. Unknown gates remain excluded. The Hospital Road segment IDs and geometry remain unchanged.
+
+`ThemeToggle` uses a persisted preference and system media subscription. A pre-render script applies the root theme before content paints; hydration suppression is confined to the root attribute. MapLibre paint properties change in place. Dark mode uses the local vector-road style and hides optional light raster tiles; no map color inversion. Browser-local storage is editable, so deletion is archive management, not server authorization.
+
 Status: accepted implementation direction for the small MVP; module paths below are planned unless explicitly listed as present. Phase 0 supplies `src/app/` smoke UI/tooling; MAP-01 now implements `src/lib/geo/`, source acquisition/conversion and local road assets. ROUTE-01 implements heap-based routing and closure-aware node snapping. MAP-02 implements the interactive client dashboard and MapLibre rendering. Read [PRD](PRD.md), [data strategy](DATA_STRATEGY.md) and [ADRs](adr/README.md) together.
 
 ## System and application structure

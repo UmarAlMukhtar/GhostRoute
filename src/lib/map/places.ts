@@ -16,6 +16,8 @@ export const placeCategories = [
   'Hospital',
   'Shopping street',
   'Junction',
+  'Landmark',
+  'Locality',
 ] as const;
 export interface SearchPlace {
   id: string;
@@ -26,6 +28,7 @@ export interface SearchPlace {
   nodeId: string;
   snapMeters: number;
   aliases: string[];
+  popular?: boolean;
 }
 /** Validate the small gazetteer against the retained router once per dataset load. */
 export function validatePlaces(
@@ -39,9 +42,33 @@ export function validatePlaces(
   if (
     !Array.isArray(raw.places) ||
     !raw.places.length ||
-    raw.places.length > 100
+    raw.places.length > 20000
   )
     throw new Error('Invalid place catalog size');
+  const reversed = new Map(
+    Object.keys(data.graph.nodes).map((id) => [id, [] as string[]]),
+  );
+  for (const edge of Object.values(data.graph.edges))
+    reversed.get(edge.to)!.push(edge.from);
+  const reachable = (reverse: boolean) => {
+    const seen = new Set([anchor]),
+      queue = [anchor];
+    for (let i = 0; i < queue.length; i++) {
+      const neighbors = reverse
+        ? (reversed.get(queue[i]) ?? [])
+        : (data.graph.outgoing[queue[i]] ?? []).map(
+            (id) => data.graph.edges[id].to,
+          );
+      for (const id of neighbors)
+        if (!seen.has(id)) {
+          seen.add(id);
+          queue.push(id);
+        }
+    }
+    return seen;
+  };
+  const fromAnchor = reachable(false),
+    toAnchor = reachable(true);
   const ids = new Set<string>();
   return raw.places.map((value) => {
     const p = record(value, 'Place'),
@@ -77,12 +104,7 @@ export function validatePlaces(
         Math.abs(snap.distanceMeters - p.snapMeters) > 0.01
       )
         throw new Error(`Place ${id} no longer matches its verified road node`);
-      const route = data.router.findRoute(
-        role === 'origin'
-          ? { originNodeId: nodeId, destinationNodeId: anchor }
-          : { originNodeId: anchor, destinationNodeId: nodeId },
-      );
-      if (route.status !== 'found')
+      if (!(role === 'origin' ? toAnchor : fromAnchor).has(nodeId))
         throw new Error(`Place ${id} is disconnected from the demo network`);
     }
     return {
@@ -94,6 +116,7 @@ export function validatePlaces(
       nodeId,
       snapMeters: p.snapMeters,
       aliases: p.aliases,
+      popular: p.popular !== false,
     };
   });
 }
@@ -106,12 +129,30 @@ const normalize = (value: string) =>
     .trim();
 export function filterPlaces(places: readonly SearchPlace[], query: string) {
   const tokens = normalize(query).split(' ').filter(Boolean);
-  return places.filter((p) => {
-    const haystack = normalize(
-      [p.name, p.locality, p.category, ...p.aliases].join(' '),
-    );
-    return tokens.every((token) => haystack.includes(token));
-  });
+  if (!tokens.length)
+    return places.filter((p) => p.popular !== false).slice(0, 8);
+  const normalizedQuery = normalize(query);
+  return places
+    .filter((p) => {
+      const haystack = normalize(
+        [p.name, p.locality, p.category, ...p.aliases].join(' '),
+      );
+      return tokens.every((token) => haystack.includes(token));
+    })
+    .sort((a, b) => {
+      const score = (p: SearchPlace) =>
+        normalize(p.name) === normalizedQuery
+          ? 0
+          : p.aliases.some((alias) => normalize(alias) === normalizedQuery)
+            ? 1
+            : normalize(p.name).startsWith(normalizedQuery)
+              ? 2
+              : normalize(p.name).includes(normalizedQuery)
+                ? 3
+                : 4;
+      return score(a) - score(b) || a.name.localeCompare(b.name);
+    })
+    .slice(0, 8);
 }
 export function choosePlace(
   data: MapData,
@@ -143,5 +184,38 @@ export function choosePlace(
   return {
     ...selection,
     selection: { ...selection.selection, label: place.name },
+  };
+}
+
+export function coordinatePlace(
+  query: string,
+  data: MapData,
+): SearchPlace | null {
+  const match = query
+    .trim()
+    .match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+  if (!match) return null;
+  const coordinate: GeoPoint = [Number(match[2]), Number(match[1])];
+  const action = selectCoordinate(data, coordinate, 'origin');
+  if (action.type !== 'select')
+    return {
+      id: 'coordinates',
+      name: query,
+      locality: 'Outside road-network coverage',
+      category: 'Landmark',
+      coordinate,
+      nodeId: '',
+      snapMeters: 0,
+      aliases: [],
+    };
+  return {
+    id: 'coordinates',
+    name: query,
+    locality: 'Latitude, longitude',
+    category: 'Landmark',
+    coordinate,
+    nodeId: action.selection.nodeId,
+    snapMeters: action.selection.snapMeters ?? 0,
+    aliases: [],
   };
 }

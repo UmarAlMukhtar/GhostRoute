@@ -44,7 +44,8 @@ function restriction(t: Tags): string | null {
     )
   )
     return 'conditional access/direction';
-  if (t.barrier && t.barrier !== 'no') return 'unhandled barrier';
+  if (t.barrier && !['no', 'toll_booth'].includes(t.barrier))
+    return 'unhandled barrier';
   if (t.foot && !allowed.has(t.foot)) return 'restricted foot access';
   if (!t.foot && t.access && !allowed.has(t.access))
     return 'restricted general access';
@@ -55,6 +56,7 @@ function restriction(t: Tags): string | null {
 export function convertOsm(
   input: unknown,
   version: string,
+  compact = false,
 ): {
   graph: RoadGraph;
   roads: RoadGeoJSON;
@@ -100,6 +102,20 @@ export function convertOsm(
       }
     }
   }
+  const references = new Map<string, number>();
+  for (const way of ways)
+    for (const id of way.nodes)
+      references.set(id, (references.get(id) ?? 0) + 1);
+  const retainNode = (id: string) => {
+    const node = nodes.get(id)!;
+    const [x, y] = node.coordinate;
+    return (
+      !compact ||
+      (references.get(id) ?? 0) > 1 ||
+      Object.keys(node.tags).length > 0 ||
+      (x >= 76.273 && x <= 76.294 && y >= 9.963 && y <= 9.99)
+    );
+  };
   const graph: RoadGraph = { version, nodes: {}, edges: {}, outgoing: {} };
   const roads: RoadGeoJSON = { type: 'FeatureCollection', features: [] },
     exclusions: { id: string; reason: string }[] = [];
@@ -167,13 +183,32 @@ export function convertOsm(
         exclusions.push({ id: segmentId, reason: nodeRestriction });
         continue;
       }
+      let end = i + 1;
+      while (
+        end < way.nodes.length - 1 &&
+        !retainNode(way.nodes[end]) &&
+        way.nodes[end + 1] !== a.id &&
+        !restriction(nodes.get(way.nodes[end + 1])!.tags)
+      )
+        end++;
+      const shape = way.nodes
+        .slice(i, end + 1)
+        .map((id) => nodes.get(id)!.coordinate);
+      const last = nodes.get(way.nodes[end])!;
       const lengthMeters =
-        Math.round(distanceMeters(a.coordinate, b.coordinate) * 1000) / 1000;
+        Math.round(
+          shape
+            .slice(1)
+            .reduce(
+              (sum, p, index) => sum + distanceMeters(shape[index], p),
+              0,
+            ) * 1000,
+        ) / 1000;
       if (lengthMeters <= 0)
         throw new Error(`OSM segment ${segmentId}: zero length`);
       const edgeIds: string[] = [];
       for (const direction of directions) {
-        const [from, to] = direction === 'forward' ? [a, b] : [b, a];
+        const [from, to] = direction === 'forward' ? [a, last] : [last, a];
         const id = `${segmentId}:${direction}`;
         for (const n of [from, to]) {
           graph.nodes[n.id] = { id: n.id, coordinate: n.coordinate };
@@ -187,7 +222,7 @@ export function convertOsm(
           lengthMeters,
           geometry: {
             type: 'LineString',
-            coordinates: [from.coordinate, to.coordinate],
+            coordinates: direction === 'forward' ? shape : [...shape].reverse(),
           },
           osmWayId: way.id,
         };
@@ -200,9 +235,10 @@ export function convertOsm(
         properties: { segmentId, osmWayId: way.id, edgeIds, tags: t },
         geometry: {
           type: 'LineString',
-          coordinates: [a.coordinate, b.coordinate],
+          coordinates: shape,
         },
       });
+      i = end - 1;
     }
   }
   for (const ids of Object.values(graph.outgoing)) ids.sort();

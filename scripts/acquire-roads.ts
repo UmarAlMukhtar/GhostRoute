@@ -1,44 +1,85 @@
-import { readFile, writeFile, stat } from 'node:fs/promises';
+import { readFile, writeFile, stat, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { convertOsm } from '../src/lib/geo/convert.ts';
 import { record } from '../src/lib/geo/validate.ts';
 
-// Deliberately one bounded request, never an application or CI startup dependency.
-const url =
-  'https://api.openstreetmap.org/api/0.6/map.json?bbox=76.274,9.966,76.292,9.984';
+// Acquisition is development-only. Overpass is preferred; bounded map API cells are an explicit fallback.
+const queryBounds = [76.22, 9.89, 76.42, 10.14];
+const url = 'https://overpass-api.de/api/interpreter';
+const query =
+  '[out:json][timeout:180];way[highway](9.89,76.22,10.14,76.42);(._;>;);out meta;';
 const importedAt = new Date().toISOString();
 const path = process.argv[2];
+const directory = path && (await stat(path)).isDirectory();
+const paths = directory
+  ? (await readdir(path))
+      .filter((p) => p.endsWith('.json'))
+      .sort()
+      .map((p) => `${path}/${p}`)
+  : path
+    ? [path]
+    : [];
 const response = path
   ? null
   : await fetch(url, {
-      signal: AbortSignal.timeout(60000),
-      headers: {
-        'User-Agent':
-          'GhostRoute-MAP-01 (https://github.com/UmarAlMukhtar/GhostRoute)',
-      },
+      method: 'POST',
+      body: new URLSearchParams({ data: query }),
+      signal: AbortSignal.timeout(240000),
     });
 if (response && !response.ok)
   throw new Error(
     `OSM HTTP ${response.status}; keep the existing frozen source`,
   );
-const bytes = path
-  ? await readFile(path)
-  : Buffer.from(await response!.arrayBuffer());
-if (bytes.length > 25_000_000)
-  throw new Error('OSM response exceeds 25 MB acquisition budget');
-const raw = record(JSON.parse(bytes.toString()), 'OSM response');
-if (!Array.isArray(raw.elements))
-  throw new Error('OSM response has no elements');
-const bounds = record(raw.bounds, 'OSM response bounds');
-if (
-  bounds.minlon !== 76.274 ||
-  bounds.minlat !== 9.966 ||
-  bounds.maxlon !== 76.292 ||
-  bounds.maxlat !== 9.984
-)
-  throw new Error('OSM response bounds differ from the reviewed request');
-const elements = raw.elements.map((e) => record(e, 'OSM element'));
+const responses = paths.length
+  ? await Promise.all(
+      paths.map(async (p) => ({ path: p, bytes: await readFile(p) })),
+    )
+  : [{ path: url, bytes: Buffer.from(await response!.arrayBuffer()) }];
+const sha256 = (b: Uint8Array) => createHash('sha256').update(b).digest('hex');
+const sourceRequests: {
+  sourceUrl: string;
+  sha256: string;
+  fetchedAt: string;
+}[] = [];
+const byId = new Map<string, Record<string, unknown>>();
+for (const input of responses) {
+  if (input.bytes.length > 40_000_000)
+    throw new Error('OSM response exceeds 40 MB per-cell budget');
+  const raw = record(JSON.parse(input.bytes.toString()), 'OSM response');
+  if (!Array.isArray(raw.elements))
+    throw new Error('OSM response has no elements');
+  let sourceUrl = url;
+  if (path) {
+    const bounds = record(raw.bounds, 'OSM response bounds');
+    const box = [bounds.minlon, bounds.minlat, bounds.maxlon, bounds.maxlat];
+    if (
+      !box.every((v) => typeof v === 'number') ||
+      Number(box[0]) < queryBounds[0] ||
+      Number(box[1]) < queryBounds[1] ||
+      Number(box[2]) > queryBounds[2] ||
+      Number(box[3]) > queryBounds[3]
+    )
+      throw new Error('OSM response bounds differ from the reviewed request');
+    sourceUrl = `https://api.openstreetmap.org/api/0.6/map.json?bbox=${box.join(',')}`;
+  }
+  sourceRequests.push({
+    sourceUrl,
+    sha256: sha256(input.bytes),
+    fetchedAt: path ? (await stat(input.path)).mtime.toISOString() : importedAt,
+  });
+  for (const value of raw.elements) {
+    const element = record(value, 'OSM element');
+    const key = `${element.type}:${element.id}`;
+    const previous = byId.get(key);
+    if (
+      !previous ||
+      Number(element.version ?? 0) > Number(previous.version ?? 0)
+    )
+      byId.set(key, element);
+  }
+}
+const elements = [...byId.values()];
 const ways = elements.filter(
   (e) => e.type === 'way' && record(e.tags ?? {}, 'tags').highway,
 );
@@ -50,7 +91,8 @@ const nodeIds = new Set(
 );
 const selected = elements.filter(
   (e) =>
-    (e.type === 'node' && nodeIds.has(e.id)) ||
+    (e.type === 'node' &&
+      (nodeIds.has(e.id) || record(e.tags ?? {}, 'tags').name)) ||
     ways.includes(e) ||
     (e.type === 'relation' &&
       (record(e.tags ?? {}, 'tags')['restriction:foot'] ||
@@ -89,7 +131,6 @@ const normalized = {
 };
 convertOsm(normalized, 'acquisition-validation');
 const source = Buffer.from(JSON.stringify(normalized) + '\n');
-const sha256 = (b: Uint8Array) => createHash('sha256').update(b).digest('hex');
 await writeFile(
   'data/source/ernakulam.osm.json.gz',
   gzipSync(source, { level: 9 }),
@@ -99,18 +140,20 @@ await writeFile(
   JSON.stringify(
     {
       sourceUrl: url,
+      sourceRequests,
+      overpassQuery: query,
       importedAt,
-      fetchedAt: path
-        ? (await stat(path)).mtime.toISOString()
-        : new Date().toISOString(),
-      acquisition: path
-        ? 'Local response; fetchedAt uses file modification time as download evidence'
-        : 'Direct HTTP GET',
-      ...(path
-        ? { responseFileModifiedAt: (await stat(path)).mtime.toISOString() }
-        : {}),
-      queryBounds: [76.274, 9.966, 76.292, 9.984],
-      rawResponseSha256: sha256(bytes),
+      fetchedAt: sourceRequests
+        .map((r) => r.fetchedAt)
+        .sort()
+        .at(-1),
+      acquisition: directory
+        ? 'Merged bounded OSM map API responses; duplicate elements use the highest version; raw responses outside Git'
+        : path
+          ? 'Imported bounded response'
+          : 'Overpass POST',
+      queryBounds,
+      rawResponseSha256: sha256(Buffer.concat(responses.map((r) => r.bytes))),
       normalizedSourceSha256: sha256(source),
       normalization:
         'highway ways, their referenced nodes, explicit pedestrian restriction relations; all tags and element versions/timestamps; no editor identities',

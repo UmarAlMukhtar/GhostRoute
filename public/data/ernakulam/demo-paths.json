@@ -1,5 +1,5 @@
 {
-  "graphVersion": "ernakulam-walking-v1-c5690329d952ed13",
+  "graphVersion": "ernakulam-walking-v2-da5f90bcba976cb6",
   "purpose": "Directed BFS connectivity witness, not shortest-distance routes or an approved shelter",
   "origin": {
     "nodeId": "271145615",
@@ -73,5 +73,5 @@
     "distanceMeters": 1470.595
   },
   "distinctAlternateMeters": 695.005,
-  "disconnectedNodeId": "11189614551"
+  "disconnectedNodeId": "10008248853"
 }

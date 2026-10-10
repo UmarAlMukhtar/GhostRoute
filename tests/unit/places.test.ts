@@ -1,3 +1,4 @@
+import expandedFixture from '../../public/data/ernakulam/demo-paths.json';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import catalog from '../../data/places/ernakulam.json';
@@ -23,8 +24,8 @@ const data = parseMapData(
 const places = validatePlaces(catalog, data);
 describe('verified offline place catalog', () => {
   it('preserves OSM point coordinates and evidence of named site/road membership', () => {
-    expect(places).toHaveLength(7);
-    for (const p of catalog.places) {
+    expect(places.length).toBeGreaterThan(10000);
+    for (const p of catalog.places.filter((p) => p.popular)) {
       const node = evidence.elements.find(
         (e) => e.type === 'node' && String(e.id) === p.sourceNodeId,
       )!;
@@ -39,8 +40,8 @@ describe('verified offline place catalog', () => {
     }
   });
   it('routes every pair through the real graph without silently choosing disconnected nodes', () => {
-    for (const a of places)
-      for (const b of places) {
+    for (const a of places.filter((p) => p.popular))
+      for (const b of places.filter((p) => p.popular)) {
         const action = choosePlace(data, b, 'destination', {
           nodeId: a.nodeId,
           coordinate: data.graph.nodes[a.nodeId].coordinate,
@@ -56,14 +57,18 @@ describe('verified offline place catalog', () => {
       }
   });
   it('shows all defaults and filters aliases, punctuation, category and locality', () => {
-    expect(filterPlaces(places, '')).toEqual(places);
-    expect(filterPlaces(places, 'maharajas')).toHaveLength(1);
-    expect(filterPlaces(places, "Maharaja's")).toHaveLength(1);
-    expect(filterPlaces(places, 'M G Road')[0].id).toBe('mg-road');
+    expect(filterPlaces(places, '')).toEqual(places.filter((p) => p.popular));
+    expect(filterPlaces(places, 'maharajas')[0].name).toContain('Maharaja');
+    expect(filterPlaces(places, "Maharaja's")[0].name).toContain('Maharaja');
+    expect(
+      filterPlaces(places, 'M G Road').some((p) => p.id === 'mg-road'),
+    ).toBe(true);
     expect(
       filterPlaces(places, 'ERS').some((p) => p.id === 'south-station'),
     ).toBe(true);
-    expect(filterPlaces(places, 'Broadway Market')[0].id).toBe('broadway');
+    expect(
+      filterPlaces(places, 'Broadway Market').some((p) => p.id === 'broadway'),
+    ).toBe(true);
     expect(filterPlaces(places, 'not in catalog')).toEqual([]);
   });
   it.each([
@@ -109,7 +114,7 @@ describe('verified offline place catalog', () => {
     ).toThrow(/disconnected/);
   });
   it('refuses a disconnected counterpart or stale place without changing selection', () => {
-    const node = data.graph.nodes['11189614551'];
+    const node = data.graph.nodes[expandedFixture.disconnectedNodeId];
     expect(
       choosePlace(data, places[0], 'destination', {
         nodeId: node.id,
@@ -146,12 +151,13 @@ describe('dataset extent overlay', () => {
     expect(coverage.area.geometry.coordinates[0]).toEqual(
       coverage.outline.geometry.coordinates,
     );
+    const [west, south, east, north] = data.bounds;
     expect(coverage.outline.geometry.coordinates).toEqual([
-      [76.2732579, 9.9638296],
-      [76.2936855, 9.9638296],
-      [76.2936855, 9.9897189],
-      [76.2732579, 9.9897189],
-      [76.2732579, 9.9638296],
+      [west, south],
+      [east, south],
+      [east, north],
+      [west, north],
+      [west, south],
     ]);
   });
   it.each(

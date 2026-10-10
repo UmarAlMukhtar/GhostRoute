@@ -14,16 +14,21 @@ const request = {
   destinationNodeId: fixture.destination.nodeId,
 };
 
-// Independent Bellman-Ford oracle in integer millimeters; test-only, no heap or path reconstruction.
+// Independent sorted-frontier Dijkstra in integer millimeters; no production heap or reconstruction.
 function referenceDistance(
   origin: string,
   destination: string,
   blocked: RoadClosures = {},
 ): number {
-  const distances = new Map([[origin, 0]]);
-  for (let pass = 1; pass < Object.keys(graph.nodes).length; pass++) {
-    let changed = false;
-    for (const edge of Object.values(graph.edges)) {
+  const distances = new Map([[origin, 0]]),
+    frontier: [string, number][] = [[origin, 0]];
+  while (frontier.length) {
+    frontier.sort((a, b) => b[1] - a[1]);
+    const [current, distance] = frontier.pop()!;
+    if (distance !== distances.get(current)) continue;
+    if (current === destination) return distance / 1000;
+    for (const id of graph.outgoing[current]) {
+      const edge = graph.edges[id];
       if (
         blocked.blockedSegmentIds?.has(edge.segmentId) ||
         blocked.blockedEdgeIds?.has(edge.id) ||
@@ -31,17 +36,14 @@ function referenceDistance(
         blocked.blockedNodeIds?.has(edge.to)
       )
         continue;
-      const candidate =
-        (distances.get(edge.from) ?? Infinity) +
-        Math.round(edge.lengthMeters * 1000);
+      const candidate = distance + Math.round(edge.lengthMeters * 1000);
       if (candidate < (distances.get(edge.to) ?? Infinity)) {
         distances.set(edge.to, candidate);
-        changed = true;
+        frontier.push([edge.to, candidate]);
       }
     }
-    if (!changed) break;
   }
-  return (distances.get(destination) ?? Infinity) / 1000;
+  return Infinity;
 }
 
 it('proves the real Hospital Road shortest-distance detour against an independent solver', () => {

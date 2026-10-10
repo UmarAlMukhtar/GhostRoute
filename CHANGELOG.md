@@ -1,5 +1,12 @@
 # Change log
 
+## Kochi geographic expansion and search — 2026-10-11T00:48:58+05:30
+
+- Changed: Acquired 44 bounded real OSM responses, merged source/provenance, preserved access/topology, retained full geometry with shape-node compaction, regenerated graph/roads/fixtures and a 12,409-name local index. Added snapping grid, directed index validation, debounce/ranking and coordinate search; updated data/architecture/README/ADR and regression tests.
+- Why: Support real navigation across central Kochi, Edappally, Vyttila, Kakkanad, Fort Kochi and Aluva rather than enlarge an empty visual boundary.
+- Checks: Production build and 174 unit tests passed; Hospital Road retains 944.333 m baseline and 980.790 m single-segment detour. Final browser verification remains in progress and will be recorded separately.
+- Limits: ~65 MB raw runtime graph/road JSON; frozen OSM access assumes missing permissions, approximate node snapping, incomplete gazetteer and retained disconnected components. Human geographic/implementation review pending. Local work only, no push or deploy.
+
 ## Final demo and submission readiness — 2026-10-10T23:45:20+05:30
 
 - Changed: Added presenter-controlled Demo Mode with real calculated metrics, restart/exit/manual handoff and regional reset; improved mobile guide spacing and keyboard access. Prepared Vercel config/runbook, pitch, submission narrative and named team draft; corrected stale foundation-only status; documented priorities and publication stop conditions.

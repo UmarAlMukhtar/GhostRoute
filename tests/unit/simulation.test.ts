@@ -1,3 +1,4 @@
+import expandedFixture from '../../public/data/ernakulam/demo-paths.json';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createFloodEngine } from '../../src/lib/simulation/flood';
@@ -345,7 +346,10 @@ describe('real Ernakulam simulation and rerouting', () => {
     expect(
       reroute(
         router,
-        router.findRoute({ ...request, destinationNodeId: '11189614551' }),
+        router.findRoute({
+          ...request,
+          destinationNodeId: expandedFixture.disconnectedNodeId,
+        }),
         f,
       )?.status,
     ).toBe('no-route');
