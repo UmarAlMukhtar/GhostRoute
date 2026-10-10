@@ -1,5 +1,48 @@
 # Verification record
 
+## MAP-02 — Interactive Ernakulam route explorer
+
+Verified 2026-10-10T23:13:00+05:30, starting from clean `ae2d726` on `codex-foundation`. The real graph, geographic/routing modules, organizer instructions, submission file and workflows are unchanged. No push, deployment, remote issue or settings change.
+
+| Check                                             | Actual result                                                                                                               |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm lint`                                       | PASS, no errors or warnings. Generated licensed worker assets are excluded.                                                 |
+| `pnpm typecheck`                                  | PASS, Next type generation and strict TypeScript.                                                                           |
+| `pnpm test`                                       | PASS, **106 tests across 9 files**, including existing routing/closure regressions and actual graph-to-UI data integration. |
+| `pnpm build`                                      | PASS, optimized production static page. Also executed by `pnpm test:e2e`.                                                   |
+| `pnpm test:e2e`                                   | PASS, **16 tests**: 8 journeys each in desktop and touch-capable mobile Chromium.                                           |
+| `pnpm format`                                     | PASS, maintained files formatted; organizer RULES and generated assets excluded.                                            |
+| `pnpm data:prepare` + asset diff                  | PASS, source and generated runtime assets byte-for-byte unchanged. 1,719 nodes, 3,712 directed edges, 1,856 segments.       |
+| Template/source preservation + `git diff --check` | PASS. README event section preserved; changes to inherited ignore/log files are additive.                                   |
+
+The commands used the already available pnpm 11.25.0 via a process-local PATH to the bundled runtime; no shell configuration was changed. Installation used the existing pnpm store. Build/browser commands needed the host permission for local worker/server ports already recorded in earlier milestones.
+
+### Browser and visual evidence
+
+Actual production Chromium rendering was inspected at **1440 × 900** and **360 × 800**, with mobile sheet expanded/collapsed. Tests also resize through desktop/mobile/**640 × 450** and verify endpoints remain in view and the page has no horizontal overflow. A development-server check under React Strict Mode recorded **one map canvas, three local asset requests, zero uncaught page errors**, and the real 944.3 m result. Short viewport content reflows into a vertically scrollable page; panels scroll at constrained heights.
+
+The Hospital Road preset uses the retained real Dijkstra router: **944.333 m**, displayed **944.3 m**, **21 traversed segments**. Tests exercise named and map-click selections, show snap offsets, reject clicks farther than 100 m, handle a real disconnected node, zero-distance endpoints and subsequent recalculation, reset old geometry, retry corrupt asset loads, and retain routing when WebGL is unavailable.
+
+Screenshots (local ignored test outputs; regenerate with the browser suite):
+
+- `test-results/foundation-real-map-Hospit-a5c17-set-and-responsive-controls-chromium/route.png`
+- `test-results/foundation-real-map-Hospit-a5c17-set-and-responsive-controls-mobile-chromium/route.png`
+- `test-results/foundation-real-map-Hospit-a5c17-set-and-responsive-controls-mobile-chromium/route-collapsed.png`
+
+Visual inspection caught a legend covering a desktop endpoint and missing mobile road rendering with large asymmetric camera padding. Increased desktop clearance and a mobile map viewport sized above the expanded sheet resolved these; later screenshots show both real roads and routes. The initial production worker failed because MapLibre 6's package-relative module URL does not survive bundling. Serving the exact installed worker/shared module locally resolved the failure. Test iteration also corrected strict TypeScript annotations, alert locators, and a test attempting to click the disabled minimum-zoom button.
+
+### Limits and next work
+
+All automated/visual browser checks block public OSM tile requests, in accordance with the provider's no automated tile-fetching policy. Local-road fallback was actually rendered; live provider availability/appearance is not certified. WebGL, a served app and local assets are still needed; no service worker/offline installation, physical-device testing, screen-reader audit, WCAG certification or real-world route safety validation is claimed. Default node snapping is an approximation, and the 12-component frozen graph is not complete urban coverage. No road names are drawn in the local fallback.
+
+Next: **SIM-01 — Flood Simulation and Road Intersection Engine**, deriving physical-segment/node closures from deterministic polygons, then **INT-01 — Automatic Disaster-Aware Rerouting**. Existing empty map sources provide the visual integration boundary; no flood behavior is implemented here.
+
+### MAP-02 file inventory
+
+Created: `scripts/prepare-maplibre.mjs`, `src/components/Dashboard.tsx`, `src/components/MapView.tsx`, `src/lib/map/data.ts`, `src/lib/map/selection.ts`, `src/lib/map/style.ts`, `tests/unit/map.test.ts`.
+
+Modified: `.env.example`, `.gitignore`, `.prettierignore`, `AI_USAGE.md`, `CHANGELOG.md`, `README.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN_SPEC.md`, `docs/TASKS.md`, `docs/TESTING.md`, `docs/VERIFICATION.md`, `docs/adr/002-maplibre-osm.md`, `docs/adr/README.md`, `eslint.config.mjs`, `package.json`, `playwright.config.ts`, `pnpm-lock.yaml`, `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, `tests/e2e/foundation.spec.ts`, `tests/unit/foundation.test.ts`.
+
 ## ROUTE-01 — Dijkstra routing engine
 
 Verified 2026-10-10T22:49:08+05:30, starting from clean `5362005` on `codex-foundation`. No push, remote issue/settings changes or new dependencies. Existing organizer instructions, workflows and MAP-01 source/runtime assets remain unchanged. Foundation page text now accurately says the engine exists; map rendering and flood simulation remain unimplemented.

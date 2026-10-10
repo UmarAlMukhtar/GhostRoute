@@ -1,7 +1,7 @@
 # ADR-002: MapLibre and OpenStreetMap
 
 - Date: 2026-10-10
-- Status: Accepted; online basemap provider proposed
+- Status: Accepted; optional OSM standard raster selected for MAP-02
 - Scope: planned MVP, not a claim of feature implementation
 
 ## Context
@@ -10,7 +10,7 @@ The demo needs inspectable geographic roads and independent layer styling.
 
 ## Decision
 
-Use MapLibre for rendering and OSM-derived local roads/graph. Preserve ODbL attribution. Choose an online provider only after terms review; local road style is the mandatory demo fallback.
+Use MapLibre for rendering and OSM-derived local roads/graph. Preserve ODbL attribution. MAP-02 uses optional OSM standard raster tiles after reviewing its [tile policy](https://operations.osmfoundation.org/policies/tiles/): browser Referer/cache behavior, visible attribution, no bulk/prefetch and no public tile requests from tests. Local road style is the mandatory fallback. Service availability is best effort.
 
 ## Alternatives considered
 

@@ -35,12 +35,12 @@ This template has no application code or required technology stack. The document
 
 GhostRoute is an open-source disaster-aware navigation **simulation** for Kochi–Ernakulam. It will demonstrate how a shortest path through real mapped roads changes when a simulated flood makes road segments unavailable.
 
-**Current status: Phase 0 + MAP-01 + ROUTE-01 complete.** This checkout contains a tooling smoke page, real local Ernakulam OSM road data, shared geographic contracts, a reproducible converter, heap-based Dijkstra routing, closure-aware snapping and validation tests. It does not yet contain an interactive map, flood simulation or verified emergency destinations.
+**Current status: MAP-02 is implemented locally.** The interactive Ernakulam map supports clicked or named endpoints, real shortest-distance routes, reset, responsive controls and a local-road fallback. The frozen dataset, Dijkstra engine and snapping are independent of remote tiles. Flood simulation and verified emergency destinations are not implemented.
 
 - **Project name:** GhostRoute
 - **Team:** Participant names/handles await the team's confirmation; maximum four members.
-- **Working demo:** `pnpm dev` currently shows the foundation page only. The planned product walkthrough is in [DEMO_PLAN](docs/DEMO_PLAN.md).
-- **Technology stack:** Next.js App Router, React, strict TypeScript, Tailwind, pnpm, ESLint, Prettier, Vitest and Playwright. MapLibre, Turf and selected shadcn/ui components are planned and will be added only when used.
+- **Working demo:** `pnpm dev` opens the interactive route explorer. The planned product walkthrough is in [DEMO_PLAN](docs/DEMO_PLAN.md).
+- **Technology stack:** Next.js App Router, React, strict TypeScript, Tailwind, pnpm, ESLint, Prettier, Vitest and Playwright. MapLibre GL JS and Lucide render the map and icons. Native accessible controls suffice for this screen; Turf and shadcn components remain deferred until needed.
 
 ### Problem and solution
 
@@ -85,11 +85,16 @@ In the original Codex workspace, run `cd repository` first; the official clone i
 
 `RULES.md` is excluded from automatic formatting so its inherited bytes remain intact. Do not add npm/yarn lockfiles or competing tool configs. CI runs the same checks; local results are in [VERIFICATION](docs/VERIFICATION.md).
 
-The local dataset has 1,719 nodes, 3,712 directed edges and 12 components. Run `pnpm data:prepare` to reproduce it without network access. [DATA_STRATEGY](docs/DATA_STRATEGY.md) records bounds, access assumptions and the verified alternate-path fixture. The [routing API](docs/ROUTING_ENGINE.md) supports node/edge/physical-road closures. Next implementation: MAP-02 (interactive map rendering).
+The local dataset has 1,719 nodes, 3,712 directed edges and 12 components. Run `pnpm data:prepare` to reproduce it without network access. [DATA_STRATEGY](docs/DATA_STRATEGY.md) records bounds, access assumptions and the verified alternate-path fixture. The [routing API](docs/ROUTING_ENGINE.md) supports node/edge/physical-road closures. Next implementation: SIM-01 (flood simulation and road intersections), then INT-01 (automatic rerouting).
 
 ### Demo instructions and limitations
 
-Today: start the app and confirm the heading, foundation status and safety disclaimer. This proves setup only. After P0 is built: choose a reviewed origin and synthetic destination, calculate the baseline, trigger the flood, compare blocked roads and the updated path, then reset. Full steps and internet-failure fallback are in [DEMO_PLAN](docs/DEMO_PLAN.md). No hosted deployment is claimed.
+1. Run `pnpm dev`, then open the app. Use **Try the Hospital Road demo**, then **Find route**: the actual shortest path is 944.3 m across 21 directed road segments.
+2. Alternatively choose named locations from the two menus, or use their crosshair buttons to pick on the map. Clicked points snap within 100 m; the panel reports the offset and the map distinguishes the clicked hollow dot from the snapped letter marker.
+3. Change either endpoint to clear the previous route, calculate again, or **Reset**. On mobile, expand/collapse the routing sheet with its header button. Presets work without map clicks.
+4. If remote street tiles fail or take over 12 seconds, local roads and routing remain usable. WebGL failure leaves named route controls/results available, with a clear error. This is not a complete offline web app: app assets must be served locally or loaded beforehand.
+
+`dev` and `build` copy the installed MapLibre worker and shared module into ignored, versioned local assets; no CDN worker is required. The optional OSM street tiles use normal browser caching, visible attribution and no prefetch. See the [OSMF tile policy](https://operations.osmfoundation.org/policies/tiles/) and [map architecture](docs/ARCHITECTURE.md#map-02-browser-integration). Automated browser tests abort external tile requests. No hosted deployment is claimed. The full future flood walkthrough remains in [DEMO_PLAN](docs/DEMO_PLAN.md).
 
 **Simulation only. Hazards and destinations are demonstration data. Routes are not verified safe. Follow local authorities.** The graph is a small, potentially stale extract; the flood model is two-dimensional. Neither an unblocked road nor a synthetic destination establishes actual access, capacity or safety.
 

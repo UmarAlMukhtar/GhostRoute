@@ -8,14 +8,23 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:3100',
     trace: 'retain-on-failure',
+    reducedMotion: 'reduce',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1440, height: 900 },
+      },
+    },
     {
       name: 'mobile-chromium',
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 360, height: 800 },
+        hasTouch: true,
+        isMobile: true,
       },
     },
   ],

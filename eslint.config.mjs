@@ -7,6 +7,7 @@ export default defineConfig([
   ...nextTypescript,
   globalIgnores([
     '.next/**',
+    'public/vendor/maplibre/**',
     'out/**',
     'next-env.d.ts',
     'coverage/**',

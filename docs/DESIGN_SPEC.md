@@ -1,14 +1,14 @@
 # Product design specification
 
-Status: planned product design. The Phase 0 page is only a tooling smoke test and is not the dashboard.
+Status: MAP-02 dashboard implemented; simulation-specific states below remain planned.
 
 ## Principles and composition
 
 A calm, premium emergency-operations dashboard should prioritize the map and the next clear action. Use restrained surfaces, precise spacing and professional system sans-serif typography; no remote font dependency or decorative emergency alarm effects. Keep simulation state obvious. “Available in this simulation” is acceptable; “safe route” as a verified result is not.
 
-Desktop (at least 1024 px): full remaining-viewport map below a compact header. A 320 px floating route panel at top-left contains origin/destination and distances/status; a small floating simulation panel sits top-right; zoom/recenter controls occupy the opposite corner from attribution. The bottom map edge reserves space for a compact legend and visible OSM attribution. Keep panels clear of selected route endpoints where possible; fit bounds with panel padding only after explicit route selection, not every render.
+Desktop (760 px and above): remaining-viewport map beneath a white brand/region/demo-status header. A 350 px floating panel holds native endpoint selects, map-pick buttons, calculate/preset actions and actual route information. Map zoom, scale and extent controls sit at the right. The attribution and safety footer remains outside the map and panel. The route camera includes panel padding.
 
-Mobile (360–1023 px): header and simulation badge remain visible; map has at least 45 viewport-height space, followed by stacked route and simulation controls in document flow. Avoid gesture-dependent bottom sheets in P0. No panel covers attribution, controls or safety copy. Preserve native page scrolling outside the map, provide labeled zoom buttons and a keyboard route-selection path. At 200% zoom allow reflow, never fixed-height clipped content.
+Mobile (below 760 px): compact header and full-height map with a button-controlled, scrollable bottom sheet limited to 54% of map height. The header exposes expanded state; collapsed content is removed from keyboard navigation. Selecting a map point collapses the sheet; a completed selection or error reopens it. This supersedes the earlier stacked-controls proposal per MAP-02's requested mobile interaction. No drag gesture is required. The map viewport resizes into the space above the expanded sheet so roads and markers share the same unobscured canvas; it expands again when collapsed. Short viewports allow page scrolling. Respect safe-area insets and reduced-motion preferences.
 
 ## Visual tokens and hierarchy
 
@@ -57,4 +57,10 @@ Optional line transitions/camera moves should be 150–250 ms and respect `prefe
 
 ## Content and scope
 
-Persistent copy: “Simulation only. Hazards and destinations are demonstration data. Routes are not verified safe. Follow local authorities.” Show dataset date and attribution. Do not show invented ETA, water depth, shelter capacity, live incident count, verified badge or emergency-service affiliation. Rich side-by-side metrics/explanations, replay and extra scenarios remain P1. No design-tool file or finished dashboard is claimed in this phase.
+Persistent copy: “Simulation only. Hazards and destinations are demonstration data. Routes are not verified safe. Follow local authorities.” Show dataset date and attribution. Do not show invented ETA, water depth, shelter capacity, live incident count, verified badge or emergency-service affiliation. Rich side-by-side metrics/explanations, replay and extra scenarios remain P1. MAP-02 delivers the route explorer. Simulation panels/legends, automatic rerouting and hazard status remain SIM-01/INT-01.
+
+## Implemented interaction details
+
+The primary route is solid blue with white casing. A is a circular blue origin marker; B is a dark rounded-square destination marker. A small hollow point distinguishes a click more than 2 m from its snapped node; the panel always reports a clicked selection's offset. This is not a walkable approach line. Named demo destinations are geographic test points, not verified shelters.
+
+The interface displays distance, traversed segment count and Walking demo / shortest-distance profile; no ETA or safety score. Help uses a native modal dialog with Escape dismissal. Loading, invalid asset retry, too-far selection, disconnected route, missing tiles and WebGL failure have explicit copy. No disabled flood teaser or pretend address search is included. Future overlays retain their own layer identities and semantic colors.

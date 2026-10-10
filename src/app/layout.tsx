@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'GhostRoute — foundation',
+  title: 'GhostRoute — Ernakulam route explorer',
   description:
-    'Disaster-aware navigation simulation. Development foundation only.',
+    'Explore real Ernakulam roads with a transparent, local routing simulation. Routes are not verified safe.',
 };
 
 export default function RootLayout({

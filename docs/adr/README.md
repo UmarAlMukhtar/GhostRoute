@@ -3,7 +3,7 @@
 Accepted means the implementation direction is selected, not that it is implemented or verified. Proposed subdecisions require evidence before adoption.
 
 - [ADR-001: Frontend-first architecture](001-frontend-first.md) — Accepted
-- [ADR-002: MapLibre and OpenStreetMap](002-maplibre-osm.md) — Accepted; online basemap provider proposed
+- [ADR-002: MapLibre and OpenStreetMap](002-maplibre-osm.md) — Accepted; optional OSM standard raster with local fallback
 - [ADR-003: Deterministic Dijkstra routing](003-routing.md) — Accepted; queue choice superseded by ADR-008
 - [ADR-004: Frozen geographic dataset](004-geographic-data.md) — Accepted; MAP-01 extent and path witness verified
 - [ADR-005: Deterministic flood simulation](005-simulation.md) — Accepted

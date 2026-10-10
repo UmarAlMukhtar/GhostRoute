@@ -33,3 +33,6 @@ test-results/
 # Unfiltered acquisition responses; only the compact frozen road source is versioned.
 data/source/*.raw.json
 data/source/*.osm
+
+# Generated local MapLibre worker assets (prepared by dev/build).
+/public/vendor/maplibre/

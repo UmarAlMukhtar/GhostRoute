@@ -23,3 +23,7 @@ Codex inspected the existing instructions/contracts/dataset, implemented and tes
 On 10 October 2026, Codex prepared this documentation template from the organizer's supplied rules and checked the linked Luma page for the event name and dates. This covered `README.md`, `RULES.md`, `AGENTS.md`, `CHANGELOG.md`, `AI_USAGE.md`, `SUBMISSION.md`, `.gitignore`, and the pull request checklist. Agent validation covered local links, event consistency, required documents, and diff whitespace; organizer review is pending.
 
 This preparation is separate from participant project implementation and participant AI usage during the event.
+
+## MAP-02 assistance — 2026-10-10T23:13:00+05:30
+
+Codex inspected the existing contracts, rules and design, implemented the interactive dashboard and browser data boundary, integrated the existing router, added MapLibre/Lucide and local worker preparation, and wrote unit/browser tests. Real browser inspection exposed worker URL and viewport/legend defects; these were fixed and rechecked. Final verification: 106 unit tests, 16 desktop/mobile browser journeys, lint, types, build, formatting and unchanged data regeneration. Desktop/mobile screenshots were actually inspected; public tile traffic was blocked. No geographic roads or routing logic were fabricated or replaced. Human review remains pending. Nothing was pushed or deployed.

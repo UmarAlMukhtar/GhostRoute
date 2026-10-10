@@ -1,6 +1,6 @@
 # GhostRoute architecture
 
-Status: accepted implementation direction for the small MVP; module paths below are planned unless explicitly listed as present. Phase 0 supplies `src/app/` smoke UI/tooling; MAP-01 now implements `src/lib/geo/`, source acquisition/conversion and local road assets. ROUTE-01 implements heap-based routing and closure-aware node snapping. Read [PRD](PRD.md), [data strategy](DATA_STRATEGY.md) and [ADRs](adr/README.md) together.
+Status: accepted implementation direction for the small MVP; module paths below are planned unless explicitly listed as present. Phase 0 supplies `src/app/` smoke UI/tooling; MAP-01 now implements `src/lib/geo/`, source acquisition/conversion and local road assets. ROUTE-01 implements heap-based routing and closure-aware node snapping. MAP-02 implements the interactive client dashboard and MapLibre rendering. Read [PRD](PRD.md), [data strategy](DATA_STRATEGY.md) and [ADRs](adr/README.md) together.
 
 ## System and application structure
 
@@ -19,22 +19,22 @@ flowchart TB
   Tiles[Optional online basemap] --> Map
 ```
 
-| Planned path                          | Responsibility                                                                    |
-| ------------------------------------- | --------------------------------------------------------------------------------- |
-| `src/app/` (present)                  | Layout, page, styles; currently static tooling smoke page                         |
-| `src/components/MapView.tsx`          | Map instance, layer/source updates, cleanup and map load/error states             |
-| `src/components/SimulationPanel.tsx`  | Trigger/reset and visible simulation state                                        |
-| `src/components/RoutePanel.tsx`       | Selections, distances, baseline/current status and accessible feedback            |
-| `src/components/ui/`                  | Only shadcn components actually needed; use native controls first when adequate   |
-| `src/lib/geo/types.ts`                | Contracts below; one authoritative shared module                                  |
-| `src/lib/geo/validate.ts`             | Validate untrusted JSON before exposing a RoadGraph                               |
-| `src/lib/routing/shortest-path.ts`    | Dijkstra, no React/MapLibre imports                                               |
-| `src/lib/simulation/flood.ts`         | Polygon validation/intersection and blocked edge derivation                       |
-| `src/lib/simulation/state.ts`         | Reducer for selections and scenario step; no geometry duplicated in state         |
-| `scripts/prepare-roads.ts`            | Implemented deterministic offline conversion                                      |
-| `data/source/`                        | Compressed normalized OSM source, request URL and manifest (present)              |
-| `public/data/ernakulam/`              | Graph, GeoJSON, metadata and path fixture (present); scenarios/destinations later |
-| `tests/unit/`, `tests/e2e/` (present) | Foundation tests now; behavioral suites added with their features                 |
+| Planned path                             | Responsibility                                                                    |
+| ---------------------------------------- | --------------------------------------------------------------------------------- |
+| `src/app/` (present)                     | Layout, page, styles; dashboard composition and global styles                     |
+| `src/components/MapView.tsx`             | Map instance, layer/source updates, cleanup and map load/error states             |
+| `src/components/SimulationPanel.tsx`     | Trigger/reset and visible simulation state                                        |
+| `src/components/Dashboard.tsx` (present) | Local asset boundary, selections, actual route results and accessible feedback    |
+| `src/components/ui/`                     | Only shadcn components actually needed; use native controls first when adequate   |
+| `src/lib/geo/types.ts`                   | Contracts below; one authoritative shared module                                  |
+| `src/lib/geo/validate.ts`                | Validate untrusted JSON before exposing a RoadGraph                               |
+| `src/lib/routing/shortest-path.ts`       | Dijkstra, no React/MapLibre imports                                               |
+| `src/lib/simulation/flood.ts`            | Polygon validation/intersection and blocked edge derivation                       |
+| `src/lib/simulation/state.ts`            | Reducer for selections and scenario step; no geometry duplicated in state         |
+| `scripts/prepare-roads.ts`               | Implemented deterministic offline conversion                                      |
+| `data/source/`                           | Compressed normalized OSM source, request URL and manifest (present)              |
+| `public/data/ernakulam/`                 | Graph, GeoJSON, metadata and path fixture (present); scenarios/destinations later |
+| `tests/unit/`, `tests/e2e/` (present)    | Foundation tests now; behavioral suites added with their features                 |
 
 Map rendering uses separate sources for roads, baseline, current route, blocked segments, flood polygon and destinations. Initialize after mount and clean up on unmount; use `setData`, not repeated map creation. Background tiles are optional; use a local style with background and road layers when offline. Never make routing depend on tile load success. Handle WebGL failure with textual error and route controls/results where possible. Include visible OSM attribution on the local-road fallback too.
 
@@ -42,7 +42,7 @@ Map rendering uses separate sources for roads, baseline, current route, blocked 
 
 The authoritative contracts now live in [`src/lib/geo/types.ts`](../src/lib/geo/types.ts): `GeoPoint` is a named `[longitude, latitude]` tuple; RoadNode, RoadEdge, RoadGraph, DisasterZone, FloodScenario, EmergencyShelter, RouteRequest, RouteResult and RoutingProfile match the planned MVP. `RoadGeoJSON` adds typed physical-segment features with source tags and directed edge IDs. GeoJSON types come from `@types/geojson`; no React or map renderer dependency enters these contracts.
 
-`validateGraph`, haversine distance, OSM conversion, dataset validation and validation-only BFS/component reporting are implemented. `geo/connectivity.findPath` remains a MAP-01 connectivity witness; `routing/shortest-path.createRouter` implements production shortest-distance routing. Roads are locally available at `/data/ernakulam/graph.json` and `/data/ernakulam/roads.geojson`; source and runtime manifests carry hashes and provenance. Import/parse JSON as unknown then validate; UI loading is MAP-02.
+`validateGraph`, haversine distance, OSM conversion, dataset validation and validation-only BFS/component reporting are implemented. `geo/connectivity.findPath` remains a MAP-01 connectivity witness; `routing/shortest-path.createRouter` implements production shortest-distance routing. Roads are locally available at `/data/ernakulam/graph.json` and `/data/ernakulam/roads.geojson`; source and runtime manifests carry hashes and provenance. Import/parse JSON as unknown then validate; MAP-02 loads these assets once per browser session.
 
 Function contracts: `validateGraph(input: unknown): RoadGraph` throws a descriptive validation error at the loading boundary; `shortestPath(graph: RoadGraph, request: RouteRequest): RouteResult`; `deriveBlockages(graph: RoadGraph, zones: DisasterZone[]): { blockedEdgeIds: Set<string>; blockedNodeIds: Set<string> }`. Inputs are immutable. At load time reject a scenario whose `graphVersion` differs from the graph, invalid step indices, and shelter references to missing nodes. A zero-edge successful route has one node, 0 m and null line geometry. Failed results never contain a route polyline. Unknown endpoints, endpoint closures, no route, malformed options and snapping failures have distinct typed statuses described in [ROUTING_ENGINE](ROUTING_ENGINE.md); data parsing failures become a dataset error state.
 
@@ -122,3 +122,28 @@ Show separate states for loading, invalid dataset, selection outside snapping ra
 ## Future backend extensibility
 
 Static manifests can later be replaced by validated, versioned data fetches at the existing loading boundary. Verified closure feeds need timestamp/expiry, provenance and human review; shelter status needs agency ownership. Multi-user reports need authentication and abuse controls. Keep these out of the MVP rather than adding unused service interfaces today.
+
+## MAP-02 browser integration
+
+- `components/Dashboard.tsx` owns the data-loading boundary, selection reducer, accessible controls and route results. It calls the retained `router.findRoute` directly; there is no routing logic in React. `lib/map/selection.ts` handles state transitions, calls `router.snap` and maps typed results to feedback. Changing an endpoint clears old route geometry; invalid clicks preserve the previous selection and report the failure. Reset clears both endpoints/result.
+- `lib/map/data.ts` fetches local graph, roads and demo fixtures concurrently. It validates the graph once, checks every road feature against validated graph geometry/IDs and verifies preset version/coordinates. The shared promise survives Strict Mode remounts and retries after rejection. Bounds derive from the validated nodes. No runtime Overpass call occurs.
+- `components/MapView.tsx` dynamically imports MapLibre after mount, renders GeoJSON sources, updates data without rebuilding the map and cleans up workers/listeners/markers/observers on unmount. `lib/map/style.ts` supplies the tile-independent style. Origin/destination are two DOM markers, not thousands of React road elements. Route geometry is the real returned LineString; zero-distance routes have a marker and no line.
+- Future `MapOverlays` accepts separate hazard polygons, blocked-road lines and alternative-route lines. These sources start empty. SIM-01 supplies geometry and closures; INT-01 owns baseline/current route state and recalculation, retaining the same router. No flood logic exists in MAP-02.
+- The map first loads local roads, then optional OSM raster tiles. A tile error or 12-second loading timeout removes the raster source and reports local-road mode. Non-tile errors and WebGL context loss are visible; route controls remain usable. Attribution/disclaimer live outside the canvas and sheets.
+- MapLibre 6's module worker cannot use its package-relative URL inside the Next bundle. `scripts/prepare-maplibre.mjs` copies the exact installed worker/shared module and BSD license into `public/vendor/maplibre/<version>/`; `dev`/`build` run it automatically. `setWorkerUrl` selects that same-origin URL. Generated files are ignored. No external worker/CDN dependency.
+- [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/) reviewed for this demonstration: standard browser Referer/cache behavior, visible attribution, no bulk downloads, no tile archives, no automated public-tile traffic. Availability is best effort. [MapLibre raster source documentation](https://maplibre.org/maplibre-gl-js/docs/examples/add-a-raster-tile-source/) informs the source/layer setup.
+
+```mermaid
+flowchart LR
+  Local[Local graph + roads + fixture] --> Loader[Validate once / retained router]
+  Click[Map click] --> Snap[router.snap]
+  Loader --> Snap
+  Preset[Named preset] --> Selection[Selection reducer]
+  Snap --> Selection
+  Selection --> Calculate[Find route button]
+  Calculate --> Router[router.findRoute]
+  Router --> Result[Typed result / distance / segments]
+  Result --> Renderer[MapView route source]
+  Local --> Renderer
+  Optional[Optional OSM tiles] --> Renderer
+```

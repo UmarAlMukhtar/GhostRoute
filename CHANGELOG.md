@@ -1,5 +1,12 @@
 # Change log
 
+## MAP-02 — 2026-10-10T23:13:00+05:30
+
+- Changed: Replaced the smoke page with the responsive MapLibre route explorer, local validated asset loader, retained Dijkstra integration, snapped/preset endpoints, route information, reset/help, offline-road fallback and future overlay boundaries. Added MapLibre/Lucide and locally served worker preparation; preserved geographic data and routing modules.
+- Why: Make the actual Ernakulam graph and routes usable in the browser before adding flood simulation.
+- Validation: Lint/types/build/format passed; 106 Vitest tests and 16 production Chromium desktop/mobile journeys passed. Offline data regeneration is unchanged. Actual desktop/mobile screenshots and Strict Mode loading were inspected. See docs/VERIFICATION.md for corrected failures and file inventory.
+- Limitations: Remote tiles deliberately blocked in automated checks; physical devices and assistive technologies not certified. Flood simulation and automatic rerouting remain next. Human review pending; local commit only, no push or deployment.
+
 Record each meaningful project change during the event, newest first. Update this file in the same commit as the change. Use a real timestamp with timezone, for example `YYYY-MM-DDTHH:MM:SS+05:30`.
 
 ## Event build log

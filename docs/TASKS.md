@@ -1,6 +1,6 @@
 # Contributor task catalog
 
-**Phase 0, MAP-01, ROUTE-01 and QA-01 are implemented.** ROUTE-02 utilities are implemented; map interaction remains pending. Next: MAP-02. Other tasks remain unassigned/unimplemented. These are local definitions; no GitHub issues, labels or assignments have been created. Estimates are hands-on contributor time, not sequential wall-clock totals. Work follows [ROADMAP](ROADMAP.md); parallel ownership is described there. Small beginner tasks fit inside phase budgets, not in addition to eight hours. Read the relevant ADR and coordinate shared files before starting.
+**Phase 0, MAP-01, ROUTE-01, ROUTE-02, MAP-02 and QA-01 are implemented.** UI-01 route controls are delivered; simulation controls remain pending. Next: SIM-01, then INT-01. Other tasks remain unassigned/unimplemented. These are local definitions; no GitHub issues, labels or assignments have been created. Estimates are hands-on contributor time, not sequential wall-clock totals. Work follows [ROADMAP](ROADMAP.md); parallel ownership is described there. Small beginner tasks fit inside phase budgets, not in addition to eight hours. Read the relevant ADR and coordinate shared files before starting.
 
 ## UI and design
 
@@ -54,6 +54,8 @@
 
 ### MAP-02 — Render local roads with MapLibre
 
+- **Status:** Complete locally: interactive map, validated local assets, typed routing, click/preset selection, responsive sheet, local-road fallback and browser tests. See VERIFICATION for actual evidence and limits.
+
 - **Description:** Add MapLibre only now, client-only map setup, local road layers, cleanup, source attribution and optional basemap after terms review.
 - **Priority:** P0
 - **Dependencies:** MAP-01 (contract first, assets before acceptance)
@@ -91,7 +93,7 @@
 
 ### ROUTE-02 — Origin snapping and route geometry
 
-- **Status:** Geographic snapping and route geometry delivered with ROUTE-01. Remaining: MAP-02 click/preset interactions, visible snap distance and accessible failure states. Reuse router.snap; do not implement another utility.
+- **Status:** Geographic snapping and route geometry delivered with ROUTE-01. MAP-02 now delivers click/preset interactions, visible snap distance and accessible failure states. Reuse router.snap; do not implement another utility.
 
 - **Description:** Map click selects a node within 100 m; show snap distance and support equivalent keyboard presets. Render only graph-edge geometry.
 - **Priority:** P0

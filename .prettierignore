@@ -12,3 +12,5 @@ RULES.md
 # Generated compact assets; regenerate with pnpm data:prepare.
 public/data/ernakulam/*.json
 public/data/ernakulam/*.geojson
+
+public/vendor/maplibre/
