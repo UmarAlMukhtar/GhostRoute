@@ -1,5 +1,17 @@
 # Verification record
 
+## Light UI consistency and loading — 2026-10-11T02:32:13+05:30
+
+Matching Navigation/Demo page links share a segmented control with `aria-current`, equal hit areas, hover and keyboard focus. Theme controls, stored preference handling, root script, dark CSS and MapLibre theme switching are removed; a dark system preference or old stored preference leaves the app light. The existing route panels, real graph, route geometry, hazards, report validation, attribution and safety copy remain intact.
+
+Branded preparation feedback covers actual road asset loading/validation and map import/initialization. The local place index now loads independently, with inline pending feedback and disabled autocomplete while it is unavailable; map/coordinate routing stays usable. Stale debounce suggestions cannot be selected. Routes and hazards remain synchronously derived, and browser-local report save/delete use synchronous storage: these operations do not show fake progress. Repeated report submissions at the same selected location are guarded. Guide feedback uses its real stage/cue/progress and entry is disabled until data exists.
+
+Final local checks passed: `pnpm lint`, `pnpm typecheck`, `pnpm test` (175 tests / 14 files), `pnpm test:e2e` (fresh production build and 44 browser cases: 22 desktop and 22 mobile, 4.1 minutes), `pnpm format`, `pnpm format:check` and `git diff --check`. Held network requests prove preparation/disabled controls and independent search recovery; repeated native submission events create one local report. Header geometry/focus checks pass at 320, 360, 760, 1024 and 1440 px. The initial sandbox build denied compiler port binding; only failed generated `.next` was removed before the passing authorized build. Hosted deployment is checked separately after the normal PR/CI/merge workflow. Historical theme/deployment records below describe their dated versions, not current behavior.
+
+Visually inspected real local browser evidence: [desktop navigation](evidence/light-ui-desktop-navigation.png), [mobile navigation](evidence/light-ui-mobile-navigation.png), [desktop demo](evidence/light-ui-desktop-demo.png), [mobile demo](evidence/light-ui-mobile-demo.png), [desktop preparation](evidence/light-ui-desktop-preparing.png) and [mobile preparation](evidence/light-ui-mobile-preparing.png). The demo captures follow settled map paint with original/detour/blocked geometry. Public tiles are deliberately blocked in automated tests.
+
+Remaining limits: frozen OSM, synchronous computation on the main thread and large initial assets remain; no physical-phone performance or human geographic/accessibility review is claimed. Local report storage is browser/origin scoped; simulations and reports do not establish safe routes.
+
 ## Public Vercel production — 2026-10-11T02:05:50+05:30
 
 Public URL: **https://ghostroute-weld.vercel.app**. Existing Hobby project `ghostroute`, official `UmarAlMukhtar/GhostRoute`, production branch `main`, initial implementation `cfed4ea9267a5b21e8b7b474af2ec1ab71c7bb77`, Ready deployment `dpl_HyNZ3KE8yiYUbimfPjg5uPsdNBHE`. No account/login required for the production domain. Vercel settings visibly confirm repository connection, main tracking, auto domain assignment, PR comments/commit status, Node 24.x and Basic build machine; no environment variables or paid resources were added.

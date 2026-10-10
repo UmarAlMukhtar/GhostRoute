@@ -14,8 +14,6 @@ export interface MapData {
   router: ReturnType<typeof createRouter>;
   bounds: [number, number, number, number];
   places: Place[];
-  searchPlaces?: SearchPlace[];
-  searchError?: string;
 }
 
 export function parseMapData(
@@ -123,29 +121,25 @@ export function loadMapData(): Promise<MapData> {
       return response.json() as Promise<unknown>;
     }),
   )
-    .then(async ([graph, roads, fixture]) => {
-      const data = parseMapData(graph, roads, fixture);
-      try {
-        const response = await fetch('/data/ernakulam/places.json');
-        if (!response.ok)
-          throw new Error(`Place index HTTP ${response.status}`);
-        return {
-          ...data,
-          searchPlaces: validatePlaces(await response.json(), data),
-          searchError: '',
-        };
-      } catch {
-        return {
-          ...data,
-          searchPlaces: [],
-          searchError:
-            'Local place index unavailable. Use coordinates or map selection; reload to retry.',
-        };
-      }
-    })
+    .then(([graph, roads, fixture]) => parseMapData(graph, roads, fixture))
     .catch((error) => {
       pending = undefined;
       throw error;
     });
   return pending;
+}
+
+// Search can become ready independently; a failed index never blocks map routing.
+let searchPending: Promise<SearchPlace[]> | undefined;
+export function loadSearchPlaces(data: MapData): Promise<SearchPlace[]> {
+  searchPending ??= fetch('/data/ernakulam/places.json')
+    .then(async (response) => {
+      if (!response.ok) throw new Error(`Place index HTTP ${response.status}`);
+      return validatePlaces(await response.json(), data);
+    })
+    .catch((error) => {
+      searchPending = undefined;
+      throw error;
+    });
+  return searchPending;
 }
