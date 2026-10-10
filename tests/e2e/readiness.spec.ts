@@ -178,7 +178,7 @@ test('rapid switching, repeated reset, viewport resize and refresh', async ({
 test('slow local assets recover and production worker assets are served', async ({
   page,
   request,
-}) => {
+}, info) => {
   let release!: () => void;
   const hold = new Promise<void>((resolve) => {
     release = resolve;
@@ -189,11 +189,18 @@ test('slow local assets recover and production worker assets are served', async 
   });
   await page.goto('/demo');
   await expect(
+    page.getByText('Preparing GhostRoute map', { exact: true }),
+  ).toBeVisible();
+  await expect(
     page.getByText('Loading and validating local roads…'),
   ).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Demo scenarios', exact: true }),
   ).toBeDisabled();
+  await page.screenshot({
+    path: info.outputPath('map-preparing.png'),
+    fullPage: true,
+  });
   release();
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
   await expect(

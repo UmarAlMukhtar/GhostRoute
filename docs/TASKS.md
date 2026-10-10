@@ -5,7 +5,7 @@
 - [x] Acquire and validate broad real OSM roads with southern bridge approaches; preserve Hospital Road fixtures.
 - [x] Derive a meaningful local OSM search index with ranked autocomplete and coordinates.
 - [x] Separate navigation left, simulation/reporting right, and scenarios at `/demo`.
-- [x] Implement persisted Light/Dark/System preferences and local dark map styling.
+- [x] Replace theme switching with a consistent light UI, matching Navigation/Demo links and real data/map/search loading feedback.
 - [x] Add confirmed deletion for non-seed browser-local reports without claiming server security.
 - [x] Finish browser/visual verification and record exact outcomes in VERIFICATION.
 - [ ] Human geographic, accessibility and target-device review; authorized deployment/submission.

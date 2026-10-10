@@ -64,8 +64,28 @@ describe('browser data boundary', () => {
     const { loadMapData } = await import('../../src/lib/map/data');
     const [a, b] = await Promise.all([loadMapData(), loadMapData()]);
     expect(a).toBe(b);
-    expect(fetcher).toHaveBeenCalledTimes(4);
+    expect(fetcher).toHaveBeenCalledTimes(3);
     expect(await loadMapData()).toBe(a);
+  });
+  it('loads and shares the search index independently of the router', async () => {
+    vi.resetModules();
+    const fetcher = vi.fn(
+      async (url: string) =>
+        new Response(JSON.stringify(read(url.split('/').at(-1)!))),
+    );
+    vi.stubGlobal('fetch', fetcher);
+    const { loadMapData, loadSearchPlaces } =
+      await import('../../src/lib/map/data');
+    const loaded = await loadMapData();
+    expect(fetcher).toHaveBeenCalledTimes(3);
+    const [first, second] = await Promise.all([
+      loadSearchPlaces(loaded),
+      loadSearchPlaces(loaded),
+    ]);
+    expect(first).toBe(second);
+    expect(first.length).toBeGreaterThan(1000);
+    expect(fetcher).toHaveBeenCalledTimes(4);
+    expect(await loadMapData()).toBe(loaded);
   });
   it('reports HTTP failures and permits retry', async () => {
     vi.resetModules();

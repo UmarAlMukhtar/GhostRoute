@@ -36,6 +36,7 @@ interface Props {
   places: SearchPlace[];
   data: MapData;
   error: string;
+  loading: boolean;
   onAction: (action: SelectionAction) => void;
   onOpen: (open: boolean) => void;
   onFocusPlace: (coordinate: Selection['coordinate']) => void;
@@ -47,6 +48,7 @@ export default function PlaceSearch({
   places,
   data,
   error,
+  loading,
   onAction,
   onOpen,
   onFocusPlace,
@@ -77,7 +79,8 @@ export default function PlaceSearch({
       })),
     [places, settledQuery, data, role, other],
   );
-  const enabled = matches.flatMap((match, index) =>
+  const suggestions = query === settledQuery && !loading ? matches : [];
+  const enabled = suggestions.flatMap((match, index) =>
     match.action.type === 'select' ? [index] : [],
   );
   function expand(value: boolean) {
@@ -92,8 +95,13 @@ export default function PlaceSearch({
     input.current?.focus();
   }
   function choose(index: number) {
-    const match = matches[index];
-    if (!match || match.action.type !== 'select' || query !== settledQuery)
+    const match = suggestions[index];
+    if (
+      loading ||
+      !match ||
+      match.action.type !== 'select' ||
+      query !== settledQuery
+    )
       return;
     // Revalidate at selection time; never reuse stale route eligibility.
     const action = choosePlace(data, match.place, role, other);
@@ -134,7 +142,7 @@ export default function PlaceSearch({
           aria-expanded={open}
           aria-controls={`${id}-list`}
           aria-activedescendant={
-            open && active >= 0 && matches[active]
+            open && active >= 0 && suggestions[active]
               ? `${id}-option-${active}`
               : undefined
           }
@@ -143,7 +151,8 @@ export default function PlaceSearch({
           spellCheck={false}
           placeholder="Search Ernakulam places"
           value={query}
-          disabled={Boolean(error)}
+          disabled={loading || Boolean(error)}
+          aria-busy={loading}
           onFocus={() => {
             expand(true);
             setActive(-1);
@@ -181,7 +190,10 @@ export default function PlaceSearch({
             }
           }}
         />
-        {(selection || query) && (
+        {loading && (
+          <span className="loading-ring search-loading" aria-hidden="true" />
+        )}
+        {!loading && (selection || query) && (
           <button
             className="search-clear"
             aria-label={`Clear ${role === 'origin' ? 'starting point' : 'destination'}`}
@@ -192,7 +204,9 @@ export default function PlaceSearch({
         )}
       </div>
       <span id={`${id}-hint`} className="search-hint">
-        {error || 'Offline OSM search · names or latitude, longitude'}
+        {loading
+          ? 'Loading local place search…'
+          : error || 'Offline OSM search · names or latitude, longitude'}
       </span>
       {open && !error && (
         <div className="place-dropdown">
@@ -205,7 +219,7 @@ export default function PlaceSearch({
             aria-label={`${role} place suggestions`}
             className="place-results"
           >
-            {matches.map(({ place, action }, index) => {
+            {suggestions.map(({ place, action }, index) => {
               const Icon = icons[place.category];
               return (
                 <button
@@ -237,11 +251,13 @@ export default function PlaceSearch({
             })}
           </div>
           <p className="search-scope" role="status">
-            {!matches.length
-              ? 'No matching local places. Try a different name, coordinates, or pick on the map.'
-              : !enabled.length
-                ? 'These places cannot connect to your other endpoint. Clear or change that endpoint.'
-                : `${matches.length} local places · nearest-node access is approximate`}
+            {query !== settledQuery
+              ? 'Updating suggestions…'
+              : !suggestions.length
+                ? 'No matching local places. Try a different name, coordinates, or pick on the map.'
+                : !enabled.length
+                  ? 'These places cannot connect to your other endpoint. Clear or change that endpoint.'
+                  : `${suggestions.length} local places · nearest-node access is approximate`}
           </p>
         </div>
       )}

@@ -73,7 +73,7 @@ async function search(page: Page, label: string, query: string, name: string) {
   await expect(option).toBeVisible();
   await option.click();
 }
-test('expanded Edappally–Vyttila navigation, disasters, local deletion, dark theme and dedicated demo', async ({
+test('expanded Edappally–Vyttila navigation, disasters, local deletion and dedicated demo', async ({
   page,
 }, info) => {
   const errors: string[] = [];
@@ -133,7 +133,21 @@ test('expanded Edappally–Vyttila navigation, disasters, local deletion, dark t
   await page
     .getByLabel('Description', { exact: true })
     .fill('Expanded journey report created in this browser.');
-  await page.getByRole('button', { name: 'Save local report' }).click();
+  await page
+    .getByRole('button', { name: 'Save local report' })
+    .evaluate((button) => {
+      const form = button.closest('form')!;
+      form.requestSubmit();
+      form.requestSubmit();
+    });
+  expect(
+    await page.evaluate(
+      () =>
+        JSON.parse(
+          localStorage.getItem('ghostroute.local-reports.v1') ?? '[]',
+        ).filter((report: { seeded: boolean }) => !report.seeded).length,
+    ),
+  ).toBe(1);
   await expect(
     page.getByText('Expanded journey report created in this browser.'),
   ).toBeVisible();
@@ -149,20 +163,10 @@ test('expanded Edappally–Vyttila navigation, disasters, local deletion, dark t
     .click();
   await page.getByRole('button', { name: 'Confirm deletion' }).click();
   await expect(page.getByText('Local report deleted.')).toBeVisible();
-  await page
-    .getByRole('combobox', { name: 'Theme', exact: true })
-    .selectOption('dark');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-theme', 'dark');
-  await expect(
-    page.getByText('Local roads · dark map', { exact: true }),
-  ).toBeVisible();
-  await page.screenshot({
-    path: info.outputPath('expanded-dark.png'),
-    fullPage: true,
-  });
   await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(
+    page.getByRole('combobox', { name: 'Theme', exact: true }),
+  ).toHaveCount(0);
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
   await page
     .getByRole('button', { name: 'Report Incident', exact: true })
@@ -181,7 +185,7 @@ test('expanded Edappally–Vyttila navigation, disasters, local deletion, dark t
     .click();
   await expect(page.getByTestId('updated-distance')).toHaveText('1.41 km');
   await page.screenshot({
-    path: info.outputPath('demo-dark.png'),
+    path: info.outputPath('demo-light.png'),
     fullPage: true,
   });
   expect(errors).toEqual([]);
@@ -191,22 +195,122 @@ test('expanded Edappally–Vyttila navigation, disasters, local deletion, dark t
     ),
   ).toBe(true);
 });
-test('system theme follows browser preference and persisted manual override', async ({
+test('light interface ignores system and old stored themes; page links match and focus', async ({
   page,
 }) => {
   await page.route('https://tile.openstreetmap.org/**', (route) =>
     route.abort(),
   );
   await page.emulateMedia({ colorScheme: 'dark' });
+  await page.addInitScript(() =>
+    localStorage.setItem('ghostroute.theme', 'dark'),
+  );
+  for (const path of ['/', '/demo']) {
+    await page.goto(path);
+    await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+    await expect(page.getByLabel('Theme', { exact: true })).toHaveCount(0);
+    expect(await page.locator('html').getAttribute('data-theme')).toBeNull();
+    expect(
+      await page
+        .locator('html')
+        .evaluate((el) => getComputedStyle(el).colorScheme),
+    ).toBe('light');
+    const nav = page.getByRole('navigation', { name: 'Pages' });
+    const navigation = nav.getByRole('link', {
+      name: 'Navigation',
+      exact: true,
+    });
+    const demo = nav.getByRole('link', { name: 'Demo', exact: true });
+    await expect(path === '/' ? navigation : demo).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    const boxes = await Promise.all([
+      navigation.boundingBox(),
+      demo.boundingBox(),
+    ]);
+    expect(boxes[0]!.height).toBe(boxes[1]!.height);
+    expect(boxes[0]!.y).toBe(boxes[1]!.y);
+    expect(boxes[0]!.x + boxes[0]!.width).toBeLessThanOrEqual(boxes[1]!.x);
+    await navigation.focus();
+    await expect(navigation).toBeFocused();
+    expect(
+      await navigation.evaluate((el) => getComputedStyle(el).outlineStyle),
+    ).toBe('solid');
+    for (const width of [320, 360, 760, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 800 });
+      const controls = await page.locator('.header-actions').evaluate((el) => {
+        const elements = [...el.querySelectorAll('a, button')];
+        return elements
+          .map((element) => {
+            const r = element.getBoundingClientRect();
+            return {
+              x: r.x,
+              y: r.y,
+              right: r.right,
+              bottom: r.bottom,
+              visible: r.width > 0 && r.height > 0,
+            };
+          })
+          .filter((r) => r.visible);
+      });
+      for (const box of controls) {
+        expect(box.x).toBeGreaterThanOrEqual(0);
+        expect(box.right).toBeLessThanOrEqual(width);
+      }
+      for (let a = 0; a < controls.length; a++)
+        for (let b = a + 1; b < controls.length; b++) {
+          const first = controls[a],
+            second = controls[b];
+          expect(
+            first.right <= second.x ||
+              second.right <= first.x ||
+              first.bottom <= second.y ||
+              second.bottom <= first.y,
+          ).toBe(true);
+        }
+    }
+  }
+});
+test('map routing becomes usable while search index is pending and recovers', async ({
+  page,
+}) => {
+  await page.route('https://tile.openstreetmap.org/**', (route) =>
+    route.abort(),
+  );
+  let release!: () => void;
+  const hold = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route('**/data/ernakulam/places.json', async (route) => {
+    await hold;
+    await route.continue();
+  });
   await page.goto('/');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await page.getByLabel('Theme', { exact: true }).selectOption('light');
-  await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-  await page.getByLabel('Theme', { exact: true }).selectOption('system');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await page.emulateMedia({ colorScheme: 'light' });
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  const input = page.getByRole('combobox', {
+    name: 'Starting point',
+    exact: true,
+  });
+  await expect(input).toBeDisabled();
+  await expect(input).toHaveAttribute('aria-busy', 'true');
+  await expect(page.locator('.search-loading')).toHaveCount(2);
+  await expect(
+    page.getByText('Loading local place search…').first(),
+  ).toBeVisible();
+  await page.getByText('Enter coordinates', { exact: true }).click();
+  await page.getByLabel('Latitude', { exact: true }).fill('9.9713489');
+  await page.getByLabel('Longitude', { exact: true }).fill('76.28014');
+  await page.getByRole('button', { name: 'Set coordinate' }).click();
+  await expect(input).not.toHaveValue('');
+  release();
+  await expect(input).toBeEnabled();
+  await expect(input).toHaveAttribute('aria-busy', 'false');
+  await expect(page.locator('.search-loading')).toHaveCount(0);
+  await input.fill('Edappally Market');
+  await expect(
+    page.getByRole('option').filter({ hasText: a.name }).first(),
+  ).toBeVisible();
 });
 test('failed local search index preserves coordinate routing', async ({
   page,

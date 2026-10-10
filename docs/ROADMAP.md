@@ -2,7 +2,7 @@
 
 ## Expansion milestone
 
-Implemented: broader real OSM graph and local search index; navigation/simulation separation; `/demo`; persisted light/dark/system themes; browser-local report deletion. Validation and actual remaining limits are in VERIFICATION. Next: human geographic/access review, target-phone performance rehearsal, regional extract acquisition for routine refreshes, and authorized hosting checks. Shared reports require authenticated backend ownership, moderation and freshness design before any claim of server enforcement.
+Implemented: broader real OSM graph and local search index; navigation/simulation separation; `/demo`; consistent light-only UI and real map/search loading feedback; browser-local report deletion. Validation and actual remaining limits are in VERIFICATION. Next: human geographic/access review, target-phone performance rehearsal, regional extract acquisition for routine refreshes, and authorized hosting checks. Shared reports require authenticated backend ownership, moderation and freshness design before any claim of server enforcement.
 
 Goal: a tested, explainable graph rerouting demonstration, not an operational emergency system. The clock is a relative team budget including Phase 0. The event itself runs from 10 October 18:30 IST to 11 October 10:00 IST; the eight-hour plan does not redefine those organizer times. Foundation, MAP-01/02, ROUTE-01 and SIM-01/INT-01 are implemented; current work is final demo readiness and deployment preparation. If foundation work takes longer, subtract that time from stretch work and reduce dataset size, never drop core graph tests or the disclaimer.
 

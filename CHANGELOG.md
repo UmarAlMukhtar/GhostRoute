@@ -1,5 +1,12 @@
 # Change log
 
+## Light UI consistency and actual loading feedback — 2026-10-11T02:32:13+05:30
+
+- Changed: matched Navigation/Demo segmented links; removed theme control/persistence/script/dark CSS/map switching. Added branded preparation and independent local-search loading with inline feedback; hide stale suggestions and guard repeated local report submission. Updated current behavior/design/architecture/testing docs and regression cases.
+- Why: make the existing light UI consistent and clarify real waiting states while preserving map/routing/hazard/report behavior.
+- Validation: final lint/types, 175 unit tests, fresh production build and all 44 desktop/mobile browser cases (4.1 minutes), format/format check and diff whitespace passed. Six rendered navigation/demo/preparation screenshots were inspected and saved. Actual held requests and duplicate native form events cover pending/recovery/submission guards.
+- Limits: synchronous routing/hazards and browser-local report storage are unchanged; no fake async spinner, geographic refresh, ETA or physical-phone performance claim. Human review pending.
+
 ## GitHub preview evidence — 2026-10-11T02:07:25+05:30
 
 Recorded the actual Ready Vercel preview, successful commit status and bot comment for documentation PR #8 in DEPLOYMENT/VERIFICATION. Checked links and whitespace; external-fork authorization remains unverified. Codex assistance, human review pending.

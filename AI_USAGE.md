@@ -1,5 +1,9 @@
 # AI usage record
 
+## Light UI consistency and loading — 2026-10-11T02:32:13+05:30
+
+Codex inspected the existing flows and reference image, kept the map-first layout, implemented matching page navigation, removed theme code and updated current documentation. It separated actual place-index loading from map readiness, added restrained loading feedback and stale/repeated-action guards, and used held browser requests to verify genuine pending states. Final local checks passed lint/types, 175 unit tests, a fresh production build, all 44 desktop/mobile production browser cases, format/format check and diff whitespace. It visually inspected six rendered navigation/demo/preparation screenshots and preserved existing dataset/routing/hazard/report safety boundaries. Human review pending. Publication uses the authorized normal branch/PR/CI/merge workflow; no force push, unrelated settings, fabricated progress or dataset changes.
+
 ## GitHub preview evidence — 2026-10-11T02:07:25+05:30
 
 Recorded the actual Ready Vercel preview, successful commit status and bot comment for documentation PR #8 in DEPLOYMENT/VERIFICATION. Checked links and whitespace; external-fork authorization remains unverified. Codex assistance, human review pending.
