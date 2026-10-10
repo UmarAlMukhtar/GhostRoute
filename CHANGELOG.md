@@ -1,5 +1,13 @@
 # Change log
 
+## Lossless responsive map loading — 2026-10-11T04:44:13+05:30
+
+- Changed: generated a compact segment transport, bundled worker decoding/full validation with bounded result messages, and cooperative router/connectivity/hazard/catalog initialization. Reused the initialized hazard engine in Dashboard; preserved synchronous route/hazard APIs and private snapshots. Added full-network equivalence, reverse-only geometry, worker failure/retry and animation/reduced-motion tests, reproducible benchmarks and current architecture/data documentation.
+- Why: measured loading contained a 6.36-second UI-thread task that prevented the loader from painting; duplicate downloaded geometry also increased network/memory cost.
+- Evidence: isolated cold 360×800 Chromium runs with 4× CPU emulation improved median map readiness 14.49→9.22 s, data transfer including catalog 9.74→4.59 MB, longest UI task 6.36→1.32 s and coarse reported heap 386→269 MB. Every original node, directed edge, coordinate, tag, component and adjacency is retained. Source/reference graph/roads hashes remain unchanged.
+- Validation: lint/types, 181 unit tests, production build, actual animation/reduced-motion browser tests and deterministic regeneration passed. Final full browser rerun passed all 48 cases (24 desktop + 24 mobile, 4.1 minutes); formatting/whitespace passed and six real loading/readiness screenshots were inspected.
+- Limits: measurements use emulation, not physical phones; rendering still produces approximately 1.3-second tasks at 4× CPU. No new dependency, persistent cache, geographic refresh, safety claim, paid service or submission action. Human review pending; publication evidence is recorded separately.
+
 ## Light UI consistency and actual loading feedback — 2026-10-11T02:32:13+05:30
 
 - Changed: matched Navigation/Demo segmented links; removed theme control/persistence/script/dark CSS/map switching. Added branded preparation and independent local-search loading with inline feedback; hide stale suggestions and guard repeated local report submission. Updated current behavior/design/architecture/testing docs and regression cases.

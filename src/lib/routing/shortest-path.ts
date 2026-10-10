@@ -1,3 +1,4 @@
+import { cooperatively, synchronously } from '../geo/cooperative.ts';
 import type {
   GeoPoint,
   RoadGraph,
@@ -13,7 +14,7 @@ import type {
 } from '../geo/types.ts';
 import { point } from '../geo/validate.ts';
 import { distanceMeters } from '../geo/distance.ts';
-import { connectedComponents } from '../geo/connectivity.ts';
+import { componentSteps } from '../geo/connectivity.ts';
 import { MinHeap } from './min-heap.ts';
 
 /** Access was filtered by walking-v1 during ingestion; no inferred safety/accessibility costs. */
@@ -24,7 +25,36 @@ export const DISTANCE_PROFILE: Readonly<RoutingProfile> = Object.freeze({
 
 /** Accept a RoadGraph already validated at the JSON boundary; take a private snapshot once. */
 export function createRouter(input: RoadGraph) {
-  const graph = structuredClone(input);
+  return synchronously(routerSteps(input));
+}
+
+export function createRouterAsync(input: RoadGraph) {
+  return cooperatively(routerSteps(input));
+}
+
+function* routerSteps(input: RoadGraph) {
+  let batch = 0;
+  const graph: RoadGraph = {
+    version: input.version,
+    nodes: {},
+    edges: {},
+    outgoing: {},
+  };
+  for (const [id, node] of Object.entries(input.nodes)) {
+    graph.nodes[id] = { id: node.id, coordinate: [...node.coordinate] };
+    graph.outgoing[id] = [...input.outgoing[id]];
+    if (++batch % 512 === 0) yield;
+  }
+  for (const [id, edge] of Object.entries(input.edges)) {
+    graph.edges[id] = {
+      ...edge,
+      geometry: {
+        type: edge.geometry.type,
+        coordinates: edge.geometry.coordinates.map((p) => [...p]),
+      },
+    };
+    if (++batch % 512 === 0) yield;
+  }
   const nodeIds = Object.keys(graph.nodes).sort();
   if (!nodeIds.length) throw new Error('Routing graph: empty nodes');
   const cells = new Map<string, string[]>();
@@ -36,6 +66,7 @@ export function createRouter(input: RoadGraph) {
       ids = cells.get(key) ?? [];
     ids.push(id);
     cells.set(key, ids);
+    if (++batch % 512 === 0) yield;
   }
   const outgoing = new Map(nodeIds.map((id) => [id, [] as string[]]));
   const incoming = new Map(nodeIds.map((id) => [id, [] as string[]]));
@@ -48,9 +79,10 @@ export function createRouter(input: RoadGraph) {
     outgoing.get(edge.from)!.push(id);
     incoming.get(edge.to)!.push(id);
     segments.add(edge.segmentId);
+    if (++batch % 512 === 0) yield;
   }
   for (const ids of outgoing.values()) ids.sort();
-  const largestComponent = new Set(connectedComponents(graph)[0]);
+  const largestComponent = new Set((yield* componentSteps(graph))[0]);
   const cloneNode = (id: string): RoadNode => ({
     id,
     coordinate: [...graph.nodes[id].coordinate],

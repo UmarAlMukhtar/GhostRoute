@@ -6,6 +6,7 @@ import evidence from '../../data/places/osm-evidence.json';
 import { parseMapData } from '../../src/lib/map/data';
 import {
   validatePlaces,
+  validatePlacesAsync,
   filterPlaces,
   choosePlace,
 } from '../../src/lib/map/places';
@@ -23,6 +24,9 @@ const data = parseMapData(
 );
 const places = validatePlaces(catalog, data);
 describe('verified offline place catalog', () => {
+  it('cooperative catalog validation returns the identical verified index', async () => {
+    expect(await validatePlacesAsync(catalog, data)).toEqual(places);
+  });
   it('preserves OSM point coordinates and evidence of named site/road membership', () => {
     expect(places.length).toBeGreaterThan(10000);
     for (const p of catalog.places.filter((p) => p.popular)) {

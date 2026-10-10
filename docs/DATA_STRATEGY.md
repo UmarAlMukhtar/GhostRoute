@@ -106,3 +106,7 @@ Keep a tiny synthetic mathematical graph fixture in tests, separate from OSM ass
 ## Data quality limits
 
 OSM completeness, access rules, road condition, usable sidewalks, steps and crossings are uncertain; a connected mapped edge is not proof of physical passability. The simulation ignores elevation, water depth/velocity, bridge strength, crowding and traffic. Missing wider-area paths can produce false local unreachability. Document dataset age and exclusions visibly; do not silently fetch a newer network during a presentation.
+
+## Lossless runtime transport
+
+`pnpm data:prepare` also emits `dataset.json` (`ghostroute-segments-v1`). It stores each node ID/coordinate and each physical segment's complete canonical LineString, OSM way ID, tags, and explicit forward/reverse endpoints and meter weights once. Reconstruction rebuilds the original directed edges and sorted adjacency before full geographic validation in a bundled same-origin worker. No coordinates, components, directions, source identities, access constraints or tags are omitted. The original `graph.json` and `roads.geojson` remain deterministic reference/verification assets. A full-network equivalence test compares every reconstructed value with those originals. Fixture graph-version checks still reject mismatched deployment assets, and a failed worker/load clears the shared promise for explicit retry. No persistent browser cache or new stale-data policy is introduced.

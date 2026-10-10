@@ -1,3 +1,4 @@
+import { packDataset } from '../src/lib/geo/transport.ts';
 import { preparePlaces } from './prepare-places.ts';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -83,6 +84,7 @@ const fixture = {
   disconnectedNodeId: components.find((c) => !c.includes(originNodeId))![0],
 };
 const files: Record<string, string> = {
+  'dataset.json': JSON.stringify(packDataset(graph, roads)) + '\n',
   'graph.json': JSON.stringify(graph) + '\n',
   'roads.geojson': JSON.stringify(roads) + '\n',
   'demo-paths.json': JSON.stringify(fixture, null, 2) + '\n',
@@ -109,6 +111,8 @@ const metadata = {
           'src/lib/geo/validate.ts',
           'src/lib/geo/dataset.ts',
           'src/lib/geo/connectivity.ts',
+          'src/lib/geo/cooperative.ts',
+          'src/lib/geo/transport.ts',
         ].map((p) => readFile(p)),
       )
     )

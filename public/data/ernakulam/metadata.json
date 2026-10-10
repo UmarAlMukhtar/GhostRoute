@@ -246,7 +246,7 @@
     "licenseUrl": "https://www.openstreetmap.org/copyright"
   },
   "converter": "walking-v2-shape-compaction",
-  "converterSha256": "95875fdc4e2cfc5957bb61356c3762a6ada2f1fdd56a1f35a10551345119a5c8",
+  "converterSha256": "7e000ff6c58d64a19e6107836c3a988ff4494fe3d2a4c2877e57662a3dea3525",
   "nodeCount": 49740,
   "directedEdgeCount": 115412,
   "segmentCount": 57706,
@@ -11575,6 +11575,7 @@
     }
   ],
   "outputSha256": {
+    "dataset.json": "1250af1e0caa7401564a9d879ea9f8414d0cd91f8f2b60f6ae5bb81ae791ea3f",
     "graph.json": "9b1e0cd4074a8eeef1024bb3ca52de9be08bb154d848128067216a56a01554ac",
     "roads.geojson": "9f52437ed2fb95d88333ae805f9e4a1dbe11cc711e9f1b69fe3b87d760a1b093",
     "demo-paths.json": "6990f941b04b16408389fb255e2374f8c3f2aa11dad9e11b6c4dc0d71b4299a1",
