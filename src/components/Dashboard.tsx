@@ -466,14 +466,10 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
   );
   const shelters = useMemo(
     () =>
-      impactActive &&
-      data &&
-      flood?.status === 'ready' &&
-      state.origin &&
-      current?.status !== 'found'
+      impactActive && data && flood?.status === 'ready' && state.origin
         ? findReachableShelters(data, state.origin, flood)
         : [],
-    [impactActive, data, flood, state.origin, current],
+    [impactActive, data, flood, state.origin],
   );
   const overlays = useMemo<MapOverlays | undefined>(
     () =>
@@ -913,66 +909,72 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
                       {routeMessage(current!)}
                     </p>
                   )}
-                  {current && !found && impactActive && (
-                    <section
-                      className="evacuation-assistance"
-                      aria-labelledby="evacuation-title"
-                    >
-                      <p className="eyebrow">EVACUATION ASSISTANCE</p>
-                      <h3 id="evacuation-title">Reachable relief points</h3>
-                      <p>
-                        Your destination cannot be reached through the current
-                        simulated closures. These options are ranked by
-                        closure-aware walking distance.
-                      </p>
-                      {shelters.length ? (
-                        <ol className="shelter-list">
-                          {shelters.map((shelter, index) => (
-                            <li key={shelter.id}>
-                              <div>
-                                <strong>
-                                  {index === 0 ? 'Recommended: ' : ''}
-                                  {shelter.name}
-                                </strong>
-                                <span>
-                                  {formatDistance(shelter.route.distanceMeters)}{' '}
-                                  · {shelter.capacityLabel}
-                                </span>
-                                <small>{shelter.facilities.join(' · ')}</small>
-                              </div>
-                              <button
-                                className="secondary"
-                                onClick={() =>
-                                  dispatch({
-                                    type: 'select',
-                                    role: 'destination',
-                                    selection: {
-                                      nodeId: shelter.nodeId,
-                                      coordinate: shelter.coordinate,
-                                      label: shelter.name,
-                                    },
-                                  })
-                                }
-                              >
-                                Route here
-                              </button>
-                            </li>
-                          ))}
-                        </ol>
-                      ) : (
-                        <p className="notice error">
-                          No illustrative relief point is reachable in this
-                          simulation. Move the origin or adjust the simulated
-                          hazards.
+                  {impactActive &&
+                    state.origin &&
+                    flood?.status === 'ready' && (
+                      <section
+                        className="evacuation-assistance"
+                        aria-labelledby="evacuation-title"
+                      >
+                        <p className="eyebrow">EVACUATION ASSISTANCE</p>
+                        <h3 id="evacuation-title">Emergency shelters</h3>
+                        <p>
+                          {current?.status === 'found'
+                            ? 'Your destination still has an available simulated route. These nearby fallback options are ranked by closure-aware walking distance.'
+                            : 'Your destination cannot be reached through the current simulated closures. Choose a reachable fallback below.'}
                         </p>
-                      )}
-                      <p className="shelter-disclaimer">
-                        Demonstration-only relief points, facilities and
-                        capacity. They are not verified shelters or live
-                        availability information.
-                      </p>
-                    </section>
-                  )}
+                        {shelters.length ? (
+                          <ol className="shelter-list">
+                            {shelters.map((shelter, index) => (
+                              <li key={shelter.id}>
+                                <div>
+                                  <strong>
+                                    {index === 0 ? 'Recommended: ' : ''}
+                                    {shelter.name}
+                                  </strong>
+                                  <span>
+                                    {formatDistance(
+                                      shelter.route.distanceMeters,
+                                    )}{' '}
+                                    · {shelter.capacityLabel}
+                                  </span>
+                                  <small>
+                                    {shelter.facilities.join(' · ')}
+                                  </small>
+                                </div>
+                                <button
+                                  className="secondary"
+                                  onClick={() =>
+                                    dispatch({
+                                      type: 'select',
+                                      role: 'destination',
+                                      selection: {
+                                        nodeId: shelter.nodeId,
+                                        coordinate: shelter.coordinate,
+                                        label: shelter.name,
+                                      },
+                                    })
+                                  }
+                                >
+                                  Route here
+                                </button>
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <p className="notice error">
+                            No illustrative relief point is reachable in this
+                            simulation. Move the origin or adjust the simulated
+                            hazards.
+                          </p>
+                        )}
+                        <p className="shelter-disclaimer">
+                          Demonstration-only relief points, facilities and
+                          capacity. They are not verified shelters or live
+                          availability information.
+                        </p>
+                      </section>
+                    )}
                   {found ? (
                     <div className="route-result">
                       <div className="result-header">
@@ -1247,6 +1249,12 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
                 <i className="legend-flood" />
                 Illustrative hazard
               </span>
+              {shelters.length > 0 && (
+                <span>
+                  <i className="legend-shelter" />
+                  Emergency shelters
+                </span>
+              )}
             </>
           )}
         </div>

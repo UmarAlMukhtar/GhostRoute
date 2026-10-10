@@ -1,5 +1,9 @@
 # AI usage record
 
+## Visible emergency-shelter guidance — 2026-10-11T04:28:00+05:30
+
+Codex adjusted the evacuation flow after user feedback so available illustrative shelters are shown when any simulated incident is active rather than being hidden until the original destination fails. It added a purple legend key and updated the demo safety wording. TypeScript, ESLint, production build and focused shelter/map tests passed; human review remains pending.
+
 ## Windows verification repair — 2026-10-11T04:10:47+05:30
 
 Codex diagnosed a failing frozen-data assertion as a Git Windows CRLF checkout mismatch, not a source-data or route change, and made the hash assertion normalize only JSON line endings. The focused dataset test then passed. It also started the production browser suite: the app built, but all Chromium cases were blocked by a missing Playwright browser binary. A browser download was initiated but did not finish; browser verification remains pending.

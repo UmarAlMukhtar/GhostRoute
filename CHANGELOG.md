@@ -1,5 +1,12 @@
 # Change log
 
+## Visible emergency-shelter guidance — 2026-10-11T04:28:00+05:30
+
+- Changed: display emergency shelter options and purple map pins whenever a simulated incident is active, not only once the original destination becomes unreachable. Added a matching map-legend key and context-specific guidance.
+- Why: people need to see evacuation options as soon as a disaster is being assessed, while retaining the original destination route when it remains available.
+- Checks: TypeScript, ESLint, production build and focused shelter/map tests passed (13 tests).
+- Limits: every relief point and facility remains illustrative demo data, not a live or verified camp listing.
+
 ## Windows dataset-test portability — 2026-10-11T04:10:47+05:30
 
 - Changed: normalized checked-out JSON line endings before comparing generated asset hashes in the frozen-dataset test.

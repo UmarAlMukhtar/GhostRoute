@@ -1223,6 +1223,9 @@ svg {
 .legend-flood {
   background: #06b6d4;
 }
+.legend-shelter {
+  background: #7e22ce;
+}
 @media (min-width: 761px) {
   .route-panel {
     width: 370px;
