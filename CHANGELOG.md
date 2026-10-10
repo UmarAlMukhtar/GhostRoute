@@ -1,5 +1,12 @@
 # Change log
 
+## Extension-safe root hydration — 2026-10-11T04:40:00+05:30
+
+- Changed: allow the root body to tolerate browser-extension attributes added before React hydrates.
+- Why: prevent a development-only hydration warning when an extension injects a `__processed_*` attribute into `<body>`.
+- Checks: TypeScript, ESLint and production build passed.
+- Limits: this suppresses only root-level extension-attribute noise; it does not mask normal component hydration defects.
+
 ## Visible emergency-shelter guidance — 2026-10-11T04:28:00+05:30
 
 - Changed: display emergency shelter options and purple map pins whenever a simulated incident is active, not only once the original destination becomes unreachable. Added a matching map-legend key and context-specific guidance.

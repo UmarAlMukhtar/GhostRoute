@@ -1,5 +1,9 @@
 # AI usage record
 
+## Extension-safe root hydration — 2026-10-11T04:40:00+05:30
+
+Codex diagnosed the reported hydration warning from the injected `__processed_*` body attribute, added a root-body hydration-warning boundary, and verified TypeScript, ESLint and the production build. This does not change map, routing, shelter, or disaster-simulation behavior.
+
 ## Visible emergency-shelter guidance — 2026-10-11T04:28:00+05:30
 
 Codex adjusted the evacuation flow after user feedback so available illustrative shelters are shown when any simulated incident is active rather than being hidden until the original destination fails. It added a purple legend key and updated the demo safety wording. TypeScript, ESLint, production build and focused shelter/map tests passed; human review remains pending.
