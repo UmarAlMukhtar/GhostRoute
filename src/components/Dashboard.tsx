@@ -510,7 +510,7 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
       >
         Skip to routing controls
       </a>
-      <header className="topbar">
+      <header className={`topbar ${demo ? 'demo-topbar' : ''}`}>
         <Link href="/" className="brand" aria-label="GhostRoute home">
           <span className="brand-icon">
             <Route size={25} strokeWidth={2.5} />

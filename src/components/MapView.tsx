@@ -59,6 +59,7 @@ export default function MapView({
   const callbacks = useRef({ onReposition, onReportClick, selecting });
   const [ready, setReady] = useState(false);
   const [failure, setFailure] = useState('');
+  const [darkMap, setDarkMap] = useState(false);
   const [tiles, setTiles] = useState<'loading' | 'online' | 'fallback'>(
     'loading',
   );
@@ -240,6 +241,7 @@ export default function MapView({
     if (!ready || !map) return;
     function applyTheme() {
       const dark = document.documentElement.dataset.theme === 'dark';
+      setDarkMap(dark);
       if (container.current)
         container.current.dataset.theme = dark ? 'dark' : 'light';
       map!.setPaintProperty(
@@ -472,11 +474,13 @@ export default function MapView({
         <Layers size={14} />
         {!ready && !failure
           ? 'Loading road map…'
-          : tiles === 'fallback'
-            ? 'Local roads · basemap unavailable'
-            : tiles === 'loading'
-              ? 'Local roads ready · loading basemap'
-              : 'Street map + local roads'}
+          : darkMap
+            ? 'Local roads · dark map'
+            : tiles === 'fallback'
+              ? 'Local roads · basemap unavailable'
+              : tiles === 'loading'
+                ? 'Local roads ready · loading basemap'
+                : 'Street map + local roads'}
       </div>
       {failure && (
         <div className="map-failure" role="alert">

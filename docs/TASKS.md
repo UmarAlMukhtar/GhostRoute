@@ -7,7 +7,7 @@
 - [x] Separate navigation left, simulation/reporting right, and scenarios at `/demo`.
 - [x] Implement persisted Light/Dark/System preferences and local dark map styling.
 - [x] Add confirmed deletion for non-seed browser-local reports without claiming server security.
-- [ ] Finish browser/visual verification and record exact outcomes in VERIFICATION.
+- [x] Finish browser/visual verification and record exact outcomes in VERIFICATION.
 - [ ] Human geographic, accessibility and target-device review; authorized deployment/submission.
 
 **Phase 0, MAP-01, ROUTE-01, ROUTE-02, MAP-02 and QA-01 are implemented.** UI-01, SIM-01 and INT-01 are delivered, including three real-graph flood scenarios and desktop/mobile browser journeys. Next: final UI/accessibility polish, demo reliability, deployment and submission. Other tasks remain unassigned/unimplemented. These are local definitions; no GitHub issues, labels or assignments have been created. Estimates are hands-on contributor time, not sequential wall-clock totals. Work follows [ROADMAP](ROADMAP.md); parallel ownership is described there. Small beginner tasks fit inside phase budgets, not in addition to eight hours. Read the relevant ADR and coordinate shared files before starting.

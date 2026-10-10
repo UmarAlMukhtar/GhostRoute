@@ -154,6 +154,9 @@ test('expanded Edappally–Vyttila navigation, disasters, local deletion, dark t
     .selectOption('dark');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByTestId('map')).toHaveAttribute('data-theme', 'dark');
+  await expect(
+    page.getByText('Local roads · dark map', { exact: true }),
+  ).toBeVisible();
   await page.screenshot({
     path: info.outputPath('expanded-dark.png'),
     fullPage: true,

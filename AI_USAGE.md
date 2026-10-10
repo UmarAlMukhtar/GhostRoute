@@ -1,5 +1,9 @@
 # AI usage record
 
+## Expanded UI and verification assistance — 2026-10-11T01:19:34+05:30
+
+Codex implemented separate workflows/themes/local deletion and meaningful failure/regression tests, inspected real screenshots and corrected drawer overlap, map-label overflow, contrast and reset test assumptions. Actual final checks passed: 174 unit tests and 42 browser tests plus lint/types/build/format/regeneration. Measurements and source/phone/storage limitations are recorded in VERIFICATION. Human review pending; no push/deployment or fabricated security/physical validation.
+
 ## Navigation, themes and local report management — 2026-10-11T01:06:18+05:30
 
 Implemented separate left navigation/right workflows, `/demo`, persisted Light/Dark/System and confirmed local report deletion. Corrected actual browser drawer overlap, off-screen map overflow and dark contrast; preserve independent navigation/simulation reset. Validation: 174 unit tests, all 21 final desktop browser cases, lint/types/build/format and deterministic data regeneration passed. Final mobile suite/evidence is still running. Human review pending; no push or deployment.

@@ -1,5 +1,9 @@
 # Change log
 
+## Expanded workflows and final verification — 2026-10-11T01:19:34+05:30
+
+Separated navigation, simulation and reports; added `/demo`, Light/Dark/System, confirmed browser-local report deletion and full regression/visual evidence. Validation: 174 unit tests, 42 production browser tests, lint/types/build/format and byte-identical regeneration passed. Larger initial asset/memory costs and physical phone validation remain documented; human review pending. Local commits only.
+
 ## Navigation, themes and local report management — 2026-10-11T01:06:18+05:30
 
 Implemented separate left navigation/right workflows, `/demo`, persisted Light/Dark/System and confirmed local report deletion. Corrected actual browser drawer overlap, off-screen map overflow and dark contrast; preserve independent navigation/simulation reset. Validation: 174 unit tests, all 21 final desktop browser cases, lint/types/build/format and deterministic data regeneration passed. Final mobile suite/evidence is still running. Human review pending; no push or deployment.

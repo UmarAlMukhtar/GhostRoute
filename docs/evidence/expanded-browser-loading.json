@@ -1,0 +1,70 @@
+[
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "readyMilliseconds": 8227,
+    "resources": [
+      {
+        "url": "graph.json",
+        "duration": 616.5999999977648,
+        "transferBytes": 6130206,
+        "decodedBytes": 42632911
+      },
+      {
+        "url": "roads.geojson",
+        "duration": 275.4000000022352,
+        "transferBytes": 2997836,
+        "decodedBytes": 22067272
+      },
+      {
+        "url": "demo-paths.json",
+        "duration": 5.399999998509884,
+        "transferBytes": 900,
+        "decodedBytes": 1983
+      },
+      {
+        "url": "places.json",
+        "duration": 87.19999999925494,
+        "transferBytes": 605657,
+        "decodedBytes": 3432790
+      }
+    ],
+    "heapBytes": 322000000
+  },
+  {
+    "viewport": {
+      "width": 360,
+      "height": 800
+    },
+    "readyMilliseconds": 6185,
+    "resources": [
+      {
+        "url": "graph.json",
+        "duration": 936.6999999992549,
+        "transferBytes": 6130206,
+        "decodedBytes": 42632911
+      },
+      {
+        "url": "roads.geojson",
+        "duration": 428.0999999977648,
+        "transferBytes": 2997836,
+        "decodedBytes": 22067272
+      },
+      {
+        "url": "demo-paths.json",
+        "duration": 18.800000000745058,
+        "transferBytes": 900,
+        "decodedBytes": 1983
+      },
+      {
+        "url": "places.json",
+        "duration": 46.70000000298023,
+        "transferBytes": 605657,
+        "decodedBytes": 3432790
+      }
+    ],
+    "heapBytes": 286000000
+  }
+]

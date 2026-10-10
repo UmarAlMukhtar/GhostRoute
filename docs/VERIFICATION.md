@@ -1,5 +1,29 @@
 # Verification record
 
+## Expanded navigation verification — 2026-10-11T01:19:34+05:30
+
+The frozen graph has **49,740 nodes, 115,412 directed edges and 57,706 physical segments**; the offline gazetteer has **12,409 names**. Whole-way extent is `[76.2148797, 9.8510819, 76.4365348, 10.1499696]` (west, south, east, north). Forty-four bounded OSM API responses were merged by OSM identity after Overpass requests failed. Geometry, intersections, access restrictions and disconnected components remain real; the southern bridge approaches connect Fort Kochi without arbitrary joins. See source manifest and DATA_STRATEGY.
+
+Actual final checks: `pnpm lint` (zero warnings), `pnpm typecheck`, `pnpm test` (**174 tests / 14 files, 50.92 s**), `pnpm build` (both `/` and `/demo`), `pnpm test:e2e` (**42 tests: 21 desktop and 21 touch-capable mobile Chromium, 3.6 min**), `pnpm format`, `pnpm format:check`, and `pnpm data:prepare` all passed. Regeneration reproduced every graph, roads, fixture, metadata and catalog hash byte for byte. `git diff --check` passed. Commands used the existing pnpm 11.25.0 / Node 22.23.1 runtime with a process-local PATH. Production builds/local browser ports needed sandbox escalation; a failed compiler cache was removed from generated `.next` before successful builds.
+
+The production browser suite blocks public tiles. It verifies the exact Edappally Market → Vyttila Mobility Hub journey, a real flood detour, second hazard creation/removal, report creation, cancelled and confirmed deletion, persisted removal after refresh, dark preference persistence, `/demo` and the Hospital Road flood. It also checks System preference changes, coordinate routing when the local name index fails, keyboard/touch search, disconnected/outside-network results, map/WebGL fallback, guided reset and rapid repeated scenario changes. Earlier full attempts exposed old selectors, fixed-position simulation overlap, off-screen geographic label overflow and independent reset semantics; they were corrected and rerun, not counted as passes.
+
+### Real route and performance evidence
+
+Edappally Market paths: Vyttila Mobility Hub **7,100.304 m**, Kakkanad Water Metro **8,485.297 m**, Fort Kochi Police Station **19,550.361 m**, Aluva **15,175.597 m**. Hospital Road remains **944.333 m**; its flood scenario detour remains **1.41 km**. These are distance-based walking model paths, not certified passable routes.
+
+Thirty measured cross-region calculations on AMD Ryzen 7 8845HS / Fedora 44 / Node 22 had median/p95 ms: Vyttila **29.387 / 33.421**, Kakkanad **44.102 / 50.906**, Fort Kochi **144.140 / 185.795**, Aluva **79.832 / 93.541**. Catalog validation took **891.906 ms** once; one illustrative polygon intersection over the full graph measured **9.220 / 27.440 ms** median/p95. Initialization measured **1,359.744 / 1,786.545 ms**; original Hospital route calculation **0.286 / 0.404 ms**, snap **0.040 / 0.085 ms**. Detailed measurements are in `docs/evidence/expanded-*-performance.json` and `expanded-routing-benchmark.json`; these are local benchmarks, not latency guarantees.
+
+Cold production Chromium readiness during a concurrent local test run measured **8.227 s desktop (1440×900)** and **6.185 s mobile viewport (360×800)**. Four data assets transferred about **9.735 MB compressed** and decoded **68.135 MB**; coarse Chromium heap estimates were **322 MB / 286 MB**. Full graph + roads raw bytes: **64,700,183**. Initial loading remains the main cost. Cached initialization, degree-two shape compaction, indexed snapping, one-time directed reachability validation and lazy name-index loading avoid repeated work. The browser measurements use a laptop and do not establish physical low-memory phone performance.
+
+### Visual review and limits
+
+Actual desktop/mobile light and dark screenshots were inspected. Left navigation and right workflow controls are usable; mobile workflows use scrollable bottom panels. The saved mobile demo screenshot was additionally captured after the asynchronous map paint settled on the same production build. Dark surfaces/labels/report cards/dialog buttons and map paint are themed directly; original blue, detour green and blocked red remain distinct. Short viewports (including 640×450) do not create horizontal overflow. Evidence screenshots live in `docs/evidence/`; the suite regenerates originals in ignored `test-results/expansion-expanded-Edappal-d4e56-rk-theme-and-dedicated-demo-{chromium,mobile-chromium}/`.
+
+Search is a frozen OSM gazetteer, not an exhaustive live geocoder; building-polygon-only POIs are not indexed, and all selected names must snap within 100 m and have directed connection to the original region. OSM walking assumptions, private access exclusions, missing mapping, disconnected roads and outdated names remain limitations. Dark mode uses local road styling and hides optional raster imagery. Storage failure prevents durable theme preference/report operations; media updates can fall back to System if storage cannot be read. Local report deletion persists the validated browser archive before UI mutation, rejects seed/unknown IDs and preserves state on failure; there is no authenticated identity, shared backend or server-enforced ownership. Unverified reports never close roads.
+
+Human geographic, accessibility and real target-device review remains pending. No push, deployment, remote issue, paid API, shared backend, live hazard validation or physical emergency route validation occurred. Organizer rules, submission fields and Git history remain preserved.
+
 ## MAP-02 — Interactive Ernakulam route explorer
 
 Verified 2026-10-10T23:13:00+05:30, starting from clean `ae2d726` on `codex-foundation`. The real graph, geographic/routing modules, organizer instructions, submission file and workflows are unchanged. No push, deployment, remote issue or settings change.

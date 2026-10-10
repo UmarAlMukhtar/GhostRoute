@@ -2077,3 +2077,34 @@ svg {
   ) {
   color: #b7cbd4;
 }
+[data-theme='dark'] .map-status {
+  background: #1e3540;
+  color: #b7cbd4;
+  border-color: var(--line);
+}
+[data-theme='dark'] .statusbar strong {
+  color: #d6d9ad;
+}
+@media (max-width: 759px) {
+  .topbar {
+    position: relative;
+  }
+  .header-actions .help-button {
+    display: inline-flex;
+    position: absolute;
+    top: 10px;
+    right: 14px;
+  }
+}
+@media (max-width: 759px) {
+  .topbar {
+    height: 116px;
+    align-content: flex-start;
+  }
+  .topbar .brand {
+    min-height: 44px;
+  }
+  .topbar.demo-topbar {
+    height: 156px;
+  }
+}

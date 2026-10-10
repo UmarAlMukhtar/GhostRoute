@@ -119,6 +119,9 @@ test('nested stages, endpoint changes, unavailable destination and replay', asyn
   await expect(page.getByTestId('simulation-availability')).toHaveText(
     'No available route',
   );
+  await page
+    .getByRole('button', { name: 'Close side panel', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Reset route', exact: true }).click();
   await page
     .getByRole('button', { name: 'Demo scenarios', exact: true })
@@ -132,6 +135,9 @@ test('nested stages, endpoint changes, unavailable destination and replay', asyn
   await expect(
     page.getByRole('button', { name: 'Start simulation' }),
   ).toBeDisabled();
+  await page
+    .getByRole('button', { name: 'Close side panel', exact: true })
+    .click();
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
