@@ -162,7 +162,7 @@ test('disconnected real node yields no route', async ({ page }) => {
 test('invalid dataset is actionable and retries successfully', async ({
   page,
 }) => {
-  await page.route('**/graph.json', (route) =>
+  await page.route('**/dataset.json', (route) =>
     route.fulfill({ json: { version: 'broken' } }),
   );
   await page.goto('/demo');
@@ -171,7 +171,7 @@ test('invalid dataset is actionable and retries successfully', async ({
       .getByRole('alert')
       .filter({ hasText: 'could not be loaded or validated' }),
   ).toBeVisible();
-  await page.unroute('**/graph.json');
+  await page.unroute('**/dataset.json');
   await page.getByRole('button', { name: 'Retry data loading' }).click();
   await expect(
     page.getByRole('button', { name: 'Try the Hospital Road demo' }),

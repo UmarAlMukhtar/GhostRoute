@@ -39,7 +39,6 @@ import DemoGuide from './DemoGuide';
 import { demoSteps } from '../lib/map/demo';
 import type { SimulationAction } from '../lib/simulation/session';
 import type { SelectionAction } from '../lib/map/selection';
-import { createFloodEngine } from '../lib/simulation/flood';
 import { scenarios } from '../lib/simulation/scenarios';
 import {
   initialSimulation,
@@ -442,10 +441,7 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
     dispatch({ type: 'active', role });
     setSheetOpen(false);
   }
-  const engine = useMemo(
-    () => (data ? createFloodEngine(data.graph) : null),
-    [data],
-  );
+  const engine = data?.engine;
   const individualImpacts = useMemo(
     () =>
       engine

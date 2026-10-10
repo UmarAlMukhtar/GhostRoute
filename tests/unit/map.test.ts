@@ -1,6 +1,7 @@
 import expandedFixture from '../../public/data/ernakulam/demo-paths.json';
 import { readFileSync } from 'node:fs';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { fetchMapAssets } from '../../src/lib/map/fetch-assets';
 import { parseMapData } from '../../src/lib/map/data';
 import {
   formatDistance,
@@ -16,6 +17,44 @@ const graph = read('graph.json'),
   roads = read('roads.geojson'),
   fixture = read('demo-paths.json');
 const data = parseMapData(graph, roads, fixture);
+beforeEach(() => {
+  vi.stubGlobal(
+    'Worker',
+    class {
+      onmessage?: (event: { data: unknown }) => void;
+      onerror?: () => void;
+      terminate = vi.fn();
+      postMessage() {
+        void fetchMapAssets()
+          .then((assets) => {
+            this.onmessage?.({
+              data: { type: 'nodes', nodes: Object.values(assets.graph.nodes) },
+            });
+            this.onmessage?.({
+              data: { type: 'edges', edges: Object.values(assets.graph.edges) },
+            });
+            this.onmessage?.({
+              data: {
+                type: 'roads',
+                roads: assets.roads.features.map((f) => f.properties),
+              },
+            });
+            this.onmessage?.({
+              data: {
+                type: 'ready',
+                version: assets.graph.version,
+                places: assets.places,
+                bounds: assets.bounds,
+              },
+            });
+          })
+          .catch((error) =>
+            this.onmessage?.({ data: { type: 'error', error: error.message } }),
+          );
+      }
+    },
+  );
+});
 afterEach(() => vi.unstubAllGlobals());
 describe('browser data boundary', () => {
   it('loads real road geometry and initializes the actual router', () => {
@@ -64,8 +103,37 @@ describe('browser data boundary', () => {
     const { loadMapData } = await import('../../src/lib/map/data');
     const [a, b] = await Promise.all([loadMapData(), loadMapData()]);
     expect(a).toBe(b);
-    expect(fetcher).toHaveBeenCalledTimes(3);
+    expect(a.graph).toEqual(data.graph);
+    expect(a.roads).toEqual(data.roads);
+    expect(fetcher).toHaveBeenCalledTimes(2);
     expect(await loadMapData()).toBe(a);
+  });
+  it('terminates a failed worker and permits a fresh initialization', async () => {
+    vi.resetModules();
+    const healthyWorker = globalThis.Worker;
+    const terminate = vi.fn();
+    vi.stubGlobal(
+      'Worker',
+      class {
+        onerror?: () => void;
+        terminate = terminate;
+        postMessage() {
+          queueMicrotask(() => this.onerror?.());
+        }
+      },
+    );
+    const { loadMapData } = await import('../../src/lib/map/data');
+    await expect(loadMapData()).rejects.toThrow(/worker failed/);
+    expect(terminate).toHaveBeenCalledOnce();
+    vi.stubGlobal('Worker', healthyWorker);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async (url: string) =>
+          new Response(JSON.stringify(read(url.split('/').at(-1)!))),
+      ),
+    );
+    expect((await loadMapData()).places).toHaveLength(2);
   });
   it('loads and shares the search index independently of the router', async () => {
     vi.resetModules();
@@ -77,14 +145,14 @@ describe('browser data boundary', () => {
     const { loadMapData, loadSearchPlaces } =
       await import('../../src/lib/map/data');
     const loaded = await loadMapData();
-    expect(fetcher).toHaveBeenCalledTimes(3);
+    expect(fetcher).toHaveBeenCalledTimes(2);
     const [first, second] = await Promise.all([
       loadSearchPlaces(loaded),
       loadSearchPlaces(loaded),
     ]);
     expect(first).toBe(second);
     expect(first.length).toBeGreaterThan(1000);
-    expect(fetcher).toHaveBeenCalledTimes(4);
+    expect(fetcher).toHaveBeenCalledTimes(3);
     expect(await loadMapData()).toBe(loaded);
   });
   it('reports HTTP failures and permits retry', async () => {

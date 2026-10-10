@@ -207,6 +207,7 @@ test('slow local assets recover and production worker assets are served', async 
     page.getByText('Local roads · basemap unavailable'),
   ).toBeVisible();
   for (const path of [
+    '/data/ernakulam/dataset.json',
     '/data/ernakulam/graph.json',
     '/data/ernakulam/roads.geojson',
     '/vendor/maplibre/6.13.0/maplibre-gl-worker.mjs',

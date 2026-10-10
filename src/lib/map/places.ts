@@ -1,3 +1,4 @@
+import { cooperatively, synchronously } from '../geo/cooperative.ts';
 import type { MapData } from './data.ts';
 import type { GeoPoint } from '../geo/types.ts';
 import { point, record, text } from '../geo/validate.ts';
@@ -35,6 +36,21 @@ export function validatePlaces(
   input: unknown,
   data: Pick<MapData, 'graph' | 'router' | 'bounds'>,
 ): SearchPlace[] {
+  return synchronously(placeSteps(input, data));
+}
+
+export function validatePlacesAsync(
+  input: unknown,
+  data: Pick<MapData, 'graph' | 'router' | 'bounds'>,
+) {
+  return cooperatively(placeSteps(input, data));
+}
+
+function* placeSteps(
+  input: unknown,
+  data: Pick<MapData, 'graph' | 'router' | 'bounds'>,
+): Generator<void, SearchPlace[]> {
+  let batch = 0;
   const raw = record(input, 'Gazetteer');
   if (raw.graphVersion !== data.graph.version)
     throw new Error('Place catalog does not match this road dataset');
@@ -48,12 +64,15 @@ export function validatePlaces(
   const reversed = new Map(
     Object.keys(data.graph.nodes).map((id) => [id, [] as string[]]),
   );
-  for (const edge of Object.values(data.graph.edges))
+  for (const edge of Object.values(data.graph.edges)) {
     reversed.get(edge.to)!.push(edge.from);
-  const reachable = (reverse: boolean) => {
+    if (++batch % 512 === 0) yield;
+  }
+  function* reachable(reverse: boolean): Generator<void, Set<string>> {
     const seen = new Set([anchor]),
       queue = [anchor];
     for (let i = 0; i < queue.length; i++) {
+      if (++batch % 512 === 0) yield;
       const neighbors = reverse
         ? (reversed.get(queue[i]) ?? [])
         : (data.graph.outgoing[queue[i]] ?? []).map(
@@ -66,11 +85,13 @@ export function validatePlaces(
         }
     }
     return seen;
-  };
-  const fromAnchor = reachable(false),
-    toAnchor = reachable(true);
+  }
+  const fromAnchor = yield* reachable(false);
+  const toAnchor = yield* reachable(true);
   const ids = new Set<string>();
-  return raw.places.map((value) => {
+  const places: SearchPlace[] = [];
+  for (const value of raw.places) {
+    if (++batch % 32 === 0) yield;
     const p = record(value, 'Place'),
       id = text(p.id, 'Place ID');
     if (ids.has(id)) throw new Error('Duplicate place ID');
@@ -107,7 +128,7 @@ export function validatePlaces(
       if (!(role === 'origin' ? toAnchor : fromAnchor).has(nodeId))
         throw new Error(`Place ${id} is disconnected from the demo network`);
     }
-    return {
+    places.push({
       id,
       name: text(p.name, 'Place name'),
       locality: text(p.locality, 'Place locality'),
@@ -117,8 +138,9 @@ export function validatePlaces(
       snapMeters: p.snapMeters,
       aliases: p.aliases,
       popular: p.popular !== false,
-    };
-  });
+    });
+  }
+  return places;
 }
 const normalize = (value: string) =>
   value
