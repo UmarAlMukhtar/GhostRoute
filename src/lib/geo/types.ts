@@ -54,20 +54,65 @@ export interface RoutingProfile {
   id: 'walking-demo';
   cost: 'distance';
 }
-export interface RouteRequest {
+export interface RoadClosures {
+  blockedEdgeIds?: ReadonlySet<string>;
+  blockedNodeIds?: ReadonlySet<string>;
+  blockedSegmentIds?: ReadonlySet<string>;
+}
+export interface RoutingOptions extends RoadClosures {
+  profile?: RoutingProfile;
+}
+export interface RouteRequest extends RoutingOptions {
   originNodeId: string;
   destinationNodeId: string;
-  profile: RoutingProfile;
-  blockedEdgeIds: ReadonlySet<string>;
-  blockedNodeIds: ReadonlySet<string>;
 }
+export type RequestFailure = { status: 'invalid-request'; reason: string };
+export type SnapFailure =
+  | { status: 'invalid-coordinate'; reason: string }
+  | {
+      status: 'snap-distance-exceeded';
+      nearestDistanceMeters: number;
+      maxDistanceMeters: number;
+    }
+  | { status: 'no-eligible-node' }
+  | RequestFailure;
 export type RouteResult =
   | {
       status: 'found';
+      origin: RoadNode;
+      destination: RoadNode;
       nodeIds: string[];
       edgeIds: string[];
+      segmentIds: string[];
       distanceMeters: number;
       geometry: LineString | null;
+      metadata: {
+        graphVersion: string;
+        algorithm: 'dijkstra';
+        profileId: RoutingProfile['id'];
+        settledNodeCount: number;
+      };
     }
-  | { status: 'unreachable'; reason: 'disconnected' | 'endpoint-blocked' }
-  | { status: 'invalid'; reason: string };
+  | {
+      status:
+        | 'invalid-origin'
+        | 'invalid-destination'
+        | 'origin-blocked'
+        | 'destination-blocked';
+      nodeId: string;
+    }
+  | { status: 'no-route' }
+  | SnapFailure;
+export interface SnapOptions extends RoutingOptions {
+  maxDistanceMeters?: number;
+  largestComponentOnly?: boolean;
+  role?: 'origin' | 'destination';
+}
+export type SnapResult =
+  | {
+      status: 'snapped';
+      node: RoadNode;
+      distanceMeters: number;
+      graphVersion: string;
+    }
+  | SnapFailure;

@@ -1,6 +1,6 @@
 # Contributor task catalog
 
-**Phase 0 and MAP-01 are implemented.** Other tasks remain unassigned/unimplemented. Next: ROUTE-01, followed by MAP-02. These are local definitions; no GitHub issues, labels or assignments have been created. Estimates are hands-on contributor time, not sequential wall-clock totals. Work follows [ROADMAP](ROADMAP.md); parallel ownership is described there. Small beginner tasks fit inside phase budgets, not in addition to eight hours. Read the relevant ADR and coordinate shared files before starting.
+**Phase 0, MAP-01, ROUTE-01 and QA-01 are implemented.** ROUTE-02 utilities are implemented; map interaction remains pending. Next: MAP-02. Other tasks remain unassigned/unimplemented. These are local definitions; no GitHub issues, labels or assignments have been created. Estimates are hands-on contributor time, not sequential wall-clock totals. Work follows [ROADMAP](ROADMAP.md); parallel ownership is described there. Small beginner tasks fit inside phase budgets, not in addition to eight hours. Read the relevant ADR and coordinate shared files before starting.
 
 ## UI and design
 
@@ -78,6 +78,8 @@
 
 ### ROUTE-01 — Implement deterministic Dijkstra
 
+- **Status:** Complete locally. Indexed heap, typed failures, three closure types, ordered route geometry, snapping utility, independent real-data shortest-distance tests and benchmark. See ROUTING_ENGINE and VERIFICATION.
+
 - **Description:** Start with TESTING synthetic fixture; implement the shortestPath signature in ARCHITECTURE, validate request, track predecessors and sum positive weights.
 - **Priority:** P0
 - **Dependencies:** MAP-01 shared types; real assets needed for final integration
@@ -89,11 +91,13 @@
 
 ### ROUTE-02 — Origin snapping and route geometry
 
+- **Status:** Geographic snapping and route geometry delivered with ROUTE-01. Remaining: MAP-02 click/preset interactions, visible snap distance and accessible failure states. Reuse router.snap; do not implement another utility.
+
 - **Description:** Map click selects a node within 100 m; show snap distance and support equivalent keyboard presets. Render only graph-edge geometry.
 - **Priority:** P0
 - **Dependencies:** MAP-01, MAP-02, ROUTE-01
 - **Estimated effort:** 30 min
-- **Relevant modules:** src/lib/geo/selection.ts; src/components/MapView.tsx; tests/unit/selection.test.ts
+- **Relevant modules:** src/lib/routing/shortest-path.ts; src/components/MapView.tsx; tests/unit/snapping.test.ts
 - **Acceptance criteria:** Outside radius fails visibly; deterministic nearest-node ties; presets work without clicking; no invented connector or straight-line fallback.
 - **Suggested GitHub labels:** `routing, maps, P0` (suggestions only)
 - **First-time contributor suitability:** Not a first task; requires domain/integration context.
@@ -160,6 +164,8 @@
 ## Testing
 
 ### QA-01 — Fixture and routing edge cases
+
+- **Status:** Complete with ROUTE-01; synthetic fixture, heap/routing/snapping regressions and real-data Bellman-Ford comparison.
 
 - **Description:** Turn TESTING specification into a typed synthetic fixture and regression tests alongside ROUTE-01; do not implement a second production router.
 - **Priority:** P0

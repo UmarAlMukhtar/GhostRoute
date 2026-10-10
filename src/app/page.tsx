@@ -9,8 +9,8 @@ export default function Home() {
         Navigate to safety when ordinary routes become unsafe.
       </p>
       <p className="mt-6">
-        This page validates the development tooling. The map, routing engine and
-        flood simulation are not implemented yet.
+        The local road dataset and routing engine are ready. The interactive map
+        and flood simulation are not implemented yet.
       </p>
       <p className="mt-8 rounded-lg border border-amber-700 bg-amber-50 p-4 text-amber-950">
         Simulation only. Hazards and destinations are demonstration data. Routes

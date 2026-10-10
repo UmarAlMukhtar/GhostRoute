@@ -35,7 +35,7 @@ This template has no application code or required technology stack. The document
 
 GhostRoute is an open-source disaster-aware navigation **simulation** for Kochi–Ernakulam. It will demonstrate how a shortest path through real mapped roads changes when a simulated flood makes road segments unavailable.
 
-**Current status: Phase 0 + MAP-01 complete.** This checkout contains a tooling smoke page, real local Ernakulam OSM road data, shared geographic contracts, a reproducible converter and validation tests. It does not yet contain an interactive map, routing engine, flood simulation or verified emergency destinations.
+**Current status: Phase 0 + MAP-01 + ROUTE-01 complete.** This checkout contains a tooling smoke page, real local Ernakulam OSM road data, shared geographic contracts, a reproducible converter, heap-based Dijkstra routing, closure-aware snapping and validation tests. It does not yet contain an interactive map, flood simulation or verified emergency destinations.
 
 - **Project name:** GhostRoute
 - **Team:** Participant names/handles await the team's confirmation; maximum four members.
@@ -68,23 +68,24 @@ pnpm dev
 
 In the original Codex workspace, run `cd repository` first; the official clone is nested beneath the initial empty Git shell. Open [localhost:3000](http://localhost:3000). No environment variables or API keys are required; `.env.example` records that explicitly. On supported Linux CI hosts, `pnpm exec playwright install --with-deps chromium` installs browser system libraries too. Fedora users may need equivalent native libraries; see [TESTING](docs/TESTING.md).
 
-| Command             | Purpose                                                        |
-| ------------------- | -------------------------------------------------------------- |
-| `pnpm data:prepare` | Rebuild local road assets offline from the frozen OSM source   |
-| `pnpm data:acquire` | Intentionally refresh the OSM source; review before accepting  |
-| `pnpm dev`          | Local Next development server                                  |
-| `pnpm build`        | Production compilation                                         |
-| `pnpm start`        | Serve an existing production build                             |
-| `pnpm lint`         | ESLint                                                         |
-| `pnpm typecheck`    | Generate Next route types, then strict TypeScript check        |
-| `pnpm test`         | Vitest unit tests, non-watch mode                              |
-| `pnpm test:e2e`     | Build and run Chromium browser tests against production server |
-| `pnpm format`       | Format maintained files with Prettier                          |
-| `pnpm format:check` | Check formatting without edits                                 |
+| Command                 | Purpose                                                        |
+| ----------------------- | -------------------------------------------------------------- |
+| `pnpm routes:benchmark` | Measure local initialization, routing, rerouting and snapping  |
+| `pnpm data:prepare`     | Rebuild local road assets offline from the frozen OSM source   |
+| `pnpm data:acquire`     | Intentionally refresh the OSM source; review before accepting  |
+| `pnpm dev`              | Local Next development server                                  |
+| `pnpm build`            | Production compilation                                         |
+| `pnpm start`            | Serve an existing production build                             |
+| `pnpm lint`             | ESLint                                                         |
+| `pnpm typecheck`        | Generate Next route types, then strict TypeScript check        |
+| `pnpm test`             | Vitest unit tests, non-watch mode                              |
+| `pnpm test:e2e`         | Build and run Chromium browser tests against production server |
+| `pnpm format`           | Format maintained files with Prettier                          |
+| `pnpm format:check`     | Check formatting without edits                                 |
 
 `RULES.md` is excluded from automatic formatting so its inherited bytes remain intact. Do not add npm/yarn lockfiles or competing tool configs. CI runs the same checks; local results are in [VERIFICATION](docs/VERIFICATION.md).
 
-The local dataset has 1,719 nodes, 3,712 directed edges and 12 components. Run `pnpm data:prepare` to reproduce it without network access. [DATA_STRATEGY](docs/DATA_STRATEGY.md) records bounds, access assumptions and the verified alternate-path fixture. Next implementation: ROUTE-01 (Dijkstra), then MAP-02 (map rendering).
+The local dataset has 1,719 nodes, 3,712 directed edges and 12 components. Run `pnpm data:prepare` to reproduce it without network access. [DATA_STRATEGY](docs/DATA_STRATEGY.md) records bounds, access assumptions and the verified alternate-path fixture. The [routing API](docs/ROUTING_ENGINE.md) supports node/edge/physical-road closures. Next implementation: MAP-02 (interactive map rendering).
 
 ### Demo instructions and limitations
 

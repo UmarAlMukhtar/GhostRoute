@@ -4,6 +4,13 @@ Record each meaningful project change during the event, newest first. Update thi
 
 ## Event build log
 
+## 2026-10-10T22:49:08+05:30 — ROUTE-01 deterministic shortest-path engine
+
+- Changed: Added indexed binary-heap Dijkstra, private reusable graph initialization, typed route/snapping results, node/edge/segment closures, default walking-distance profile, geographic snapping and benchmark command. Added synthetic/real routing and heap/snapping tests, integration docs and ADR-008; corrected foundation status text.
+- Why: Supply true shortest routes and predictable closure recalculation for MAP-02 and SIM-01, without a backend or invented safety/accessibility data.
+- Validation: Lint, strict types, 94 unit tests, production build, format/check and 2 desktop/mobile Chromium smoke tests passed. Data regeneration unchanged. Independent Bellman-Ford agrees with real 944.333 m baseline and 980.790 m closed-road route. Actual initialization/routing/snapping timings and environment are recorded in VERIFICATION.
+- Limitations: Node benchmarks exclude UI/flood latency; snapping is to existing nodes, not verified entrances. No map/flood implementation, dependency additions, push or remote mutations. Human review pending.
+
 ## 2026-10-10T22:30:30+05:30 — MAP-01 real Ernakulam road data
 
 - Changed: Added reusable geographic/routing contracts, OSM acquisition and deterministic offline conversion, graph/GeoJSON validation, component/path witnesses, frozen normalized source and local assets with ODbL attribution. Updated data/architecture/task/verification docs, README and minimal tooling; only dependency added is GeoJSON types.

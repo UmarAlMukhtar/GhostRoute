@@ -1,5 +1,57 @@
 # Verification record
 
+## ROUTE-01 — Dijkstra routing engine
+
+Verified 2026-10-10T22:49:08+05:30, starting from clean `5362005` on `codex-foundation`. No push, remote issue/settings changes or new dependencies. Existing organizer instructions, workflows and MAP-01 source/runtime assets remain unchanged. Foundation page text now accurately says the engine exists; map rendering and flood simulation remain unimplemented.
+
+### Executed results
+
+| Check                                                                             | Result                                                                                                                                |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm lint`                                                                       | PASS; no errors/warnings.                                                                                                             |
+| `pnpm typecheck`                                                                  | PASS; Next type generation and strict TypeScript.                                                                                     |
+| `pnpm test`                                                                       | PASS; **94 tests in 8 files**, including all 47 preexisting tests.                                                                    |
+| `pnpm build`                                                                      | PASS; Next production build/static pages. Ran with the local-port permission already identified as necessary for Turbopack in MAP-01. |
+| `pnpm format`                                                                     | PASS; all maintained files formatted, inherited RULES excluded.                                                                       |
+| `pnpm format:check`                                                               | PASS.                                                                                                                                 |
+| `pnpm data:prepare` + `git diff --exit-code -- data/source public/data/ernakulam` | PASS; regenerated data byte-for-byte unchanged from MAP-01.                                                                           |
+| `pnpm exec playwright test`                                                       | PASS; 2 existing Chromium desktop/mobile tests against the production build, after status-copy correction.                            |
+| `pnpm routes:benchmark`                                                           | PASS; checked fixture distances before measuring the operations below.                                                                |
+| `git diff --check`, local links and template preservation                         | PASS; no organizer instruction/workflow changes or lost event content.                                                                |
+
+The newly installed shell pnpm launcher previously timed out. This task used the already-verified bundled pnpm 11.25.0 launcher via a process-local PATH, without changing shell configuration, repository package-manager selection or lockfile. No claim is made that the user's new standalone launcher is repaired.
+
+Initial new suites failed before the engine modules existed. Test-first regressions exposed null profiles being treated as defaults and sparse coordinate arrays being misclassified as no eligible node; both now return typed invalid results. Strict type checking caught heap index narrowing and misplaced negative-test annotations after formatting; these were corrected. The final production code passed all checks above. Playwright emitted only existing NO_COLOR/FORCE_COLOR environment warnings.
+
+### Real shortest-path evidence
+
+Validated graph version: `ernakulam-walking-v1-c5690329d952ed13`; 1,719 nodes / 3,712 directed edges. Origin `271145615` (Park Avenue / Hospital Road), destination `1906667447` (Jos Junction). Baseline: **944.333 m**, 21 edges. Block both directions of physical segment `768625211:4`: **980.790 m**, 34 edges, **+36.457 m**. Clear route contains the segment; blocked route excludes it, including in reverse-direction routing.
+
+The test-only Bellman-Ford reference independently computes distances using integer millimeter weights; it agrees with heap-based Dijkstra for these and additional directed/closure/disconnected requests. Tests check continuity, summed weights, ordered node/segment IDs and full geometry. MAP-01's 1,003.818 / 1,470.595 m BFS witnesses remain unchanged and are not shortest-distance expectations.
+
+### Measured performance
+
+Measured `2026-10-10T17:17:51.608Z` on AMD Ryzen 7 8845HS w/ Radeon 780M Graphics; Fedora/Linux `7.2.8-200.fc44.x86_64`, `x64`, Node `v22.23.1`. **30 measured samples per operation after 5 warmups**; median and nearest-rank p95. Inputs are already parsed in memory; file read, JSON parse, network, UI rendering and flood intersection are excluded. Router initialization includes a private graph copy and adjacency/component indexes. Each routing measurement includes closure validation, shortest-path search and geometry reconstruction. The batch row is total time for **100 alternating clear/closed requests**, not one request.
+
+| Operation                                    | Median    | p95       |
+| -------------------------------------------- | --------- | --------- |
+| Router initialization                        | 19.162 ms | 26.022 ms |
+| Geographic validation + initialization       | 30.895 ms | 40.971 ms |
+| Baseline route                               | 0.280 ms  | 0.448 ms  |
+| Hospital Road reroute                        | 0.121 ms  | 0.154 ms  |
+| 100 alternating route requests (whole batch) | 15.730 ms | 18.513 ms |
+| Largest-component snap                       | 0.225 ms  | 0.393 ms  |
+
+Node route p95 is below the PRD's 100 ms routing target on this machine. This is not proof of browser, mobile-device or complete flood-to-map latency. Rerun `pnpm routes:benchmark` to obtain current measurements; do not turn wall-clock values into brittle CI assertions.
+
+### Changed files and integration boundary
+
+New: `src/lib/routing/shortest-path.ts`, `min-heap.ts`; `scripts/benchmark-routing.ts`; `tests/fixtures/graph.ts`; routing, snapping, min-heap and real-routing test files; `docs/ROUTING_ENGINE.md`; ADR-008. Modified: shared geographic request/result contracts, package benchmark script, foundation status copy, README, architecture/data/testing/task docs, ADR-003/index, verification and event/AI logs. The graph model, dependencies, data pipeline and dataset are unchanged.
+
+MAP-02 should load/validate once and retain `createRouter(graph)` per dataset version, use `router.snap` for role-aware selections, and render only found route geometries. SIM-01 later passes blocked nodes/segments/edges to new requests without rebuilding the router. Snapping remains a nearest-node approximation; original weak-component membership does not guarantee directed reachability after closures. No wheelchair profile, verified road safety, shelter availability, flood UI, map UI, hosted CI or deployment is claimed. Human implementation/geographic review remains pending.
+
+---
+
 ## MAP-01 — Ernakulam geographic data foundation
 
 Verified 2026-10-10T22:30:30+05:30, locally on `codex-foundation`, starting from clean `773c266`. No push, remote issue or settings change. MAP-02, ROUTE-01 and SIM-01 remain unimplemented.

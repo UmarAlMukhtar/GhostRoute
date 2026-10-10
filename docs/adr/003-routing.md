@@ -1,7 +1,7 @@
 # ADR-003: Deterministic Dijkstra routing
 
 - Date: 2026-10-10
-- Status: Accepted
+- Status: Accepted; queue choice superseded by [ADR-008](008-heap-routing.md)
 - Scope: planned MVP, not a claim of feature implementation
 
 ## Context

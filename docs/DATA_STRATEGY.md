@@ -1,6 +1,6 @@
 # Geographic data strategy
 
-MAP-01 implemented 10 October 2026. Real local OSM roads are bundled; map rendering, Dijkstra and flood simulation are separate upcoming tasks.
+MAP-01 implemented 10 October 2026. Real local OSM roads are bundled, and ROUTE-01 implements Dijkstra. Map rendering and flood simulation remain upcoming tasks.
 
 ## Selected area and observed coverage
 
@@ -61,7 +61,7 @@ An intentional source update uses `pnpm data:acquire` then `pnpm data:prepare` a
 
 The baseline witness is 15 edges / **1,003.818 m**, via Hospital Road, TD Road, Club Road and Durbar Hall Road. Blocking **768625211:4**, both `forward` and `reverse`, leaves a 25-edge / **1,470.595 m** witness via Park Avenue, Cannon Shed Road and Market Road before rejoining Hospital Road. It uses **695.005 m** of physical segments absent from the baseline. Tests walk each consecutive directed edge, verify endpoint coordinates, sum distances and exclude the blocked segment. A node from another component is also frozen as an unreachable fixture.
 
-ROUTE-01 must independently calculate shortest paths: these BFS distances are not Dijkstra expectations and are not a claim about the eventual optimal detour. SIM-01 must independently choose/test its flood polygon; no hazard geometry was added here.
+ROUTE-01 now independently calculates shortest paths (see [ROUTING_ENGINE](ROUTING_ENGINE.md)): these BFS distances are not Dijkstra expectations and are not a claim about the eventual optimal detour. SIM-01 must independently choose/test its flood polygon; no hazard geometry was added here.
 
 ## Coordinates and GeoJSON
 

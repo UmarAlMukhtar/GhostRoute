@@ -1,6 +1,6 @@
 # GhostRoute architecture
 
-Status: accepted implementation direction for the small MVP; module paths below are planned unless explicitly listed as present. Phase 0 supplies `src/app/` smoke UI/tooling; MAP-01 now implements `src/lib/geo/`, source acquisition/conversion and local road assets. Read [PRD](PRD.md), [data strategy](DATA_STRATEGY.md) and [ADRs](adr/README.md) together.
+Status: accepted implementation direction for the small MVP; module paths below are planned unless explicitly listed as present. Phase 0 supplies `src/app/` smoke UI/tooling; MAP-01 now implements `src/lib/geo/`, source acquisition/conversion and local road assets. ROUTE-01 implements heap-based routing and closure-aware node snapping. Read [PRD](PRD.md), [data strategy](DATA_STRATEGY.md) and [ADRs](adr/README.md) together.
 
 ## System and application structure
 
@@ -42,9 +42,9 @@ Map rendering uses separate sources for roads, baseline, current route, blocked 
 
 The authoritative contracts now live in [`src/lib/geo/types.ts`](../src/lib/geo/types.ts): `GeoPoint` is a named `[longitude, latitude]` tuple; RoadNode, RoadEdge, RoadGraph, DisasterZone, FloodScenario, EmergencyShelter, RouteRequest, RouteResult and RoutingProfile match the planned MVP. `RoadGeoJSON` adds typed physical-segment features with source tags and directed edge IDs. GeoJSON types come from `@types/geojson`; no React or map renderer dependency enters these contracts.
 
-`validateGraph`, haversine distance, OSM conversion, dataset validation and validation-only BFS/component reporting are implemented. `findPath` is a connectivity witness, **not** the production shortest-distance engine. Roads are locally available at `/data/ernakulam/graph.json` and `/data/ernakulam/roads.geojson`; source and runtime manifests carry hashes and provenance. Import/parse JSON as unknown then validate; UI loading is MAP-02.
+`validateGraph`, haversine distance, OSM conversion, dataset validation and validation-only BFS/component reporting are implemented. `geo/connectivity.findPath` remains a MAP-01 connectivity witness; `routing/shortest-path.createRouter` implements production shortest-distance routing. Roads are locally available at `/data/ernakulam/graph.json` and `/data/ernakulam/roads.geojson`; source and runtime manifests carry hashes and provenance. Import/parse JSON as unknown then validate; UI loading is MAP-02.
 
-Function contracts: `validateGraph(input: unknown): RoadGraph` throws a descriptive validation error at the loading boundary; `shortestPath(graph: RoadGraph, request: RouteRequest): RouteResult`; `deriveBlockages(graph: RoadGraph, zones: DisasterZone[]): { blockedEdgeIds: Set<string>; blockedNodeIds: Set<string> }`. Inputs are immutable. At load time reject a scenario whose `graphVersion` differs from the graph, invalid step indices, and shelter references to missing nodes. A zero-edge successful route has one node, 0 m and null line geometry. Failed results never contain a route polyline. Unknown request node/edge IDs or unsupported profile produce `invalid`; data parsing failures become a dataset error state.
+Function contracts: `validateGraph(input: unknown): RoadGraph` throws a descriptive validation error at the loading boundary; `shortestPath(graph: RoadGraph, request: RouteRequest): RouteResult`; `deriveBlockages(graph: RoadGraph, zones: DisasterZone[]): { blockedEdgeIds: Set<string>; blockedNodeIds: Set<string> }`. Inputs are immutable. At load time reject a scenario whose `graphVersion` differs from the graph, invalid step indices, and shelter references to missing nodes. A zero-edge successful route has one node, 0 m and null line geometry. Failed results never contain a route polyline. Unknown endpoints, endpoint closures, no route, malformed options and snapping failures have distinct typed statuses described in [ROUTING_ENGINE](ROUTING_ENGINE.md); data parsing failures become a dataset error state.
 
 ## Ingestion, representation and connectivity
 
@@ -52,7 +52,9 @@ Convert frozen OSM node/way JSON using node identities, not coordinate proximity
 
 ## Routing algorithm
 
-Dijkstra minimizes sum of positive meter weights. For this bounded graph, start with an array/set of unsettled node IDs and a linear minimum scan: O(V² + E), simple to verify. Sort node IDs and outgoing edge IDs; on equal cost keep the first discovered predecessor. Stop after settling the destination. Reject invalid requests before traversal; skip blocked edges and blocked nodes, never mutate base weights or the base graph. Reconstruct both edge IDs and node IDs and join edge geometries. If measured p95 exceeds 100 ms, reduce the extent first; adopt a small binary heap only after profiling (ADR-003). Do not display fabricated ETA.
+Dijkstra minimizes positive meter weights using an indexed binary min-heap with decrease-key, O((V + E) log V). This replaces the earlier linear-scan plan per the explicit ROUTE-01 requirement ([ADR-008](adr/008-heap-routing.md)). Queue ties use code-unit node IDs; sorted outgoing edge IDs and strict improvement preserve the first equal-cost predecessor. Stop only when the destination is settled. Requests support blocked nodes, directed edges and physical segments without changing the graph.
+
+Use `createRouter(validateGraph(input))` once per dataset version, then `router.findRoute(request)` for repeated changes and `router.snap(coordinate, options)` for selections. The router takes a private snapshot, indexes incoming/outgoing edges and the original largest weak component, and validates positive weights/endpoints. Untrusted JSON still goes through the full geographic validator first. The exported `shortestPath(graph, request)` is a one-off convenience. Results include ordered physical segments, copied endpoints/geometry and deterministic metadata; no ETA or safety score. Snapping uses haversine meters and directional eligibility under the same closures; it does not establish physical access or path reachability. See [ROUTING_ENGINE](ROUTING_ENGINE.md) for contracts, statuses, examples and limits.
 
 ```mermaid
 flowchart TD
@@ -61,7 +63,7 @@ flowchart TD
   Valid -- Yes --> Endpoint{Endpoint blocked?}
   Endpoint -- Yes --> NoPath[Unreachable]
   Endpoint -- No --> Init[Distances infinity; origin zero]
-  Init --> Pick[Settle lowest-distance node with stable tie order]
+  Init --> Pick[Pop minimum from indexed binary heap]
   Pick --> Destination{Destination settled?}
   Destination -- Yes --> Reconstruct[Reconstruct graph edge path]
   Destination -- No --> Relax[Relax eligible outgoing edges]

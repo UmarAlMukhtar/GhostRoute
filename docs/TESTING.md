@@ -2,7 +2,7 @@
 
 ## Current foundation versus product acceptance
 
-Phase 0 runs one Vitest smoke test asserting that the static page explicitly identifies unimplemented features and the safety limitation. Playwright checks the production page at desktop and 360 px viewport widths, visible status/disclaimer, no horizontal overflow and no uncaught page errors. These do **not** prove routing, geographic validity, flood behavior or full accessibility. All product tests below are required implementation work, not silently skipped tests or fabricated pass counts.
+Phase 0 runs one Vitest smoke test asserting that the static page explicitly identifies unimplemented features and the safety limitation. Playwright checks the production page at desktop and 360 px viewport widths, visible status/disclaimer, no horizontal overflow and no uncaught page errors. The browser smoke does not prove routing, flood behavior or full accessibility. MAP-01 now tests geographic validity offline; ROUTE-01 implements the routing/snapping/heap suites below. Flood, integration and browser journey suites remain future work.
 
 ## Commands and environment
 
@@ -12,7 +12,7 @@ Install Chromium with `pnpm exec playwright install chromium`. CI Ubuntu uses `-
 
 ## Deterministic graph fixture specification
 
-Implement `tests/fixtures/graph.ts` in QA-01 using the contracts from ARCHITECTURE. This is a **synthetic mathematical fixture**, not OSM or evidence about actual Ernakulam roads. Coordinates below are synthetic near the test region; weights are chosen test inputs, not measured geographic distances. Use graph version `synthetic-routing-v1`, stable IDs and `osmWayId: 'synthetic'` in this test only. Give every edge its own segment ID, geometry in traversal order and sorted adjacency. Production data must have geodesically measured weights.
+Implemented `tests/fixtures/graph.ts` in ROUTE-01/QA-01 using the contracts from ARCHITECTURE. This is a **synthetic mathematical fixture**, not OSM or evidence about actual Ernakulam roads. Coordinates below are synthetic near the test region; weights are chosen test inputs, not measured geographic distances. Use graph version `synthetic-routing-v1`, stable IDs and `osmWayId: 'synthetic'` in this test only. Give every edge its own segment ID, geometry in traversal order and sorted adjacency. Production data must have geodesically measured weights.
 
 | Node | Synthetic `[longitude, latitude]` |
 | ---- | --------------------------------- |
@@ -29,9 +29,9 @@ Implement `tests/fixtures/graph.ts` in QA-01 using the contracts from ARCHITECTU
 | ac               | A → C     | 150 m  |
 | cd               | C → D     | 150 m  |
 
-Expected A→D results: clear = `[ab, bd]`, node IDs `[A,B,D]`, 200 m; blocked `bd` = `[ac,cd]`, `[A,C,D]`, 300 m; blocked `bd` and `cd` = unreachable. A→E and D→A are unreachable (directed graph). A→A is found with 0 m, no edges and null line geometry unless A is flooded, when it is endpoint-blocked. Input arrays/records must remain unchanged.
+Expected A→D results: clear = `[ab, bd]`, node IDs `[A,B,D]`, 200 m; blocked `bd` = `[ac,cd]`, `[A,C,D]`, 300 m; blocked `bd` and `cd` = unreachable. A→E and D→A are unreachable (directed graph). A→A is found with 0 m, no edges and null line geometry unless A is flooded, when it is origin-blocked. Input arrays/records must remain unchanged.
 
-Critical acceptance test to write before ROUTE-01 implementation:
+Critical acceptance behavior, implemented in `tests/unit/routing.test.ts`:
 
 ```ts
 const original = shortestPath(graph, request('A', 'D', []));
@@ -48,7 +48,7 @@ expect(rerouted).toMatchObject({
 });
 ```
 
-`request` here is a test fixture helper that sets the `walking-demo` profile, blockedEdgeIds and an empty blockedNodeIds set. Implement it inside QA-01. Also assert edge continuity, graph membership, no blocked edge/node, geometry endpoints and sum of all chosen weights. These assertions guard against merely drawing a different line.
+`request` above illustrates the request shape; actual tests use createRouter with optional closure sets and the default walking profile. Also assert edge continuity, graph membership, no blocked edge/node, geometry endpoints and sum of all chosen weights. These assertions guard against merely drawing a different line.
 
 ## Unit test matrix
 
@@ -79,6 +79,14 @@ Manually check logical tab order, visible focus, native select behavior, result 
 
 ## Performance and release checks
 
-Measure 30 route/flood updates after warmup on a recorded laptop/browser/dataset; report median and p95. Target route <100 ms and total update <300 ms p95, local initial map <3 s excluding online tiles. Include graph size and asset bytes. Profile before adding a worker/heap/index. Two three-minute rehearsals include blocked-network tiles and reset. Test a missing local dataset separately; a tile outage must not be confused with a road data outage.
+Measure 30 route/flood updates after warmup on a recorded laptop/browser/dataset; report median and p95. Target route <100 ms and total update <300 ms p95, local initial map <3 s excluding online tiles. Include graph size and asset bytes. The requested indexed heap is implemented; measure before adding a worker or spatial index. Two three-minute rehearsals include blocked-network tiles and reset. Test a missing local dataset separately; a tile outage must not be confused with a road data outage.
 
 CI runs format, lint, types, unit tests, production build and Chromium browser tests with frozen dependencies and no secrets. Failure artifacts retain Playwright traces. Hosted Actions success is not assumed from local checks. Final evidence and unresolved coverage go in [VERIFICATION](VERIFICATION.md).
+
+## ROUTE-01 implemented coverage
+
+`routing.test.ts`, `min-heap.test.ts`, `snapping.test.ts` and `real-routing.test.ts` cover weighted/directed shortest paths, decrease-key/tie ordering, identical/invalid/blocked endpoints, isolated components, all closure types together, physical versus directed blocking, immutable inputs/results, shape-point reconstruction, malformed requests/profiles and repeated reset/recalculation. Snapping tests geographic meters, longitude wrap/high latitude, inclusive radius, malformed coordinates/options, origin versus destination eligibility and largest-component restriction.
+
+The real Hospital Road pair has a 944.333 m shortest path and a 980.790 m path after physical segment 768625211:4 is blocked. A separate test-only Bellman-Ford relaxation in integer millimeters verifies these distances and representative additional requests/closures independently of the heap. MAP-01 BFS witnesses remain unchanged; they prove connectivity, not optimal distance. Future SIM-01 must still prove polygon-to-segment blocking, and MAP-02 must prove rendered geometry.
+
+`pnpm routes:benchmark` measures 30 samples after 5 warmups on the real graph: private router initialization; full validation + initialization; baseline; rerouting; 100 alternating requests per batch; and snapping. Timings exclude disk reads, JSON parse, network and rendering. Results and machine details are recorded in VERIFICATION, not asserted as brittle timing tests.
