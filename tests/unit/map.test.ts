@@ -118,7 +118,7 @@ describe('selection and presentation', () => {
     });
     const action = selectCoordinate(data, [0, 0], 'origin');
     const rejected = selectionReducer(selected, action);
-    expect(rejected.message).toContain('within 100 m');
+    expect(rejected.message).toContain('outside the supported');
     expect(rejected.origin).toBe(selected.origin);
     expect(selectCoordinate(data, [NaN, 0], 'destination').type).toBe('error');
   });
@@ -144,6 +144,7 @@ describe('selection and presentation', () => {
       'alternative-casing',
       'alternative',
       'blockedRoads',
+      'reports',
     ]);
     expect(formatDistance(1234)).toBe('1.23 km');
   });

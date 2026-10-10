@@ -9,6 +9,7 @@ test.beforeEach(async ({ page }) => {
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
   await page.getByRole('button', { name: 'Find route', exact: true }).click();
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
 });
 test('Hospital flood reroutes real roads, renders overlays and resets', async ({
   page,
@@ -22,6 +23,7 @@ test('Hospital flood reroutes real roads, renders overlays and resets', async ({
     )
       errors.push(message.text());
   });
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   await page.getByRole('button', { name: 'Start simulation' }).click();
   await expect(page.getByTestId('blocked-count')).toHaveText('5');
   await expect(page.getByTestId('original-distance')).toHaveText('944.3 m');
@@ -65,6 +67,7 @@ test('nested stages, endpoint changes, unavailable destination and replay', asyn
   await page
     .getByLabel('Flood scenario', { exact: true })
     .selectOption('expanding');
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   await page.getByRole('button', { name: 'Start simulation' }).click();
   await expect(
     page.getByRole('button', { name: 'Previous stage' }),
@@ -114,12 +117,14 @@ test('nested stages, endpoint changes, unavailable destination and replay', asyn
     'No available route',
   );
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   await expect(
     page.getByRole('button', { name: 'Start simulation' }),
   ).toBeDisabled();
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   await page.getByRole('button', { name: 'Start simulation' }).click();
   await expect(page.getByTestId('updated-distance')).toHaveText('1.41 km');
 });

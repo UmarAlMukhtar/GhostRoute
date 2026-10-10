@@ -248,3 +248,14 @@
 Guided Demo Mode, production asset checks, delayed-data recovery, keyboard/manual handoff, repeated scenario switching/reset, mobile resizing and refresh are implemented/tested locally. Submission narrative, pitch and Vercel runbook are prepared. Stop conditions and priorities are in ROADMAP.
 
 Remaining release tasks, in order: human keyboard/200%-zoom/target-device accessibility review (A11Y-01/UI-02); two timed rehearsals with the actual presenter, including tile failure (DOC-02/OPS-02); confirm participant handles/contributions and venue instructions; authorize exact push and Vercel account/project deployment (OPS-01); inspect hosted build and judge-accessible demo; record final implementation SHA/URL and submit through the organizer's announced method. Do not claim hosted CI, deployment, human rehearsal or submission from local tests.
+
+## Interactive platform milestone
+
+- NAV-02: arbitrary coordinates, map selection, marker dragging, swap and one-shot geolocation — implemented. Existing 100 m snapping and coverage rejection retained.
+- HAZ-01: user-created flood/landslide/fire circles and direct roadblocks, multiple editable enabled/disabled hazards, immutable shared impact/rerouting — implemented.
+- REPORT-01: validated unverified report form, separate purple markers/list, filters, browser-local persistence and explicit exploratory routing — implemented local adapter only.
+- REPORT-02 (P1, open): approved shared Supabase backend, RLS/server endpoints, abuse controls and audited verification/expiry policy. No remote resources created.
+- NAV-03 (P1, open): provider-compliant address search; no fake search UI.
+- REPORT-03 (P2, open): photos and moderator UI after policy/storage work.
+
+Dependencies/acceptance and stop conditions: [PLATFORM](PLATFORM.md). No verified/shared reporting is complete.

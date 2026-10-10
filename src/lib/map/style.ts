@@ -20,6 +20,7 @@ export function localStyle(roads: RoadGeoJSON): StyleSpecification {
     version: 8,
     sources: {
       roads: { type: 'geojson', data: roads },
+      reports: { type: 'geojson', data: EMPTY },
       route: { type: 'geojson', data: EMPTY },
       hazards: { type: 'geojson', data: EMPTY },
       blockedRoads: { type: 'geojson', data: EMPTY },
@@ -36,7 +37,15 @@ export function localStyle(roads: RoadGeoJSON): StyleSpecification {
         type: 'fill',
         source: 'hazards',
         paint: {
-          'fill-color': '#06b6d4',
+          'fill-color': [
+            'match',
+            ['get', 'kind'],
+            'landslide',
+            '#a16207',
+            'fire',
+            '#f97316',
+            '#06b6d4',
+          ],
           'fill-opacity': 0.25,
           'fill-outline-color': '#b45309',
         },
@@ -123,6 +132,17 @@ export function localStyle(roads: RoadGeoJSON): StyleSpecification {
           'line-color': '#dc2626',
           'line-width': 5,
           'line-dasharray': [2, 1],
+        },
+      },
+      {
+        id: 'reports',
+        type: 'circle',
+        source: 'reports',
+        paint: {
+          'circle-radius': 8,
+          'circle-color': '#7e22ce',
+          'circle-stroke-color': '#fff',
+          'circle-stroke-width': 3,
         },
       },
     ],

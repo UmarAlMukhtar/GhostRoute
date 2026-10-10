@@ -31,6 +31,8 @@ This template has no application code or required technology stack. The document
 
 ## GhostRoute
 
+Current version: four workspaces for arbitrary routing, editable multi-disaster simulation, browser-local unverified reports and the guided demo. See [platform workflows and limits](docs/PLATFORM.md).
+
 **Navigate to safety when ordinary routes become unsafe.**
 
 GhostRoute is an open-source disaster-aware navigation **simulation** for Kochi–Ernakulam. It demonstrates how a shortest path through real mapped roads changes when a simulated flood makes road segments unavailable.
@@ -135,3 +137,15 @@ Desktop and mobile captures below use the actual local graph/router with optiona
 ### Deployment and submission status
 
 Vercel configuration is prepared locally; no public URL or hosted build is claimed. No environment variables are required. Follow DEPLOYMENT.md only after approving the target account/project and publishing actions. The submitted implementation SHA, participant handles/contributions, two timed human rehearsals and venue submission confirmations remain human-owned. New code is MIT; OSM data is ODbL with separate attribution, and inherited organizer-text redistribution terms still need clarification.
+
+### Interactive multi-disaster platform
+
+Use **Navigate** to select arbitrary supported map points, enter coordinates, drag/swap endpoints or request your current location. **Simulate** adds editable flood, landslide and fire exclusion zones or individual roadblocks; multiple hazards automatically update real shortest paths. **Reports** saves unverified observations locally, with separate purple markers and filters. **Demo** retains the guided Hospital Road scenarios.
+
+Reports persist **in this browser only**, not across users and not with emergency services. They do not affect routes by default. Incident-aware mode has no trusted verification feed; explicitly opting into exploratory unverified closures uses associated roads only. Simulations and reports remain separate; clearing hazards preserves reports. No new credentials are required for this local version. Shared Supabase persistence, verified moderation, photo uploads and address search are not implemented.
+
+See [platform workflows, policies and cloud migration](docs/PLATFORM.md), [current verification](docs/VERIFICATION.md) and [ADR-010](docs/adr/010-interactive-hazards-reports.md). Simulation radii are illustrative, not scientific hazard models. No calculated route is certified safe.
+
+![Interactive hazards and real rerouting](docs/screenshots/platform-desktop.png)
+
+[Mobile platform screenshot](docs/screenshots/platform-mobile.png) · [Local incident report screenshot](docs/screenshots/reports-desktop.png)

@@ -1319,3 +1319,254 @@ svg {
     margin: 4px 0;
   }
 }
+
+/* Workspaces share one map and one route result. */
+[hidden] {
+  display: none !important;
+}
+.workspace-tabs {
+  display: flex;
+  gap: 3px;
+  padding: 4px;
+  background: #eef2f6;
+  border-radius: 10px;
+  margin: 14px 0;
+}
+.workspace-tabs button {
+  flex: 1;
+  min-height: 44px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 650;
+}
+.workspace-tabs button[aria-current] {
+  background: white;
+  color: #1d4ed8;
+  box-shadow: 0 1px 4px #0f172a16;
+}
+.routing-mode,
+.explore-controls label {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.routing-mode select,
+.explore-controls select,
+.explore-controls textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  padding: 8px;
+  background: white;
+  color: #334155;
+  font: inherit;
+}
+.explore-controls h2 {
+  font-size: 20px;
+  margin: 20px 0 8px;
+}
+.explore-controls p,
+.impact-summary p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #475569;
+  overflow-wrap: anywhere;
+}
+.explore-controls textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+.explore-controls input[type='range'] {
+  width: 100%;
+  height: 32px;
+}
+.hazard-types {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin: 16px 0;
+}
+.hazard-types button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 48px;
+  padding: 8px;
+  border: 1px solid #dbe2eb;
+  border-radius: 8px;
+  background: white;
+  color: #334155;
+  font-size: 12px;
+  text-align: left;
+}
+.hazard-types button[aria-pressed='true'] {
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+.hazard-types button:nth-child(1) svg {
+  color: #0891b2;
+}
+.hazard-types button:nth-child(2) svg {
+  color: #a16207;
+}
+.hazard-types button:nth-child(3) svg {
+  color: #ea580c;
+}
+.hazard-types button:nth-child(4) svg {
+  color: #dc2626;
+}
+.control-row {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+.control-row .secondary {
+  flex: 1;
+  font-size: 12px;
+  padding: 8px;
+}
+.hazard-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+}
+.hazard-list li {
+  border: 1px solid #dbe2eb;
+  border-radius: 9px;
+  overflow: hidden;
+}
+.hazard-list li.selected {
+  border-color: #93b4ed;
+}
+.hazard-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 0;
+  text-align: left;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px;
+  font-size: 12px;
+  color: #334155;
+}
+.hazard-title strong {
+  flex: 1;
+}
+.hazard-title span:last-child {
+  font-size: 10px;
+}
+.hazard-editor {
+  padding: 0 12px 12px;
+}
+.check-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  min-height: 44px;
+}
+.check-label input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.report-filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 18px;
+}
+.report-symbol {
+  background: #7e22ce;
+  color: white;
+  border: 2px solid #e9d5ff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  text-align: center;
+  font-weight: bold;
+}
+.impact-summary {
+  border-top: 1px solid #e2e8f0;
+  margin-top: 18px;
+  padding-top: 10px;
+}
+.impact-summary h3 {
+  font-size: 14px;
+}
+.impact-summary dl {
+  display: flex;
+  gap: 24px;
+}
+.impact-summary dt {
+  color: #64748b;
+  font-size: 11px;
+}
+.impact-summary dd {
+  margin: 4px 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+@media (min-width: 760px) {
+  .route-panel {
+    width: 370px;
+  }
+}
+.coordinate-entry {
+  font-size: 12px;
+  margin: 10px 0;
+}
+.coordinate-entry summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding-top: 12px;
+  color: #1d4ed8;
+}
+.coordinate-entry label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.coordinate-entry input,
+.coordinate-entry select {
+  min-height: 44px;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px;
+  background: white;
+}
+.workspace-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.route-panel {
+  scroll-padding-top: 64px;
+}
+.secondary {
+  min-height: 44px;
+}
+@media (max-width: 759px) {
+  .workspace-tabs {
+    top: 44px;
+  }
+  .route-panel {
+    scroll-padding-top: 108px;
+  }
+}
+.hazard-list li {
+  scroll-margin-top: 110px;
+}

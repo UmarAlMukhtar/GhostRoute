@@ -112,6 +112,7 @@ test('rapid switching, repeated reset, viewport resize and refresh', async ({
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   await page.getByRole('button', { name: 'Start simulation' }).click();
   const start = Date.now();
   for (let i = 0; i < 10; i++) {
@@ -128,6 +129,7 @@ test('rapid switching, repeated reset, viewport resize and refresh', async ({
       .getByRole('button', { name: 'Reset simulation', exact: true })
       .click();
     await expect(page.getByTestId('route-distance')).toContainText('944.3 m');
+    await page.getByRole('button', { name: 'Demo', exact: true }).click();
     await page.getByRole('button', { name: 'Start simulation' }).click();
   }
   console.log(
@@ -154,6 +156,7 @@ test('rapid switching, repeated reset, viewport resize and refresh', async ({
   await page.reload();
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
   await expect(page.getByTestId('route-distance')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Demo', exact: true }).click();
   await expect(
     page.getByRole('button', { name: 'Start simulation' }),
   ).toBeDisabled();

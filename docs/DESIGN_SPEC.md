@@ -70,3 +70,7 @@ Flood controls use a right floating panel on desktops at least 1200 px wide and 
 ## Guided Demo Mode
 
 A header entry opens eight presenter-controlled cues in the existing route panel. Progress, next action, calculated metrics and a reset are available on narrow screens; desktop retains the simulation comparison panel. Manual controls remain below the guide and exit it when used. Native keyboard activation is supported, with a skip-to-controls link; camera movement still respects reduced motion. No automatic playback, extra modal or decorative presentation framework is introduced.
+
+## Four workspaces
+
+Navigate / Simulate / Reports / Demo share the same map, mobile sheet and route result. Routing mode is explicit and independent of the visible tab. Custom hazard types use icons and cyan/ochre/orange zones; red dashed roads identify closures, blue originals and green current routes retain contrast. Purple report circles have a separate source and an unverified status in the report list/details; they never masquerade as confirmed hazards. Local-only persistence and opt-in exploratory warnings remain visible. Native labelled controls, coordinate entry and focus rings complement map gestures.

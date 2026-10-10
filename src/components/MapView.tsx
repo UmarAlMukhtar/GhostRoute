@@ -4,7 +4,8 @@ import { Expand, Layers } from 'lucide-react';
 import type { GeoJSONSource, Map as LibreMap } from 'maplibre-gl';
 import type { GeoPoint, RouteResult } from '../lib/geo/types';
 import type { MapData } from '../lib/map/data';
-import type { Selection } from '../lib/map/selection';
+import type { IncidentReport } from '../lib/incidents/reports';
+import type { Selection, Role } from '../lib/map/selection';
 import { EMPTY, localStyle, type MapOverlays } from '../lib/map/style';
 
 interface Props {
@@ -13,7 +14,10 @@ interface Props {
   origin: Selection | null;
   destination: Selection | null;
   result: RouteResult | null;
-  onPick: (point: GeoPoint) => void;
+  onPick: (point: GeoPoint, segmentId?: string) => void;
+  onReposition: (role: Role, point: GeoPoint) => void;
+  reports: IncidentReport[];
+  onReportClick: (id: string) => void;
   selecting: boolean;
   sheetOpen: boolean;
   overlays?: MapOverlays;
@@ -40,6 +44,9 @@ export default function MapView({
   destination,
   result,
   onPick,
+  onReposition,
+  reports,
+  onReportClick,
   selecting,
   sheetOpen,
   overlays,
@@ -47,6 +54,7 @@ export default function MapView({
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LibreMap | null>(null);
   const pick = useRef(onPick);
+  const callbacks = useRef({ onReposition, onReportClick, selecting });
   const [ready, setReady] = useState(false);
   const [failure, setFailure] = useState('');
   const [tiles, setTiles] = useState<'loading' | 'online' | 'fallback'>(
@@ -54,7 +62,8 @@ export default function MapView({
   );
   useEffect(() => {
     pick.current = onPick;
-  }, [onPick]);
+    callbacks.current = { onReposition, onReportClick, selecting };
+  }, [onPick, onReposition, onReportClick, selecting]);
   useEffect(() => {
     let cancelled = false;
     let instance: LibreMap | undefined;
@@ -104,7 +113,12 @@ export default function MapView({
             .setAttribute('aria-label', 'Interactive Ernakulam road map');
           map.on('idle', () => {
             if (container.current) {
-              for (const layer of ['hazards', 'blockedRoads', 'alternative'])
+              for (const layer of [
+                'hazards',
+                'blockedRoads',
+                'alternative',
+                'reports',
+              ])
                 container.current.dataset[layer] = String(
                   map.queryRenderedFeatures({ layers: [layer] }).length > 0,
                 );
@@ -113,7 +127,26 @@ export default function MapView({
               );
             }
           });
-          map.on('click', (e) => pick.current([e.lngLat.lng, e.lngLat.lat]));
+          map.on('click', (e) => {
+            const report = map.queryRenderedFeatures(e.point, {
+              layers: ['reports'],
+            })[0];
+            if (report && !callbacks.current.selecting) {
+              callbacks.current.onReportClick(String(report.properties.id));
+              return;
+            }
+            const road = map.queryRenderedFeatures(
+              [
+                [e.point.x - 5, e.point.y - 5],
+                [e.point.x + 5, e.point.y + 5],
+              ],
+              { layers: ['roads'] },
+            )[0];
+            pick.current(
+              [e.lngLat.lng, e.lngLat.lat],
+              road?.properties.segmentId,
+            );
+          });
           const fallback = () => {
             if (cancelled) return;
             clearTimeout(timeout);
@@ -256,6 +289,23 @@ export default function MapView({
   }, [ready, result, overlays, sheetOpen, overview, data.bounds]);
 
   useEffect(() => {
+    if (!ready || !mapRef.current) return;
+    (mapRef.current.getSource('reports') as GeoJSONSource)
+      .setData({
+        type: 'FeatureCollection',
+        features: reports.map((report) => ({
+          type: 'Feature',
+          properties: { id: report.id, status: report.status },
+          geometry: { type: 'Point', coordinates: report.coordinate },
+        })),
+      })
+      .catch(() =>
+        setFailure(
+          'Incident markers could not be displayed. Use the report list.',
+        ),
+      );
+  }, [ready, reports]);
+  useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
     let cancelled = false;
@@ -272,9 +322,15 @@ export default function MapView({
         element.textContent = role === 'origin' ? 'A' : 'B';
         element.setAttribute('role', 'img');
         element.setAttribute('aria-label', `${role} marker`);
-        markers.push(
-          new Marker({ element }).setLngLat(selection.coordinate).addTo(map),
-        );
+        const marker = new Marker({ element, draggable: true })
+          .setLngLat(selection.coordinate)
+          .addTo(map);
+        marker.on('dragend', () => {
+          const location = marker.getLngLat();
+          marker.setLngLat(selection.coordinate);
+          callbacks.current.onReposition(role, [location.lng, location.lat]);
+        });
+        markers.push(marker);
         if (selection.clicked && (selection.snapMeters ?? 0) > 2) {
           const clicked = document.createElement('div');
           clicked.className = 'clicked-point';

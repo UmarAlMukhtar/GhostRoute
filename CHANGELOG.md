@@ -53,3 +53,11 @@ Record each meaningful project change during the event, newest first. Update thi
 - Why: Give participants a consistent starting point for event rules, basic coding patterns, documented changes, and regular commits.
 - Validation: Checked local Markdown links, event detail consistency, required documents, and diff whitespace before publishing.
 - Limitations: Documentation scaffolding only; no participant project, application, or working demo is included. GitHub publication and template status are verified separately after creation.
+
+## Interactive hazards and local reports — 2026-10-11T00:07:14+05:30
+
+- Extended the existing graph/router/map with editable flood, landslide and fire zones, physical roadblocks, combined closures and automatic comparisons. Retained all preset demos.
+- Added Navigate/Simulate/Reports/Demo workspaces, coordinate entry, draggable/swappable endpoints, explicit geolocation, separate unverified report markers/filtering and guarded exploratory routing.
+- Reports persist only in this browser. Supabase is unconfigured; shared API/RLS/moderation requirements are documented, not falsely presented as working. No photo uploads or geocoder.
+- Verified lint/types, 153 unit tests, production build, 32 desktop/mobile browser tests, formatting, unchanged geographic regeneration, actual screenshots and measured impact/routing performance (VERIFICATION).
+- Preserved organizer instructions/workflows, source geography and routing algorithm. Local commit only; human review pending. No push, deployment, remote settings or external resources.

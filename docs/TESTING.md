@@ -106,3 +106,9 @@ MapLibre requires WebGL. Keep failures visible instead of skipping initializatio
 ## Final readiness regression suite
 
 `readiness.spec.ts` adds the complete eight-step guided sequence, real calculated outcomes, one-click reset, keyboard Enter/focus behavior, manual endpoint handoff, reduced-motion emulation, ten repeated scenario cycles, rapid switching, viewport changes to 320×640 and 640×450, refresh, held/released data requests and production JSON/module-worker responses. Public tile requests remain aborted. The delay test models unavailable/pending responses, not a specific mobile bandwidth profile. Node benchmark timings and Playwright interaction-cycle timings are reported separately in VERIFICATION.
+
+## Interactive hazards and reports
+
+`platform.test.ts` covers real graph impacts for all three exclusion-zone types, spherical radius, direct physical segment direction mapping, deduplication, repeated recalculation/edit/reset, destination blocking and graph immutability. Local report tests exercise field/coordinate validation, archive round-trip, corrupt storage, quota failure, rate limiting, status spoofing, seed exclusion and filters.
+
+`platform.spec.ts` drives production desktop/mobile Chromium through coordinate selection, actual map placement of several hazard types, roadblock removal, fire disable, report submission/refresh and explicit unverified-road exploration. It also checks swapping, marker repositioning, browser geolocation (emulated permission/location) and unsupported coordinates. Existing routing/demo/fallback regressions remain in the suite. Public tiles are blocked during automated tests. This is not physical-device, emergency-safety or hosted database verification.

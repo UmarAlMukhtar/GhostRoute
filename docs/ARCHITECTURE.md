@@ -4,7 +4,7 @@ Status: accepted implementation direction for the small MVP; module paths below 
 
 ## System and application structure
 
-Next.js App Router supplies the page/build pipeline. A client-only dashboard owns React state and a client-only MapLibre instance. Pure TypeScript functions handle graph validation, routing and flood intersections. Static local assets are the only runtime data dependency. No API routes, authentication, database, server actions or routing service.
+Next.js App Router supplies the page/build pipeline. A client-only dashboard owns React state and a client-only MapLibre instance. Pure TypeScript functions handle graph validation, routing and flood intersections. Static local geographic assets and browser-local incident storage are the runtime data sources. No shared incident service is connected. No API routes, authentication, database, server actions or routing service.
 
 ```mermaid
 flowchart TB
@@ -155,3 +155,7 @@ SIM-01/INT-01 are implemented in `simulation/flood.ts`, `scenarios.ts`, `session
 `lib/map/demo.ts` contains eight ordered cues and existing scenario/stage identifiers, never stored route metrics. `DemoGuide` renders progress and actual baseline/current values. Dashboard batches the existing selection and simulation reducer actions for each presenter step; it retains the same validated graph, flood engine and router. Manual actions exit the guide, preventing narration/state divergence. A one-click restart clears selections/closures and requests a regional camera fit without reconstructing MapLibre. The guide has no timers or additional state library.
 
 `vercel.json` pins install/build commands and uses the standard Next.js framework output. Worker assets are generated before every build. Environment variables are unnecessary. Remote publication is separate from this locally verified configuration; see DEPLOYMENT.md.
+
+## Interactive multi-disaster extension
+
+`simulation/hazards.ts` defines explicitly simulated, editable zones and geodesic circle construction. The existing `createFloodEngine` validates and intersects flood/landslide/fire polygons and direct physical-segment closures; Dijkstra is unchanged. `incidents/reports.ts` separately validates/persists browser-local observations and supplies the explicit exploratory policy. `ExploreControls` presents editors and reports, `Dashboard` composes state/derived results, and `MapView` adds draggable endpoints and a separate purple report source. There is no cloud backend or runtime Overpass dependency. Baseline recalculates whenever both endpoints change; closures are selected by routing mode. The initialized graph/router are reused. See [ADR-010](adr/010-interactive-hazards-reports.md) and [PLATFORM](PLATFORM.md).

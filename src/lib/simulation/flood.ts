@@ -66,8 +66,15 @@ function parseZones(input: unknown): DisasterZone[] {
     const id = text(zone.id, 'Flood zone ID');
     if (ids.has(id)) throw new Error('Duplicate flood zone ID');
     ids.add(id);
-    if (zone.kind !== 'flood' || zone.simulated !== true)
-      throw new Error('Only explicitly simulated flood zones are supported');
+    if (
+      (zone.kind !== 'flood' &&
+        zone.kind !== 'landslide' &&
+        zone.kind !== 'fire') ||
+      zone.simulated !== true
+    )
+      throw new Error(
+        'Only explicitly simulated flood, landslide or fire zones are supported',
+      );
     const raw = record(zone.geometry, 'Flood geometry');
     let geometry: DisasterZone['geometry'];
     if (raw.type === 'Polygon') geometry = polygon(raw.coordinates);
@@ -86,7 +93,12 @@ function parseZones(input: unknown): DisasterZone[] {
         coordinates: polygons.map((p) => p.coordinates),
       };
     } else throw new Error('Expected nonempty Polygon or MultiPolygon');
-    return { id, kind: 'flood', simulated: true, geometry };
+    return {
+      id,
+      kind: zone.kind,
+      simulated: true,
+      geometry,
+    };
   });
 }
 const bounds = (points: number[][]) => [
@@ -134,8 +146,14 @@ export function createFloodEngine(graph: RoadGraph) {
   const nodes = structuredClone(Object.values(graph.nodes));
   const graphVersion = graph.version;
   return {
-    evaluate(input: unknown): FloodResult {
+    evaluate(
+      input: unknown,
+      closedSegments: ReadonlySet<string> = new Set(),
+    ): FloodResult {
       try {
+        for (const id of closedSegments)
+          if (!segments.has(id))
+            throw new Error(`Unknown physical segment: ${id}`);
         const zones = parseZones(input).sort((a, b) =>
           a.id.localeCompare(b.id),
         );
@@ -156,6 +174,7 @@ export function createFloodEngine(graph: RoadGraph) {
         };
         for (const [id, segment] of segments) {
           if (
+            !closedSegments.has(id) &&
             !prepared.some(
               (z) =>
                 overlaps(segment.bounds, z.bounds) &&
@@ -191,7 +210,7 @@ export function createFloodEngine(graph: RoadGraph) {
             type: 'FeatureCollection',
             features: zones.map((z) => ({
               type: 'Feature',
-              properties: { id: z.id, simulated: true },
+              properties: { id: z.id, kind: z.kind, simulated: true },
               geometry: z.geometry,
             })),
           },

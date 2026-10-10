@@ -43,3 +43,7 @@ pnpm start --hostname 127.0.0.1 --port 3000
 Open `http://127.0.0.1:3000`, choose **Demo Mode**, and follow the presenter cues. Preinstall dependencies and keep the production build on the demo laptop. Local road fallback works without remote tiles, but this is not an installable offline PWA. If WebGL fails, show textual results/tests and clearly identify any previously captured recording; do not imply the live map is working.
 
 Stop publication on a build failure, missing worker/data asset, wrong route outcome, leaked secret, absent safety/attribution copy, or unresolved project/account choice. Keep the local demo available while resolving hosting issues.
+
+## Local reporting boundary
+
+This version uses browser-local storage only. A new preview/production origin starts a separate archive; clearing browser storage deletes it. No Supabase environment variables activate shared reporting yet. Before a shared pilot, implement and verify the server/RLS/verification steps in [PLATFORM](PLATFORM.md). Do not present a deployed local adapter as a shared community service.

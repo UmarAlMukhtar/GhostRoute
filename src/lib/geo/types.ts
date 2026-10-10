@@ -37,7 +37,7 @@ export type RoadGeoJSON = FeatureCollection<
 >;
 export interface DisasterZone {
   id: string;
-  kind: 'flood';
+  kind: 'flood' | 'landslide' | 'fire';
   geometry: Polygon | MultiPolygon;
   simulated: true;
 }

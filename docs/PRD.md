@@ -1,6 +1,6 @@
 # GhostRoute product requirements
 
-Status: P0 map, geographic graph, routing, simulation and rerouting are implemented locally; final deployment and human acceptance remain separate. See VERIFICATION for executed evidence.
+Status: interactive multi-hazard routing and explicitly browser-local unverified reporting extend the completed map/routing/flood demonstration; final deployment and human acceptance remain separate. See VERIFICATION for executed evidence.
 
 ## Executive summary
 
@@ -92,3 +92,9 @@ Foundation: audit and requested docs complete, inherited requirements preserved,
 ## Post-hackathon roadmap
 
 Validate geographic access rules with domain experts, expand test regions, add verified data provenance/freshness and shelter partnerships, then consider offline distribution and a backend for moderated reports. Predictive hazards need separate scientific validation and must remain distinguishable from observations.
+
+## Interactive platform scope update
+
+The user-authorized next milestone extends the original hackathon MVP: arbitrary snapped endpoints; editable flood, landslide and fire exclusion zones; click-to-block roads; multiple hazards; automatic route comparison; and separate unverified incident reporting. These are now P0. Filters, dragging, swapping, coordinate entry, explicit one-shot geolocation and opt-in exploratory report routing are implemented P1. Shared persistence and geocoding remain P1 work; uploads/moderation/official feeds remain P2. Earlier fixed-demo/no-report boundaries describe the original MVP, not this extension.
+
+Acceptance: create several hazards on real geometry, remove one and recompute; submit an unverified report; reset simulation without losing the report; refresh to reload it locally. No report is automatically a verified closure. See [PLATFORM](PLATFORM.md) for exact modes, limits, safeguards and stop conditions.

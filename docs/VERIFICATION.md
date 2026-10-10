@@ -380,3 +380,44 @@ Rendered the production application and inspected desktop/mobile screenshots. Ve
 `vercel.json` and DEPLOYMENT.md are prepared; no Vercel CLI or local linked project was found. Authentication/project access, hosted build, hosted CI and judge access are unverified. No push, deployment, remote setting change or submission occurred. Organizer instructions/workflows and the README event prefix were preserved; SUBMISSION fields were updated while retaining its complete unchecked organizer checklist.
 
 Human gates still open: handles/contributions, organizer submission method, two timed presenter rehearsals, target-device/assistive-technology review, approval of publishing account/project/actions, final submitted SHA and real URL, and organizer-text redistribution clarification. The documented deadline is 11 October 2026 at 10:00 IST; participants must confirm venue updates. Explicit priorities and stop conditions are in ROADMAP.md. The application remains an illustrative 2D simulation, not emergency guidance.
+
+## Interactive multi-disaster platform — 2026-10-11
+
+Started from clean `749a3a5` on `codex-foundation`. SIM-01/INT-01 were present and retained. The frozen graph, Dijkstra implementation, organizer instructions/workflows and Git history remain intact. No cloud resources, deployment, push or remote settings changes.
+
+- `pnpm lint`: PASS, no warnings/errors.
+- `pnpm typecheck`: PASS.
+- `pnpm test`: PASS, **153 tests in 12 files**.
+- `pnpm build`: PASS, optimized static Next.js page; executed standalone and through the browser script.
+- `pnpm test:e2e`: PASS, **32 production browser tests**, desktop 1440×900 and mobile 360×800 Chromium. Includes old demo/routing/fallback regressions and new full custom-hazard/report journeys.
+- `pnpm format`: PASS.
+- `pnpm data:prepare` and source/runtime asset diff: PASS, byte-for-byte unchanged; 1,719 nodes, 3,712 directed edges, 1,856 physical segments, 1,875,234 runtime bytes and 12 components.
+
+### Measured results
+
+`node --experimental-strip-types scripts/benchmark-platform.ts`, Node 22.23.1, Linux, AMD Ryzen 7 8845HS; five warmups then 30 measured runs. Intersection measurements include union evaluation **and individual hazard explanations**, not just one polygon. Times are local observations, not network/mobile service guarantees.
+
+| Input                                          | Blocked segments | Baseline  | Updated        | Impact median / p95 | Routing median / p95 |
+| ---------------------------------------------- | ---------------- | --------- | -------------- | ------------------- | -------------------- |
+| Defined flood + landslide + physical roadblock | 4                | 944.333 m | 980.790 m      | 2.460 / 4.046 ms    | 0.475 / 1.000 ms     |
+| 20 enabled illustrative zones                  | 50               | 944.333 m | Origin blocked | 9.002 / 11.948 ms   | 0.048 / 0.054 ms     |
+
+The first route gains 36.457 m (about 3.86%). No unavailable route is assigned an invented distance. Counts depend on exact coordinates/radius; the interactive screenshot uses a different two-enabled-zone setup and is not the three-hazard benchmark. Existing Hospital polygon results remain covered by regression tests.
+
+### Browser and visual evidence
+
+Actual production screenshots inspected for both screen sizes: local roads with public tile requests aborted, distinct blue original/green updated routes, cyan/ochre hazards and red road segments; separate purple unverified report points. Sticky workspace navigation and 44 px controls remain usable in the scrolling mobile sheet. Saved screenshots: `docs/screenshots/platform-desktop.png`, `platform-mobile.png`, `reports-desktop.png`, `reports-mobile.png`.
+
+The new browser journey selects endpoints by coordinates; places a flood, moves/resizes it, adds a landslide, clicks a real roadblock, removes that block, adds/disables fire, submits a road-associated unverified report, filters records, opens its map marker, opts into exploratory report routing, clears simulated hazards and reloads the saved report. A separate journey swaps endpoints, drags a marker, uses permissioned **emulated** geolocation and rejects out-of-region coordinates. Prior tests cover arbitrary map-click snapping, disconnected destinations, repeated demo transitions/reset, 320 px reflow, tile/WebGL failure and slow assets. No uncaught page errors were observed in the new full journey.
+
+Iteration fixed exact accessible names on native selects, mobile marker-drag feedback hidden by the collapsed sheet, and mode labeling that could otherwise call a preset flood “Normal.” Existing test assertions were updated for the explicit out-of-coverage message and separate Demo workspace. No application failure was masked by a mock routing result.
+
+### Persistence and limits
+
+No project `.env` or configured Supabase URL/server-key variables were present. Reports persist through browser local storage only, with an illustrative seed, bounded input/archive sizes, local rate limiting, error handling and no self-verification. Unit tests downgrade forged Verified status, exclude seeds/resolved/rejected records from exploratory closures, reject invalid input and preserve stored reports on simulation reset. No cross-user sharing, trusted moderation or database/RLS verification is claimed. See [PLATFORM](PLATFORM.md) for migration requirements and stop conditions.
+
+Physical device GPS, Safari/Firefox, screen readers, live tiles and hosted deployment were not tested. No geocoding or photo upload is implemented. Spatial zones are illustrative and routes are not certified safe. Human implementation/geographic review remains pending.
+
+### File inventory
+
+New: `ExploreControls.tsx`, `simulation/hazards.ts`, `incidents/reports.ts`, `platform.test.ts`, `platform.spec.ts`, `benchmark-platform.ts`, `docs/PLATFORM.md`, ADR-010 and four screenshots. Extended: Dashboard, MapView, map style/selection, DisasterZone kind contract and the existing flood impact engine; prior map/browser tests; README, PRD, architecture, roadmap, design, tasks, testing, deployment, verification, ADR index and required AI/changelog records. No dependencies were added.

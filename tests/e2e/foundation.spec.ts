@@ -202,9 +202,9 @@ test('out-of-range map click reports snapping failure', async ({ page }) => {
     },
   });
   await expect(
-    page
-      .getByRole('alert')
-      .filter({ hasText: 'too far from the road network' }),
+    page.getByRole('alert').filter({
+      hasText: /too far from the road network|outside the supported/,
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Find route', exact: true }),

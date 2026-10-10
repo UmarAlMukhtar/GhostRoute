@@ -1,3 +1,4 @@
+import { withinCoverage } from '../simulation/hazards';
 import type { GeoPoint, RouteResult } from '../geo/types';
 import type { MapData, Place } from './data';
 export type Selection = Place & { clicked?: GeoPoint; snapMeters?: number };
@@ -18,7 +19,7 @@ export const initialSelection: SelectionState = {
 };
 export type SelectionAction =
   | { type: 'select'; role: Role; selection: Selection }
-  | { type: 'active'; role: Role }
+  | { type: 'active'; role: Role | null }
   | { type: 'preset'; places: Place[] }
   | { type: 'result'; result: RouteResult }
   | { type: 'error'; message: string }
@@ -60,6 +61,12 @@ export function selectCoordinate(
   coordinate: GeoPoint,
   role: Role,
 ): SelectionAction {
+  if (!withinCoverage(coordinate, data.bounds))
+    return {
+      type: 'error',
+      message:
+        'Location is outside the supported central Ernakulam road network.',
+    };
   const snap = data.router.snap(coordinate, { role, maxDistanceMeters: 100 });
   if (snap.status !== 'snapped')
     return {

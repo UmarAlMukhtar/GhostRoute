@@ -13,3 +13,5 @@ Accepted means the implementation direction is selected, not that it is implemen
 - [ADR-008: Indexed binary heap for routing](008-heap-routing.md) — Accepted; ROUTE-01 implemented
 
 - [ADR-009: Flood integration](009-flood-integration.md) supersedes ADR-005's single-stage scope and ADR-007's single-reducer choice for the implemented three-scenario dashboard.
+
+- [ADR-010: Interactive hazards and separately sourced reports](010-interactive-hazards-reports.md) — accepted local adapter; shared verification proposed.
