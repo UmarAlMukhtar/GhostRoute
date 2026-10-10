@@ -1,0 +1,187 @@
+[
+  {
+    "path": "/",
+    "height": 116,
+    "controls": [
+      {
+        "label": "GhostRoute home",
+        "rect": {
+          "x": 14,
+          "y": 10,
+          "width": 153,
+          "height": 44,
+          "top": 10,
+          "right": 167,
+          "bottom": 54,
+          "left": 14
+        }
+      },
+      {
+        "label": "Demo",
+        "rect": {
+          "x": 14,
+          "y": 62,
+          "width": 46.5625,
+          "height": 36,
+          "top": 62,
+          "right": 60.5625,
+          "bottom": 98,
+          "left": 14
+        }
+      },
+      {
+        "label": "Theme",
+        "rect": {
+          "x": 78.703125,
+          "y": 67,
+          "width": 69,
+          "height": 26,
+          "top": 67,
+          "right": 147.703125,
+          "bottom": 93,
+          "left": 78.703125
+        }
+      },
+      {
+        "label": "Simulation",
+        "rect": {
+          "x": 165.828125,
+          "y": 62,
+          "width": 65.359375,
+          "height": 36,
+          "top": 62,
+          "right": 231.1875,
+          "bottom": 98,
+          "left": 165.828125
+        }
+      },
+      {
+        "label": "Report Incident",
+        "rect": {
+          "x": 249.328125,
+          "y": 58,
+          "width": 96.671875,
+          "height": 44,
+          "top": 58,
+          "right": 346,
+          "bottom": 102,
+          "left": 249.328125
+        }
+      },
+      {
+        "label": "About GhostRoute",
+        "rect": {
+          "x": 302,
+          "y": 10,
+          "width": 44,
+          "height": 44,
+          "top": 10,
+          "right": 346,
+          "bottom": 54,
+          "left": 302
+        }
+      }
+    ],
+    "overlaps": [],
+    "scrollWidth": 360
+  },
+  {
+    "path": "/demo",
+    "height": 156,
+    "controls": [
+      {
+        "label": "GhostRoute home",
+        "rect": {
+          "x": 14,
+          "y": 10,
+          "width": 153,
+          "height": 44,
+          "top": 10,
+          "right": 167,
+          "bottom": 54,
+          "left": 14
+        }
+      },
+      {
+        "label": "Navigation",
+        "rect": {
+          "x": 14,
+          "y": 58,
+          "width": 72.234375,
+          "height": 36,
+          "top": 58,
+          "right": 86.234375,
+          "bottom": 94,
+          "left": 14
+        }
+      },
+      {
+        "label": "Demo scenarios",
+        "rect": {
+          "x": 96.875,
+          "y": 58,
+          "width": 93.484375,
+          "height": 36,
+          "top": 58,
+          "right": 190.359375,
+          "bottom": 94,
+          "left": 96.875
+        }
+      },
+      {
+        "label": "Theme",
+        "rect": {
+          "x": 201,
+          "y": 63,
+          "width": 69,
+          "height": 26,
+          "top": 63,
+          "right": 270,
+          "bottom": 89,
+          "left": 201
+        }
+      },
+      {
+        "label": "Simulation",
+        "rect": {
+          "x": 280.640625,
+          "y": 58,
+          "width": 65.359375,
+          "height": 36,
+          "top": 58,
+          "right": 346,
+          "bottom": 94,
+          "left": 280.640625
+        }
+      },
+      {
+        "label": "Report Incident",
+        "rect": {
+          "x": 14,
+          "y": 98,
+          "width": 96.671875,
+          "height": 44,
+          "top": 98,
+          "right": 110.671875,
+          "bottom": 142,
+          "left": 14
+        }
+      },
+      {
+        "label": "About GhostRoute",
+        "rect": {
+          "x": 302,
+          "y": 10,
+          "width": 44,
+          "height": 44,
+          "top": 10,
+          "right": 346,
+          "bottom": 54,
+          "left": 302
+        }
+      }
+    ],
+    "overlaps": [],
+    "scrollWidth": 360
+  }
+]

@@ -1,0 +1,7 @@
+# OSM-derived Kochi–Ernakulam local gazetteer
+
+`ernakulam.json` contains 12,409 indexed OSM names. `pnpm data:prepare` derives named highway way points and named nodes from the frozen geographic source, preserving actual coordinates/source IDs and selecting the nearest graph node within 100 m. Both directed paths to/from central Kochi are required. The original seven popular suggestions retain their source evidence in `osm-evidence.json`; they are only defaults, not the searchable database.
+
+The compact runtime index is `public/data/ernakulam/places.json`, loaded separately from the React bundle and validated once. Exact names/aliases rank above prefixes and loosely matching terms; partial names, roads, landmarks/localities, categories and latitude,longitude input are supported. Local query timers debounce/cancel at 180 ms; no geocoding requests/API keys/public Nominatim autocomplete. Index loading failures preserve map and coordinate navigation and provide explicit feedback.
+
+Coverage is frozen and incomplete: unnamed features, building polygons without named nodes, distant entrances and disconnected walking components are absent from the index. Road points are approximate positions on real road geometry, not verified entrances; nearest-node access and OSM permissions are not certified safe. Sources and exact hashes are in `data/source/manifest.json`. OSM data and the derived index use ODbL 1.0 and © OpenStreetMap contributors attribution.

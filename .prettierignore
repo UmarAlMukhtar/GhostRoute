@@ -1,0 +1,18 @@
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+next-env.d.ts
+# Keep inherited organizer rules byte-for-byte.
+RULES.md
+
+# Generated compact assets; regenerate with pnpm data:prepare.
+public/data/ernakulam/*.json
+public/data/ernakulam/*.geojson
+
+public/vendor/maplibre/
+
+data/places/ernakulam.json

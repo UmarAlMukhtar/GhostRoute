@@ -1,0 +1,194 @@
+{
+  "elements": [
+    {
+      "type": "node",
+      "id": 7016742693,
+      "version": 6,
+      "timestamp": "2023-11-18T16:11:22Z",
+      "lat": 9.9784782,
+      "lon": 76.2757727,
+      "tags": {
+        "name": "Marine Drive, Kochi",
+        "name:en": "Marine Drive, Kochi",
+        "name:hi": "मरीन ड्राइव, कोच्चि",
+        "name:ml": "എറണാകുളം മറൈൻ ഡ്രൈവ്",
+        "tourism": "attraction",
+        "wikidata": "Q5122325",
+        "wikimedia_commons": "Category:Marine Drive, Kochi",
+        "wikipedia": "en:Marine Drive, Kochi"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1906667447,
+      "version": 11,
+      "timestamp": "2024-09-16T10:26:29Z",
+      "lat": 9.9684255,
+      "lon": 76.2860629,
+      "tags": {
+        "highway": "traffic_signals",
+        "junction": "yes",
+        "name": "Jos Junction",
+        "traffic_signals": "signal",
+        "traffic_signals:direction": "forward"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1038662801,
+      "version": 9,
+      "timestamp": "2025-09-24T17:22:29Z",
+      "nodes": [
+        1906667447, 11985215029, 1906609556, 1906609527, 1906667446,
+        13167994608, 1906609529, 11132624130, 7057750306
+      ],
+      "tags": {
+        "alt_name": "MG Road",
+        "highway": "primary",
+        "lanes": "2",
+        "lit": "yes",
+        "maxspeed": "50",
+        "name": "Mahatma Gandhi Road",
+        "name:etymology:wikidata": "Q1001",
+        "name:ml": "മഹാത്മ ഗാന്ധി റോഡ്",
+        "oneway": "yes",
+        "short_name": "MG Road",
+        "short_name:ml": "എം ജി റോഡ്",
+        "sidewalk": "left",
+        "surface": "asphalt"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4760378949,
+      "version": 6,
+      "timestamp": "2024-06-27T16:06:44Z",
+      "lat": 9.9690003,
+      "lon": 76.2909524,
+      "tags": {
+        "internet_access": "wlan",
+        "name": "Ernakulam Junction",
+        "name:ml": "എറണാകുളം ജംഗ്ഷൻ",
+        "network": "IR",
+        "operator": "SR",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "ERS",
+        "wheelchair": "yes",
+        "wikidata": "Q5392599",
+        "wikipedia": "en:Ernakulam Junction railway station"
+      }
+    },
+    {
+      "type": "node",
+      "id": 7057719920,
+      "version": 1,
+      "timestamp": "2019-12-15T10:00:54Z",
+      "lat": 9.9705151,
+      "lon": 76.2805299,
+      "tags": {
+        "entrance": "yes"
+      }
+    },
+    {
+      "type": "way",
+      "id": 264720319,
+      "version": 12,
+      "timestamp": "2024-09-20T09:10:16Z",
+      "nodes": [
+        2703744764, 2712084832, 2703744765, 7057719921, 2703744766, 12122426621,
+        12187806609, 12187806612, 12187806611, 12187806610, 2712085336,
+        2703744767, 7057719920, 2703744764
+      ],
+      "tags": {
+        "addr:city": "Ernakulam",
+        "addr:street": "Park Avenue",
+        "amenity": "college",
+        "landuse": "education",
+        "name": "Maharaja's College",
+        "name:ml": "മഹാരാജാസ് കോളേജ്",
+        "operator": "Government of Kerala",
+        "phone": "+91 484 235 2838",
+        "website": "https://www.maharajas.ac.in/",
+        "wikidata": "Q6733207",
+        "wikimedia_commons": "Category:Maharaja's College",
+        "wikipedia": "en:Maharaja's College, Ernakulam"
+      }
+    },
+    {
+      "type": "node",
+      "id": 7057737620,
+      "version": 2,
+      "timestamp": "2019-12-28T06:50:56Z",
+      "lat": 9.9715556,
+      "lon": 76.2810656,
+      "tags": {
+        "entrance": "main"
+      }
+    },
+    {
+      "type": "way",
+      "id": 755600802,
+      "version": 8,
+      "timestamp": "2024-10-08T12:26:47Z",
+      "nodes": [
+        7057737605, 7057737606, 7057737608, 7057737609, 7057737610, 7057737611,
+        7057737619, 7057737612, 7057737613, 7057737614, 7057737615, 7057737616,
+        7057737621, 7057737617, 7057737620, 7057737618, 7057737605
+      ],
+      "tags": {
+        "addr:district": "Ernakulam",
+        "addr:postcode": "682011",
+        "addr:state": "Kerala",
+        "alt_name": "Ernakulam General Hospital",
+        "amenity": "hospital",
+        "CovidVaccineCenterId": "155287",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "General Hospital Ernakulam",
+        "operator": "Department of Health Services",
+        "operator:type": "government",
+        "ref": "1473",
+        "source": "OpenGovernmentData",
+        "wheelchair": "yes",
+        "wikidata": "Q5531947",
+        "wikipedia": "en:General Hospital, Ernakulam"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1906467050,
+      "version": 3,
+      "timestamp": "2023-12-13T18:31:59Z",
+      "lat": 9.9803003,
+      "lon": 76.2769757
+    },
+    {
+      "type": "way",
+      "id": 1230913299,
+      "version": 1,
+      "timestamp": "2023-12-13T18:31:59Z",
+      "nodes": [1906467050, 1906467034],
+      "tags": {
+        "highway": "tertiary",
+        "maxspeed": "10",
+        "name": "Broadway",
+        "name:ml": "ബ്രോഡ്വേ",
+        "sidewalk": "both",
+        "surface": "paving_stones"
+      }
+    },
+    {
+      "type": "node",
+      "id": 271146530,
+      "version": 10,
+      "timestamp": "2023-08-17T05:37:23Z",
+      "lat": 9.9837451,
+      "lon": 76.2739283,
+      "tags": {
+        "junction": "yes",
+        "name": "High Court Junction"
+      }
+    }
+  ]
+}

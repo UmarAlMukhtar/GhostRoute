@@ -1,0 +1,44 @@
+{
+  "measuredAt": "2026-10-10T19:34:31.335Z",
+  "indexValidationMs": 891.905972,
+  "catalogCount": 12409,
+  "crossRegionRoutes": [
+    {
+      "origin": "Edappally Market",
+      "destination": "Vyttila Mobility Hub",
+      "status": "found",
+      "distanceMeters": 7100.304000000001,
+      "medianMs": 29.3870450000004,
+      "p95Ms": 33.42103600000064
+    },
+    {
+      "origin": "Edappally Market",
+      "destination": "Kakkanad Water Metro",
+      "status": "found",
+      "distanceMeters": 8485.296999999999,
+      "medianMs": 44.10176700000011,
+      "p95Ms": 50.90595200000007
+    },
+    {
+      "origin": "Edappally Market",
+      "destination": "Fort Kochi Police Station",
+      "status": "found",
+      "distanceMeters": 19550.360999999986,
+      "medianMs": 144.14008599999943,
+      "p95Ms": 185.79463000000032
+    },
+    {
+      "origin": "Edappally Market",
+      "destination": "Aluva",
+      "status": "found",
+      "distanceMeters": 15175.596999999996,
+      "medianMs": 79.83193800000117,
+      "p95Ms": 93.54086599999937
+    }
+  ],
+  "hazardIntersection": {
+    "medianMs": 9.219547999999122,
+    "p95Ms": 27.44004600000153,
+    "scope": "one illustrative polygon over full expanded graph; 30 samples"
+  }
+}

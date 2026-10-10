@@ -1,0 +1,44 @@
+{
+  "measuredAt": "2026-10-10T19:14:24.298Z",
+  "environment": {
+    "node": "v22.23.1",
+    "platform": "linux",
+    "release": "7.2.8-200.fc44.x86_64",
+    "arch": "x64",
+    "cpu": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics"
+  },
+  "graphVersion": "ernakulam-walking-v2-da5f90bcba976cb6",
+  "nodes": 49740,
+  "directedEdges": 115412,
+  "runs": 30,
+  "warmups": 5,
+  "distancesMeters": {
+    "baseline": 944.3330000000003,
+    "blockedHospitalRoad": 980.7900000000002
+  },
+  "initialization": {
+    "medianMs": 1359.744,
+    "p95Ms": 1786.545
+  },
+  "validationAndInitialization": {
+    "medianMs": 1724.123,
+    "p95Ms": 2078.92
+  },
+  "baseline": {
+    "medianMs": 0.286,
+    "p95Ms": 0.404
+  },
+  "reroute": {
+    "medianMs": 0.113,
+    "p95Ms": 0.178
+  },
+  "repeatedBatch100": {
+    "medianMs": 18.32,
+    "p95Ms": 22.698
+  },
+  "snap": {
+    "medianMs": 0.04,
+    "p95Ms": 0.085
+  },
+  "notes": "Node-only wall-clock measurements, in-memory data, no file read/JSON parse/network/map rendering in timed operations. Batch timing is for 100 alternating baseline/closed requests, not per request. Includes closure validation and route geometry reconstruction."
+}
