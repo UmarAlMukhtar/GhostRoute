@@ -29,3 +29,7 @@ next-env.d.ts
 out/
 playwright-report/
 test-results/
+
+# Unfiltered acquisition responses; only the compact frozen road source is versioned.
+data/source/*.raw.json
+data/source/*.osm

@@ -1,6 +1,6 @@
 # Contributor task catalog
 
-All tasks below are **unassigned and not implemented**, except the Phase 0 foundation described in README. These are local definitions; no GitHub issues, labels or assignments have been created. Estimates are hands-on contributor time, not sequential wall-clock totals. Work follows [ROADMAP](ROADMAP.md); parallel ownership is described there. Small beginner tasks fit inside phase budgets, not in addition to eight hours. Read the relevant ADR and coordinate shared files before starting.
+**Phase 0 and MAP-01 are implemented.** Other tasks remain unassigned/unimplemented. Next: ROUTE-01, followed by MAP-02. These are local definitions; no GitHub issues, labels or assignments have been created. Estimates are hands-on contributor time, not sequential wall-clock totals. Work follows [ROADMAP](ROADMAP.md); parallel ownership is described there. Small beginner tasks fit inside phase budgets, not in addition to eight hours. Read the relevant ADR and coordinate shared files before starting.
 
 ## UI and design
 
@@ -41,6 +41,8 @@ All tasks below are **unassigned and not implemented**, except the Phase 0 found
 
 ### MAP-01 — Freeze and validate Ernakulam road data
 
+- **Status:** Complete locally; real source/graph/GeoJSON, deterministic conversion, 1,719 nodes / 3,712 edges, validated alternative-path witness. See DATA_STRATEGY and VERIFICATION; human provenance review remains MAP-03.
+
 - **Description:** Create shared contracts, query/source manifest and deterministic converter using DATA_STRATEGY. Review connectivity and select real baseline/alternative paths.
 - **Priority:** P0
 - **Dependencies:** Phase 0 docs/tooling
@@ -68,7 +70,7 @@ All tasks below are **unassigned and not implemented**, except the Phase 0 found
 - **Dependencies:** MAP-01, MAP-02
 - **Estimated effort:** 20 min
 - **Relevant modules:** data/source/manifest.json; docs/DATA_STRATEGY.md; MapView.tsx
-- **Acceptance criteria:** Hash matches raw source; bounds/query/date are actual; attribution visible; no source or currency claim exceeds evidence.
+- **Acceptance criteria:** Hash matches decompressed normalized source; bounds/query/date are actual; attribution visible; no source or currency claim exceeds evidence.
 - **Suggested GitHub labels:** `documentation, maps, good first issue, P0` (suggestions only)
 - **First-time contributor suitability:** Yes; bounded and reviewable with maintainer guidance.
 

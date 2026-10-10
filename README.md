@@ -35,7 +35,7 @@ This template has no application code or required technology stack. The document
 
 GhostRoute is an open-source disaster-aware navigation **simulation** for Kochi–Ernakulam. It will demonstrate how a shortest path through real mapped roads changes when a simulated flood makes road segments unavailable.
 
-**Current status: Phase 0 foundation only.** This checkout contains a tooling smoke page, development configuration, tests and implementation specifications. It does not yet contain an interactive map, routing engine, flood simulation or verified emergency destinations.
+**Current status: Phase 0 + MAP-01 complete.** This checkout contains a tooling smoke page, real local Ernakulam OSM road data, shared geographic contracts, a reproducible converter and validation tests. It does not yet contain an interactive map, routing engine, flood simulation or verified emergency destinations.
 
 - **Project name:** GhostRoute
 - **Team:** Participant names/handles await the team's confirmation; maximum four members.
@@ -70,6 +70,8 @@ In the original Codex workspace, run `cd repository` first; the official clone i
 
 | Command             | Purpose                                                        |
 | ------------------- | -------------------------------------------------------------- |
+| `pnpm data:prepare` | Rebuild local road assets offline from the frozen OSM source   |
+| `pnpm data:acquire` | Intentionally refresh the OSM source; review before accepting  |
 | `pnpm dev`          | Local Next development server                                  |
 | `pnpm build`        | Production compilation                                         |
 | `pnpm start`        | Serve an existing production build                             |
@@ -82,11 +84,13 @@ In the original Codex workspace, run `cd repository` first; the official clone i
 
 `RULES.md` is excluded from automatic formatting so its inherited bytes remain intact. Do not add npm/yarn lockfiles or competing tool configs. CI runs the same checks; local results are in [VERIFICATION](docs/VERIFICATION.md).
 
+The local dataset has 1,719 nodes, 3,712 directed edges and 12 components. Run `pnpm data:prepare` to reproduce it without network access. [DATA_STRATEGY](docs/DATA_STRATEGY.md) records bounds, access assumptions and the verified alternate-path fixture. Next implementation: ROUTE-01 (Dijkstra), then MAP-02 (map rendering).
+
 ### Demo instructions and limitations
 
 Today: start the app and confirm the heading, foundation status and safety disclaimer. This proves setup only. After P0 is built: choose a reviewed origin and synthetic destination, calculate the baseline, trigger the flood, compare blocked roads and the updated path, then reset. Full steps and internet-failure fallback are in [DEMO_PLAN](docs/DEMO_PLAN.md). No hosted deployment is claimed.
 
-**Simulation only. Hazards and destinations are demonstration data. Routes are not verified safe. Follow local authorities.** The future graph will be a small, potentially stale extract; the flood model is two-dimensional. Neither an unblocked road nor a synthetic destination establishes actual access, capacity or safety.
+**Simulation only. Hazards and destinations are demonstration data. Routes are not verified safe. Follow local authorities.** The graph is a small, potentially stale extract; the flood model is two-dimensional. Neither an unblocked road nor a synthetic destination establishes actual access, capacity or safety.
 
 ### Roadmap and contributing
 
@@ -94,6 +98,6 @@ Start with [CONTRIBUTOR_GUIDE](docs/CONTRIBUTOR_GUIDE.md), [CONTRIBUTING](CONTRI
 
 ### Sources and licensing
 
-New GhostRoute code/documentation uses [MIT](LICENSE), with the inherited organizer text excluded from that grant pending license clarification. The [template audit](docs/TEMPLATE_AUDIT.md) records provenance. No OSM dataset is bundled yet; future OSM-derived assets use [ODbL](https://www.openstreetmap.org/copyright) and visible attribution. The code of conduct adapts [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) under its own license. Dependency versions are pinned in `package.json` and `pnpm-lock.yaml`.
+New GhostRoute code/documentation uses [MIT](LICENSE), with the inherited organizer text excluded from that grant pending license clarification. The [template audit](docs/TEMPLATE_AUDIT.md) records provenance. Bundled OSM source/derived assets use [ODbL](https://www.openstreetmap.org/copyright) and [bundled attribution](public/data/ernakulam/ATTRIBUTION.md). The code of conduct adapts [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) under its own license. Dependency versions are pinned in `package.json` and `pnpm-lock.yaml`.
 
 See [AI_USAGE.md](AI_USAGE.md) for AI assistance, [CHANGELOG.md](CHANGELOG.md) for the development record and [SUBMISSION.md](SUBMISSION.md) for the organizer's submission checklist.

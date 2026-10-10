@@ -1,0 +1,18 @@
+{
+  "sourceUrl": "https://api.openstreetmap.org/api/0.6/map.json?bbox=76.274,9.966,76.292,9.984",
+  "importedAt": "2026-10-10T16:55:36.002Z",
+  "fetchedAt": "2026-10-10T16:51:47.804Z",
+  "acquisition": "Local response; fetchedAt uses file modification time as download evidence",
+  "responseFileModifiedAt": "2026-10-10T16:51:47.804Z",
+  "queryBounds": [76.274, 9.966, 76.292, 9.984],
+  "rawResponseSha256": "3d880353e908f0b84db27b5ce89dfd821c63fdab0d1d6bcfa2ea11f2ef92789e",
+  "normalizedSourceSha256": "c5690329d952ed1392d35aea98909ff364807c3e335eb987fc35cd6f54ceb2cd",
+  "normalization": "highway ways, their referenced nodes, explicit pedestrian restriction relations; all tags and element versions/timestamps; no editor identities",
+  "sourceElements": 2379,
+  "sourceWays": 493,
+  "snapshotTimestamp": null,
+  "snapshotNote": "OSM map API does not supply a global snapshot timestamp. Element timestamps are retained; fetchedAt is not a database snapshot guarantee.",
+  "attribution": "© OpenStreetMap contributors",
+  "license": "ODbL-1.0",
+  "licenseUrl": "https://www.openstreetmap.org/copyright"
+}

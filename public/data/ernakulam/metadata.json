@@ -1,0 +1,350 @@
+{
+  "graphVersion": "ernakulam-walking-v1-c5690329d952ed13",
+  "source": {
+    "sourceUrl": "https://api.openstreetmap.org/api/0.6/map.json?bbox=76.274,9.966,76.292,9.984",
+    "importedAt": "2026-10-10T16:55:36.002Z",
+    "fetchedAt": "2026-10-10T16:51:47.804Z",
+    "acquisition": "Local response; fetchedAt uses file modification time as download evidence",
+    "responseFileModifiedAt": "2026-10-10T16:51:47.804Z",
+    "queryBounds": [
+      76.274,
+      9.966,
+      76.292,
+      9.984
+    ],
+    "rawResponseSha256": "3d880353e908f0b84db27b5ce89dfd821c63fdab0d1d6bcfa2ea11f2ef92789e",
+    "normalizedSourceSha256": "c5690329d952ed1392d35aea98909ff364807c3e335eb987fc35cd6f54ceb2cd",
+    "normalization": "highway ways, their referenced nodes, explicit pedestrian restriction relations; all tags and element versions/timestamps; no editor identities",
+    "sourceElements": 2379,
+    "sourceWays": 493,
+    "snapshotTimestamp": null,
+    "snapshotNote": "OSM map API does not supply a global snapshot timestamp. Element timestamps are retained; fetchedAt is not a database snapshot guarantee.",
+    "attribution": "© OpenStreetMap contributors",
+    "license": "ODbL-1.0",
+    "licenseUrl": "https://www.openstreetmap.org/copyright"
+  },
+  "converter": "walking-v1",
+  "converterSha256": "6d42f09fc020d608f93112530309cbb78a54403a58117d030e89b460db18b64b",
+  "nodeCount": 1719,
+  "directedEdgeCount": 3712,
+  "segmentCount": 1856,
+  "runtimeBytes": 1875234,
+  "componentSizes": [
+    1501,
+    117,
+    34,
+    30,
+    12,
+    8,
+    4,
+    4,
+    3,
+    2,
+    2,
+    2
+  ],
+  "oneWaySegmentCount": 0,
+  "parallelSegmentCandidates": [],
+  "bounds": [
+    76.2732579,
+    9.9638296,
+    76.2936855,
+    9.9897189
+  ],
+  "exclusions": [
+    {
+      "id": "1005857607",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1005857608",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1005858793:0",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "1005858793:1",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "1005874160",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1034991658",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1107291669",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1120297558",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1190255241",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1190255242",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1190255243",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1200664267",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207338584",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207351015",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207358287",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207358922",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207359187",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207359784",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207362658",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207362833",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207387784",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1207656564",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209036651",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209045860",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209048575",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209050818",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209061611",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209269683",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209269823",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209324423",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209325599",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209330660",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209353132",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209353133",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1209355203",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1218297558",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1218698719",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1224988783",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1232324454",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1287298310:0",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "1287298310:1",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "1287298310:2",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "1287298310:3",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "1319610401",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1319610402",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1392587189",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "1394192820:0",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "1394192820:1",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "27250406",
+      "reason": "ambiguous pedestrian oneway"
+    },
+    {
+      "id": "324728351:3",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "324728351:4",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "380252319:0",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "380252319:1",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "380259418:0",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "380259419:0",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "380259419:1",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "380259420:6",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "380259422:6",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "380259422:7",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "435272753",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "435272759",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "435272765",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "435756906",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "581500010:0",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "734346453",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "743659142",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "751759453:0",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "751759453:1",
+      "reason": "unhandled barrier"
+    },
+    {
+      "id": "802501334",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "927519186",
+      "reason": "restricted general access"
+    },
+    {
+      "id": "992478307",
+      "reason": "restricted general access"
+    }
+  ],
+  "outputSha256": {
+    "graph.json": "3400a892956e6cdab258c2f27539d58ef90478018558144721ef0030895b6c03",
+    "roads.geojson": "343750d923a86b3484b73d979683495dec740dbaee7aeeb37a781cbbbb2bbb88",
+    "demo-paths.json": "47175b908342080b22da41656790539073dfd0de0769242b82588e0d610ffc69"
+  },
+  "limitations": [
+    "Mapped walking access is assumed where tags are missing, not field verified.",
+    "All components retained. No coordinate snapping or invented connections.",
+    "No verified shelters, live hazards, elevation model or shortest-path engine."
+  ]
+}

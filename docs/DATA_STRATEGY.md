@@ -1,51 +1,71 @@
 # Geographic data strategy
 
-Research checked 10 October 2026. This is a reproducible acquisition/conversion plan; no road extract or verified emergency dataset is bundled in Phase 0.
+MAP-01 implemented 10 October 2026. Real local OSM roads are bundled; map rendering, Dijkstra and flood simulation are separate upcoming tasks.
 
-## Candidate region
+## Selected area and observed coverage
 
-Use a compact mainland central Ernakulam rectangle centered at `[76.2925, 9.9800]`, with display bounds `[76.280, 9.970, 76.305, 9.990]` in west/south/east/north order. It is approximately 6 km² and deliberately avoids an all-Kochi scope. Consult the [OSM map](https://www.openstreetmap.org/#map=15/9.9800/76.2925) during MAP-01 to review actual roads. These bounds are proposed, not a surveyed neighborhood boundary or a verified flood region. Extract the buffered bbox south 9.967, west 76.277, north 9.993, east 76.308. Keep whole selected ways and referenced nodes to avoid severing roads at display edges. The graph may extend slightly beyond the displayed rectangle.
+The request bbox is **[76.274, 9.966, 76.292, 9.984]** in west/south/east/north order (about 2 × 2 km). A broader OSM coverage inspection showed Marine Drive west of the Phase 0 proposal and South Railway Station Road below it. The selected rectangle includes OSM ways 180345780 (Marine Drive Walkway), 755605372 (Mahatma Gandhi Road), 768625211 (Hospital Road), 24952897 (Durbar Hall Road) and 30932690 (South Railway Station Road). These actual road positions determined the revised bounds; this is not an administrative or flood boundary.
 
-Final approval requires inspection of intersections, bridges, access restrictions, component sizes and two real alternative paths. If the dataset exceeds 5,000 nodes / 12,000 directed edges or 3 MB uncompressed runtime assets, shrink the region and record the revised bounds. Do not selectively fabricate shortcuts to satisfy the demo. A route can only claim availability within this extract.
+Whole ways retain their referenced nodes beyond the request. Actual graph extent: **[76.2732579, 9.9638296, 76.2936855, 9.9897189]**. The validator's reviewed envelope is [76.273, 9.963, 76.294, 9.990]. Keeping complete ways avoids invented boundary intersections. No coordinate snapping, simplification or largest-component-only pruning occurs.
 
-## Acquisition and reproducibility
+- Frozen source: 493 highway ways / 1,886 referenced nodes.
+- Runtime: **1,719 nodes / 3,712 directed edges / 1,856 physical segments**.
+- Components: **1,501, 117, 34, 30, 12, 8, 4, 4, 3, 2, 2, 2 nodes**. All segments in this snapshot are bidirectional, so these weak components are also strongly connected. The converter/tests support explicit pedestrian one-way tags even though this snapshot has none.
+- Graph + GeoJSON: **1,875,234 bytes**, below the 3 MB / 5,000-node / 12,000-edge budgets. No parallel-segment endpoint duplicates were found.
+- 71 way/segment exclusions are recorded individually in metadata. Smaller disconnected components remain available for honest unreachable handling.
 
-Use a single manual/development-time [Overpass QL](https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL) extraction. Never query Overpass from normal app startup or CI. Save this query as `data/source/ernakulam.overpassql` during MAP-01:
+## Source, acquisition and exact reproduction
 
-```overpass
-[out:json][timeout:30];
-way["highway"~"^(primary|secondary|tertiary|unclassified|residential|living_street|service|pedestrian|footway|path|steps|primary_link|secondary_link|tertiary_link)$"](9.967,76.277,9.993,76.308);
-(._;>;);
-out body;
-```
+The initial Overpass endpoint returned HTTP 406; two mirrors returned HTTP 500. A single small [OSM map API](https://wiki.openstreetmap.org/wiki/API_v0.6#Retrieving_map_data_by_bounding_box:_GET_/api/0.6/map) extract succeeded. It returns complete ways plus referenced nodes. This development-time fallback is not an application or CI dependency. For wider-area expansion prefer an extract or [Overpass](https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL), not repeated editing-API downloads.
 
-The bbox order differs from GeoJSON. The recurse statement retains way node identities and node coordinates; `out geom` alone is insufficient if the converter discards node IDs. Consult [Overpass examples](https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_API_by_Example). Public endpoints can rate-limit or fail; stop retry loops and use the last reviewed frozen extract. An updated query will not reproduce a previous live OSM snapshot, so keep the raw response.
+The [source manifest](../data/source/manifest.json) records the exact URL, downloaded response hash, normalized source hash, query bounds and timestamps. This response finished downloading at **2026-10-10T16:51:47.804Z**, evidenced by its local file modification time. The API provides no global snapshot timestamp; per-element edit timestamps and versions are retained. Do not equate acquisition time with verified fresh conditions.
 
-Proposed acquisition commands, to run only in MAP-01 after creating the query file:
+`data/source/ernakulam.osm.json.gz` contains only road ways, their nodes and any explicit pedestrian restriction relations, retaining all tags and topology. Editor identities and unrelated features are removed. The compressed normalized source is committed because it is necessary for exact offline conversion. The unfiltered response stays outside Git. Runtime metadata includes policy version, converter-code hash, component summary, exclusion reasons and output hashes.
+
+Exact offline regeneration from repository root (Node 22.13+ or 24; no tsx dependency):
 
 ```bash
-curl --fail --show-error --max-time 60 \
-  --data-urlencode 'data@data/source/ernakulam.overpassql' \
-  https://overpass-api.de/api/interpreter \
-  -o data/source/ernakulam.osm.json
-sha256sum data/source/ernakulam.osm.json
+pnpm install --frozen-lockfile
+pnpm data:prepare
+pnpm test
 ```
 
-Validate content before accepting it; HTTP success can still contain an error. Record query text/hash, source URL, actual fetched-at time in UTC, OSM `osm3s.timestamp_osm_base`, source SHA-256, converter commit, access policy version, source/runtime counts, connected-component summary and output SHA-256 in `data/source/manifest.json`. Re-run conversion twice against the same input and compare outputs byte-for-byte. Stable ID sorting and no conversion-time timestamps in generated graph files ensure determinism. Use `pnpm exec tsx scripts/prepare-roads.ts` only once that script and dependency are introduced; it is **not** a Phase 0 command.
+To confirm determinism:
 
-## Conversion and graph rules
+```bash
+sha256sum public/data/ernakulam/*.json public/data/ernakulam/*.geojson > /tmp/ghostroute-before.sha256
+pnpm data:prepare
+sha256sum --check /tmp/ghostroute-before.sha256
+```
 
-1. Parse untrusted JSON; require expected node/way elements, unique string IDs, finite WGS84 coordinates and complete node references. Fail clearly on empty or malformed input.
-2. Use a walking demonstration profile. Exclude ways with `foot=no/private` or `access=no/private` unless an explicit allowed `foot=yes/designated/permissive` overrides general access. Conservative MVP handling: exclude other restricted access values (customers/destination/delivery), `foot=use_sidepath`, conditional access/direction, construction/proposed roads, motorways/trunks, ferries and ways involving unhandled access barriers. Record exclusions, not silent defaults. For allowed highway classes without access tags, assume walking for the demonstration and record this limitation; these defaults are not verified local rights of access.
-3. Read [OSM access semantics](https://wiki.openstreetmap.org/wiki/Key:access) and [pedestrian direction semantics](https://wiki.openstreetmap.org/wiki/Key:oneway:foot). General vehicle `oneway` alone does not determine pedestrian direction. For this walking graph: `oneway:foot=yes` creates forward edges, `-1` reverse edges, `no` or missing creates both. Exclude unsupported values pending review. No vehicle profile or turn-restriction claim in P0.
-4. Every consecutive pair of eligible OSM way nodes is a physical segment. Keep IDs as strings. Emit directed edges with `wayId:segmentIndex:forward/reverse` and shared `segmentId`. Reverse geometry for reverse edges. Length is geodesic meters, not degrees or Web Mercator pixels. Reject zero/nonfinite lengths and duplicate edges/IDs.
-5. Connect only shared OSM node IDs. A geometric crossing is not automatically a junction. Retain bridge/tunnel/layer information in the source for audit; do not merge nearby nodes or planarize flyovers. Exclude unsupported barriers rather than routing through them. Report disconnected components and dangling references.
-6. Build sorted outgoing adjacency and road GeoJSON from the same edges; avoid duplicate visible physical segments. Validate edge endpoints against node coordinates. Retain complete segment geometry for intersection/rendering.
-7. Review one real baseline/alternative route pair and one disconnected case. Freeze the dataset before tuning the fixed flood scenario. The polygon is synthetic and chosen for demonstrability, not inferred from historical maps.
+An intentional source update uses `pnpm data:acquire` then `pnpm data:prepare` and review/tests. A live request will change with OSM edits. The [source README](../data/source/README.md) gives exact curl/import commands and failure handling. Changing the extent requires changing the acquisition URL/bounds checks, reviewed output envelope, fixtures and metadata together. Source updates that invalidate the demo or budgets must be reviewed before committing. Bump the walking policy version for changed semantics.
+
+## Conversion policy: walking-v1
+
+1. Parse unknown JSON and validate IDs, duplicate elements, coordinate ranges and complete node references. Reject empty data, API error remarks, invalid geometry and zero-length segments with useful errors.
+2. Allow primary/secondary/tertiary and their links, unclassified, residential, living_street, service, pedestrian, footway, path and steps. Exclude other classes, motor roads, area ways, construction/proposed ways and moving walkways. Missing walking/access tags on an allowed highway imply assumed demo access, not verified legal rights or sidewalks.
+3. Only `yes`, `designated`, `permissive` are accepted explicit foot/access permissions. Specific foot permission overrides general access. Reject private/no/customers/destination/delivery/use_sidepath and other unsupported values. Exclude conditional access/direction, including on nodes, rather than evaluating time-dependent rules. Nodes with unhandled barriers block incident segments, preserving the rest of the way.
+4. [Pedestrian direction](https://wiki.openstreetmap.org/wiki/Key:oneway:foot): `oneway:foot=yes` is forward, `-1` reverse, `no` or absent both. Apply foot/access forward/backward restrictions. Ignore vehicle `oneway` on streets; conservatively exclude ambiguous oneway-tagged pedestrian/path/steps ways without an explicit pedestrian direction. Exclude unsupported direction values and ways involved in explicit pedestrian turn-restriction relations. Vehicle turn relations are not a walking restriction model. See [access semantics](https://wiki.openstreetmap.org/wiki/Key:access).
+5. Split each consecutive OSM way-node pair, preserving all shape nodes and source way IDs. IDs are `way:segment:forward/reverse`; opposite directions share `segmentId`. Emit one GeoJSON feature per physical segment, with both directed edge IDs and all source way tags (including name, bridge, tunnel, layer).
+6. Shared OSM node identity alone connects roads. Crossing lines or equal coordinates with different IDs remain separate. No joining by proximity or assumed road level. Bridges/tunnels retain mapped topology; this does not verify its field accuracy.
+7. Graph loading validates meter weights against full geometry, endpoints, source IDs, reverse geometry and exact sorted adjacency. Dataset validation cross-checks map/graph agreement, duplicates, geographic envelope, component counts and byte/node/edge limits. Parallel ways with equal endpoint IDs are reported for review, not automatically merged.
+
+## Reviewed alternative-path fixture
+
+[demo-paths.json](../public/data/ernakulam/demo-paths.json) is a graph-version-bound **BFS connectivity witness**, not shortest-distance routing or a shelter selection.
+
+| Role                                         | OSM node   | [Longitude, latitude]   |
+| -------------------------------------------- | ---------- | ----------------------- |
+| Origin: Park Avenue / Hospital Road          | 271145615  | [76.28014, 9.9713489]   |
+| Destination: Jos Junction / Durbar Hall Road | 1906667447 | [76.2860629, 9.9684255] |
+
+The baseline witness is 15 edges / **1,003.818 m**, via Hospital Road, TD Road, Club Road and Durbar Hall Road. Blocking **768625211:4**, both `forward` and `reverse`, leaves a 25-edge / **1,470.595 m** witness via Park Avenue, Cannon Shed Road and Market Road before rejoining Hospital Road. It uses **695.005 m** of physical segments absent from the baseline. Tests walk each consecutive directed edge, verify endpoint coordinates, sum distances and exclude the blocked segment. A node from another component is also frozen as an unreachable fixture.
+
+ROUTE-01 must independently calculate shortest paths: these BFS distances are not Dijkstra expectations and are not a claim about the eventual optimal detour. SIM-01 must independently choose/test its flood polygon; no hazard geometry was added here.
 
 ## Coordinates and GeoJSON
 
-[RFC 7946](https://datatracker.ietf.org/doc/html/rfc7946) specifies GeoJSON positions in longitude/latitude order in decimal degrees on WGS84. Store `[longitude, latitude]`; never swap Overpass's bbox order into positions. MapLibre projects for display; EPSG:3857 coordinates must not enter the graph. Turf geodesic distances use explicit meter units; preserve precision until UI rounding. Polygon rings must be closed, have enough distinct points, valid winding, no self-intersection and lie near the selected region. For this tiny area a 2D intersection is adequate as a simulation rule; it does not model real inundation.
+[RFC 7946](https://datatracker.ietf.org/doc/html/rfc7946) specifies GeoJSON positions in longitude/latitude order in decimal degrees on WGS84. Store `[longitude, latitude]`; never swap Overpass's bbox order into positions. MapLibre projects for display; EPSG:3857 coordinates must not enter the graph. The converter uses the haversine formula with IUGG mean Earth radius 6,371,008.8 m and rounds edge lengths to millimeters; preserve precision until UI rounding. Polygon rings must be closed, have enough distinct points, valid winding, no self-intersection and lie near the selected region. For this tiny area a 2D intersection is adequate as a simulation rule; it does not model real inundation.
 
 ## Flood intersection and snapping
 

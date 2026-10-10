@@ -1,6 +1,6 @@
 # GhostRoute architecture
 
-Status: accepted implementation direction for the small MVP; module paths below are planned unless explicitly listed as present. Phase 0 implements only `src/app/` smoke UI and tooling. Read [PRD](PRD.md), [data strategy](DATA_STRATEGY.md) and [ADRs](adr/README.md) together.
+Status: accepted implementation direction for the small MVP; module paths below are planned unless explicitly listed as present. Phase 0 supplies `src/app/` smoke UI/tooling; MAP-01 now implements `src/lib/geo/`, source acquisition/conversion and local road assets. Read [PRD](PRD.md), [data strategy](DATA_STRATEGY.md) and [ADRs](adr/README.md) together.
 
 ## System and application structure
 
@@ -19,103 +19,30 @@ flowchart TB
   Tiles[Optional online basemap] --> Map
 ```
 
-| Planned path                          | Responsibility                                                                  |
-| ------------------------------------- | ------------------------------------------------------------------------------- |
-| `src/app/` (present)                  | Layout, page, styles; currently static tooling smoke page                       |
-| `src/components/MapView.tsx`          | Map instance, layer/source updates, cleanup and map load/error states           |
-| `src/components/SimulationPanel.tsx`  | Trigger/reset and visible simulation state                                      |
-| `src/components/RoutePanel.tsx`       | Selections, distances, baseline/current status and accessible feedback          |
-| `src/components/ui/`                  | Only shadcn components actually needed; use native controls first when adequate |
-| `src/lib/geo/types.ts`                | Contracts below; one authoritative shared module                                |
-| `src/lib/geo/validate.ts`             | Validate untrusted JSON before exposing a RoadGraph                             |
-| `src/lib/routing/shortest-path.ts`    | Dijkstra, no React/MapLibre imports                                             |
-| `src/lib/simulation/flood.ts`         | Polygon validation/intersection and blocked edge derivation                     |
-| `src/lib/simulation/state.ts`         | Reducer for selections and scenario step; no geometry duplicated in state       |
-| `scripts/prepare-roads.ts`            | One-time deterministic offline conversion, added in MAP-01                      |
-| `data/source/`                        | Frozen raw extract, query, manifest and licensing (planned)                     |
-| `public/data/ernakulam/`              | Reviewed graph, road GeoJSON, scenario and synthetic destinations (planned)     |
-| `tests/unit/`, `tests/e2e/` (present) | Foundation tests now; behavioral suites added with their features               |
+| Planned path                          | Responsibility                                                                    |
+| ------------------------------------- | --------------------------------------------------------------------------------- |
+| `src/app/` (present)                  | Layout, page, styles; currently static tooling smoke page                         |
+| `src/components/MapView.tsx`          | Map instance, layer/source updates, cleanup and map load/error states             |
+| `src/components/SimulationPanel.tsx`  | Trigger/reset and visible simulation state                                        |
+| `src/components/RoutePanel.tsx`       | Selections, distances, baseline/current status and accessible feedback            |
+| `src/components/ui/`                  | Only shadcn components actually needed; use native controls first when adequate   |
+| `src/lib/geo/types.ts`                | Contracts below; one authoritative shared module                                  |
+| `src/lib/geo/validate.ts`             | Validate untrusted JSON before exposing a RoadGraph                               |
+| `src/lib/routing/shortest-path.ts`    | Dijkstra, no React/MapLibre imports                                               |
+| `src/lib/simulation/flood.ts`         | Polygon validation/intersection and blocked edge derivation                       |
+| `src/lib/simulation/state.ts`         | Reducer for selections and scenario step; no geometry duplicated in state         |
+| `scripts/prepare-roads.ts`            | Implemented deterministic offline conversion                                      |
+| `data/source/`                        | Compressed normalized OSM source, request URL and manifest (present)              |
+| `public/data/ernakulam/`              | Graph, GeoJSON, metadata and path fixture (present); scenarios/destinations later |
+| `tests/unit/`, `tests/e2e/` (present) | Foundation tests now; behavioral suites added with their features                 |
 
 Map rendering uses separate sources for roads, baseline, current route, blocked segments, flood polygon and destinations. Initialize after mount and clean up on unmount; use `setData`, not repeated map creation. Background tiles are optional; use a local style with background and road layers when offline. Never make routing depend on tile load success. Handle WebGL failure with textual error and route controls/results where possible. Include visible OSM attribution on the local-road fallback too.
 
 ## Shared TypeScript contracts
 
-Proposed code for `src/lib/geo/types.ts`; these contracts are documentation in Phase 0, not a second implementation. Install `@types/geojson` when implementing the data task. No generic routing plugin system.
+The authoritative contracts now live in [`src/lib/geo/types.ts`](../src/lib/geo/types.ts): `GeoPoint` is a named `[longitude, latitude]` tuple; RoadNode, RoadEdge, RoadGraph, DisasterZone, FloodScenario, EmergencyShelter, RouteRequest, RouteResult and RoutingProfile match the planned MVP. `RoadGeoJSON` adds typed physical-segment features with source tags and directed edge IDs. GeoJSON types come from `@types/geojson`; no React or map renderer dependency enters these contracts.
 
-```ts
-import type { LineString, Polygon } from 'geojson';
-
-type LngLat = [longitude: number, latitude: number];
-
-export interface RoadNode {
-  id: string; // OSM node ID serialized as a string
-  coordinate: LngLat;
-}
-
-export interface RoadEdge {
-  id: string; // way:segment:direction, stable across conversion of same source
-  segmentId: string; // shared by opposite directions of one physical segment
-  from: string;
-  to: string;
-  lengthMeters: number;
-  geometry: LineString; // coordinates in traversal order
-  osmWayId: string;
-}
-
-export interface RoadGraph {
-  version: string; // dataset hash/version, not a wall-clock value
-  nodes: Record<string, RoadNode>;
-  edges: Record<string, RoadEdge>;
-  outgoing: Record<string, string[]>; // sorted edge IDs by source node
-}
-
-export interface DisasterZone {
-  id: string;
-  kind: 'flood';
-  geometry: Polygon;
-  simulated: true;
-}
-
-export interface FloodScenario {
-  id: string;
-  graphVersion: string;
-  label: string;
-  steps: DisasterZone[][]; // P0: empty step 0, fixed polygon at step 1
-}
-
-export interface EmergencyShelter {
-  id: string;
-  name: string;
-  coordinate: LngLat;
-  nodeId: string; // validated accessible graph node
-  provenance: 'synthetic';
-  availability: 'unknown';
-}
-
-export interface RoutingProfile {
-  id: 'walking-demo';
-  cost: 'distance';
-}
-
-export interface RouteRequest {
-  originNodeId: string;
-  destinationNodeId: string;
-  profile: RoutingProfile;
-  blockedEdgeIds: ReadonlySet<string>;
-  blockedNodeIds: ReadonlySet<string>;
-}
-
-export type RouteResult =
-  | {
-      status: 'found';
-      nodeIds: string[];
-      edgeIds: string[];
-      distanceMeters: number;
-      geometry: LineString | null;
-    }
-  | { status: 'unreachable'; reason: 'disconnected' | 'endpoint-blocked' }
-  | { status: 'invalid'; reason: string };
-```
+`validateGraph`, haversine distance, OSM conversion, dataset validation and validation-only BFS/component reporting are implemented. `findPath` is a connectivity witness, **not** the production shortest-distance engine. Roads are locally available at `/data/ernakulam/graph.json` and `/data/ernakulam/roads.geojson`; source and runtime manifests carry hashes and provenance. Import/parse JSON as unknown then validate; UI loading is MAP-02.
 
 Function contracts: `validateGraph(input: unknown): RoadGraph` throws a descriptive validation error at the loading boundary; `shortestPath(graph: RoadGraph, request: RouteRequest): RouteResult`; `deriveBlockages(graph: RoadGraph, zones: DisasterZone[]): { blockedEdgeIds: Set<string>; blockedNodeIds: Set<string> }`. Inputs are immutable. At load time reject a scenario whose `graphVersion` differs from the graph, invalid step indices, and shelter references to missing nodes. A zero-edge successful route has one node, 0 m and null line geometry. Failed results never contain a route polyline. Unknown request node/edge IDs or unsupported profile produce `invalid`; data parsing failures become a dataset error state.
 

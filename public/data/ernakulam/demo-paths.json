@@ -1,0 +1,77 @@
+{
+  "graphVersion": "ernakulam-walking-v1-c5690329d952ed13",
+  "purpose": "Directed BFS connectivity witness, not shortest-distance routes or an approved shelter",
+  "origin": {
+    "nodeId": "271145615",
+    "coordinate": [
+      76.28014,
+      9.9713489
+    ],
+    "label": "Park Avenue / Hospital Road junction"
+  },
+  "destination": {
+    "nodeId": "1906667447",
+    "coordinate": [
+      76.2860629,
+      9.9684255
+    ],
+    "label": "Jos Junction / Durbar Hall Road"
+  },
+  "blockedSegmentId": "768625211:4",
+  "blockedEdgeIds": [
+    "768625211:4:forward",
+    "768625211:4:reverse"
+  ],
+  "baseline": {
+    "edgeIds": [
+      "768625211:4:reverse",
+      "768625211:3:reverse",
+      "768625211:2:reverse",
+      "768625211:1:reverse",
+      "768625211:0:reverse",
+      "755602470:0:forward",
+      "48845452:0:reverse",
+      "1210908148:0:reverse",
+      "48845451:2:reverse",
+      "48845451:1:reverse",
+      "48845451:0:reverse",
+      "25436263:0:reverse",
+      "24952897:11:forward",
+      "24952897:12:forward",
+      "24952897:13:forward"
+    ],
+    "distanceMeters": 1003.818
+  },
+  "alternate": {
+    "edgeIds": [
+      "1017087362:0:forward",
+      "1017087362:1:forward",
+      "1017087362:2:forward",
+      "1017087362:3:forward",
+      "1017087362:4:forward",
+      "1034991659:0:forward",
+      "31651621:0:forward",
+      "31651621:1:forward",
+      "755937120:0:forward",
+      "755937120:1:forward",
+      "755937120:2:forward",
+      "755937120:3:forward",
+      "755937120:4:forward",
+      "755937120:5:forward",
+      "755937120:6:forward",
+      "755602470:0:forward",
+      "48845452:0:reverse",
+      "1210908148:0:reverse",
+      "48845451:2:reverse",
+      "48845451:1:reverse",
+      "48845451:0:reverse",
+      "25436263:0:reverse",
+      "24952897:11:forward",
+      "24952897:12:forward",
+      "24952897:13:forward"
+    ],
+    "distanceMeters": 1470.595
+  },
+  "distinctAlternateMeters": 695.005,
+  "disconnectedNodeId": "11189614551"
+}

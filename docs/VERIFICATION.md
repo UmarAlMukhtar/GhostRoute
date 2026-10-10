@@ -1,6 +1,52 @@
-# Foundation verification record
+# Verification record
 
-This record covers Phase 0 only. Product graph/simulation acceptance tests are specified in TESTING but not implemented. Final code checks completed 2026-10-10T22:12:35+05:30; all results below were executed locally.
+## MAP-01 — Ernakulam geographic data foundation
+
+Verified 2026-10-10T22:30:30+05:30, locally on `codex-foundation`, starting from clean `773c266`. No push, remote issue or settings change. MAP-02, ROUTE-01 and SIM-01 remain unimplemented.
+
+### Dataset evidence
+
+- Request bounds: [76.274, 9.966, 76.292, 9.984]; actual whole-way graph bounds: [76.2732579, 9.9638296, 76.2936855, 9.9897189]. Bounds selected after inspecting named roads in a broader real OSM extract.
+- Frozen normalized source: 493 ways, 1,886 referenced nodes, 52,266 compressed bytes. The unfiltered response remains outside Git; response and decompressed-source hashes are recorded.
+- Validated graph: **1,719 nodes, 3,712 directed edges, 1,856 physical segments**. Twelve components: 1,501 / 117 / 34 / 30 / 12 / 8 / 4 / 4 / 3 / 2 / 2 / 2 nodes. All retained segments have both directions; these components are strongly connected as well as weakly connected.
+- Graph + GeoJSON: **1,875,234 bytes**. Runtime directory including metadata, fixture and attribution: **1,886,356 bytes**. Below the 3 MB budget; no duplicate physical-segment endpoint candidates.
+- Exclusions: 51 restricted general-access ways/segments, 19 barrier-incident segments, 1 ambiguous pedestrian oneway way; individual identifiers/reasons in metadata.
+- Fixture: origin `271145615`, destination `1906667447`; blocking both edges of `768625211:4` preserves a valid alternative. BFS witnesses: 1,003.818 m baseline, 1,470.595 m alternative, 695.005 m of alternate-only segments. These are connectivity witnesses, not shortest-route results. Tests verify every directed transition and an unreachable component.
+
+### Executed checks
+
+| Command/check                           | Result                                                                                                                                          |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm add -D @types/geojson@7946.0.16`  | PASS; only new dependency is a development-time type package. Existing pnpm store required sandbox permission.                                  |
+| OSM acquisition                         | PASS via bounded curl request to OSM map API, then `pnpm data:acquire /tmp/ghostroute-selected.json`; normalized source and manifest generated. |
+| `pnpm data:prepare`                     | PASS; offline conversion, graph/map validation, bounds/budgets/components and alternative fixture.                                              |
+| Repeat conversion + `sha256sum --check` | PASS; graph, GeoJSON, fixture and metadata byte-identical across consecutive runs.                                                              |
+| `pnpm lint`                             | PASS; no warnings/errors.                                                                                                                       |
+| `pnpm typecheck`                        | PASS; Next type generation and strict TypeScript.                                                                                               |
+| `pnpm test`                             | PASS; **47 tests in 4 files**, including the unchanged foundation smoke.                                                                        |
+| `pnpm build`                            | PASS; Next production build, static `/` and not-found pages.                                                                                    |
+| `pnpm format:check`                     | PASS.                                                                                                                                           |
+| Local Markdown links                    | PASS; 109 local file links checked before adding this record.                                                                                   |
+| `git diff --check`                      | PASS.                                                                                                                                           |
+| Template preservation                   | PASS; RULES, AGENTS, workflow, PR template, SUBMISSION, LICENSE and README event section unchanged from 773c266.                                |
+
+The first test run failed because the new geo modules did not exist, before implementation. Later tests exercise conversion/access/direction, meter calculations, malformed inputs, duplicate IDs/adjacency/features, missing references, crossing/coincident-node separation, source tags, restrictions, oversize/out-of-bounds data, checksum reproduction and alternate paths. A subprocess test verifies a wrong-region acquisition does not replace the frozen source/manifest. No online requests run in the test suite.
+
+The first Overpass endpoint returned HTTP 406; two public mirrors returned HTTP 500. The direct OSM API curl acquisition succeeded. Sandbox DNS restrictions and pnpm-store access required scoped escalation; no TLS or registry safeguards were disabled. The first build failed when the sandbox denied Turbopack's local port binding. A retry retained the error in generated cache. An outside-sandbox port check succeeded; removing only `.next/cache/turbopack` and repeating the unchanged build then passed. No application/build configuration workaround was introduced.
+
+### Scope and limitations
+
+No browser/UI behavior changed, so Playwright was not rerun for MAP-01; earlier results remain below. No hosted CI, deployment, native-fetch acquisition branch, independent field survey, authoritative access verification, shelter availability or actual disaster safety was tested. OSM map API has no global snapshot timestamp; file download time and individual edit versions/timestamps are recorded without inventing one. The 12 mapped components and access exclusions may omit real routes. Steps are included; this is not a wheelchair-accessible profile.
+
+Changed files: shared geographic contracts/distance/conversion/graph and dataset validation/connectivity modules; acquisition and conversion scripts; compressed source/manifest/readme; local graph/GeoJSON/metadata/fixture/attribution; three geo/acquisition test files; package/lock/TypeScript and ignore configuration; README, DATA_STRATEGY, ARCHITECTURE, TASKS, ADR-004, this record, CHANGELOG and AI_USAGE. Existing application UI and organizer instructions/workflows are untouched.
+
+Next: **ROUTE-01 — Dijkstra routing engine**, then **MAP-02 — interactive map rendering**. Human source/implementation review remains pending.
+
+---
+
+# Phase 0 foundation verification record
+
+This historical section covers Phase 0 only. Product graph/simulation acceptance tests are specified in TESTING but not implemented. Final code checks completed 2026-10-10T22:12:35+05:30; all results below were executed locally.
 
 ## Environment and installation investigation
 
