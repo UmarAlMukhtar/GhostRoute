@@ -1193,3 +1193,129 @@ svg {
     bottom: 130px;
   }
 }
+
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 12px;
+  z-index: 30;
+  background: white;
+  color: #183641;
+  padding: 14px;
+  border: 2px solid #2563eb;
+  border-radius: 8px;
+}
+.skip-link:focus {
+  top: 8px;
+}
+.demo-entry {
+  min-height: 44px;
+  padding: 0 14px;
+  background: #155e75;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.demo-entry:disabled {
+  opacity: 0.5;
+}
+.demo-guide {
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #d9e4e7;
+}
+.guide-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #155e75;
+  font-weight: 750;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.demo-guide h2 {
+  font-size: 22px;
+  line-height: 1.25;
+  margin: 8px 0;
+  letter-spacing: -0.03em;
+}
+.demo-guide p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #506575;
+  margin: 8px 0 14px;
+}
+.demo-guide progress {
+  width: 100%;
+  height: 5px;
+  accent-color: #155e75;
+  margin-bottom: 12px;
+}
+.guide-next {
+  font-size: 12px;
+}
+.guide-reset {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  border: none;
+  background: none;
+  color: #155e75;
+  font-size: 12px;
+  margin: 8px auto -6px;
+}
+@media (max-width: 759px) {
+  .header-actions .demo-status {
+    display: none;
+  }
+  .demo-entry {
+    padding: 0 10px;
+    font-size: 11px;
+  }
+}
+.guide-metrics {
+  display: grid;
+  gap: 4px;
+  border-left: 3px solid #15803d;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  background: #f1f8f5;
+  font-size: 14px;
+  color: #183641;
+}
+.guide-metrics span {
+  font-size: 11px;
+  color: #506575;
+}
+@media (max-width: 759px) {
+  .demo-guide {
+    padding-bottom: 10px;
+  }
+  .demo-guide p {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .guide-reset {
+    margin-top: 0;
+  }
+}
+@media (max-width: 759px) {
+  .panel-content.guided {
+    padding-top: 6px;
+  }
+  .guided .guide-metrics {
+    margin-bottom: 8px;
+  }
+  .guided .demo-guide progress {
+    margin-bottom: 8px;
+  }
+}
+@media (max-width: 759px) {
+  .guided .demo-guide h2 {
+    margin: 4px 0;
+  }
+}

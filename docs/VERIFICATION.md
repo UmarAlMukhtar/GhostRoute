@@ -336,3 +336,47 @@ Physical-device touch, Safari/Firefox, screen-reader certification, live tile re
 - `tests/e2e/simulation.spec.ts`
 - `tests/unit/map.test.ts`
 - `tests/unit/simulation.test.ts`
+
+## Final hackathon readiness — 10 October 2026
+
+### Audited baseline and scope
+
+Started on clean `codex-foundation`, commit `3c31eb0`. Inspected organizer instructions, PRD/roadmap/tasks, actual simulation modules, map integration and the verification record. The original production build plus all 20 existing browser journeys passed before the readiness changes. SIM-01 and INT-01 were therefore confirmed implemented, not merely assumed from the task description. All fourteen requested map/routing/flood/reset/fallback capabilities are exercised by those real-data tests.
+
+Added an eight-step presenter-controlled Demo Mode using the existing reducers/router/scenarios; manual controls exit it. Added one-click demo reset, regional camera restoration, compact live result summaries on mobile, a keyboard skip link, deployment configuration/runbook, pitch and submission narrative. Updated obsolete foundation-only submission/roadmap/PRD text. Names supplied by the user: Umar Al Mukhtar, Sanjay KP, Alphons N J. Handles and contributions remain unconfirmed; no organizer checklist items were checked automatically.
+
+### Checks and reliability evidence
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test`: passed; 136 unit tests across 11 files.
+- `pnpm build`: successful production Next.js build, run by `pnpm test:e2e`.
+- `pnpm test:e2e`: 28 journeys passed in the final run (29.8 s; 14 desktop, 14 mobile), including the original map/flood regressions, guided walkthrough, actual distances, manual handoff, keyboard focus/Enter operation, reduced-motion emulation and one-click reset.
+- Repeated ten scenario-switch/expand/reset/reactivate cycles on each viewport; no stale route or inconsistent result. Browser refresh clears the session. Tested 1440×900 and 360×800 plus resizing to 320×640 and 640×450 without horizontal overflow.
+- Held local data requests until after observing loading/disabled controls, then released them and verified successful routing. This tests pending-response recovery, not a specific cellular bandwidth profile.
+- Public OSM tile traffic deliberately aborted; actual local MapLibre rendering, route layers and fallback verified. Production JSON and module-worker/shared-module URLs returned 200 and non-HTML content types. Browser runtime exceptions were monitored in the guided journey.
+- `npx --yes pnpm@11.25.0 install --frozen-lockfile`: passed using the exact prepared Vercel install command. This reused the installed checkout; it is not a fresh-machine or hosted-build claim.
+- `pnpm data:prepare`: passed; tracked runtime graph, GeoJSON, metadata and fixtures remain byte-identical.
+- `pnpm format` executed; final `pnpm format:check`, diff whitespace and relative documentation links checked before commit.
+
+### Performance
+
+Reran `node --experimental-strip-types scripts/benchmark-simulation.ts`: Node 22.23.1, Linux, AMD Ryzen 7 8845HS, 5 warmups and 30 samples. Engine initialization median/p95: 7.255/9.291 ms.
+
+| Scenario stage | Intersection median / p95 (ms) | Rerouting median / p95 (ms) |
+| -------------- | -----------------------------: | --------------------------: |
+| hospital 1     |                  0.350 / 0.848 |               0.406 / 0.543 |
+| expanding 1    |                  0.353 / 0.630 |               0.281 / 0.431 |
+| expanding 2    |                  0.382 / 0.576 |               0.279 / 0.347 |
+| expanding 3    |                  0.257 / 0.466 |               0.433 / 1.335 |
+| unavailable 1  |                  0.320 / 0.894 |               0.002 / 0.003 |
+
+A readiness browser run completed ten multi-action scenario cycles in 15.555 s desktop and 8.272 s mobile; this includes Playwright actionability, scrolling and assertions under six concurrent workers. These are reliability-loop timings, not per-route computational latency. No meaningful engine bottleneck justified workers, a new index or a different algorithm. No browser-wide p95 latency guarantee is claimed.
+
+### Actual visual review
+
+Rendered the production application and inspected desktop/mobile screenshots. Verified map/route contrast, hazard and road closures, guided controls, unavailable feedback, responsive sheet and visible attribution. Added actual route comparisons to the mobile guide to avoid requiring a presenter to leave the cue to read metrics; reduced top spacing so the reset touch target fits in the sheet. The browser test now checks its full bounding rectangle fits within the panel. Selected screenshots are committed in `docs/screenshots/` and embedded in README. Optional basemap tiles were blocked during capture; the roads shown are the real local dataset.
+
+### Publication and submission boundary
+
+`vercel.json` and DEPLOYMENT.md are prepared; no Vercel CLI or local linked project was found. Authentication/project access, hosted build, hosted CI and judge access are unverified. No push, deployment, remote setting change or submission occurred. Organizer instructions/workflows and the README event prefix were preserved; SUBMISSION fields were updated while retaining its complete unchecked organizer checklist.
+
+Human gates still open: handles/contributions, organizer submission method, two timed presenter rehearsals, target-device/assistive-technology review, approval of publishing account/project/actions, final submitted SHA and real URL, and organizer-text redistribution clarification. The documented deadline is 11 October 2026 at 10:00 IST; participants must confirm venue updates. Explicit priorities and stop conditions are in ROADMAP.md. The application remains an illustrative 2D simulation, not emergency guidance.

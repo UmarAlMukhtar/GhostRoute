@@ -16,6 +16,10 @@ import {
 } from 'lucide-react';
 import MapView from './MapView';
 import SimulationPanel from './SimulationPanel';
+import DemoGuide from './DemoGuide';
+import { demoSteps } from '../lib/map/demo';
+import type { SimulationAction } from '../lib/simulation/session';
+import type { SelectionAction } from '../lib/map/selection';
 import { createFloodEngine } from '../lib/simulation/flood';
 import { scenarios } from '../lib/simulation/scenarios';
 import {
@@ -40,12 +44,50 @@ export default function Dashboard() {
   const [data, setData] = useState<MapData | null>(null);
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
-  const [state, dispatch] = useReducer(selectionReducer, initialSelection);
-  const [simulation, simulate] = useReducer(
+  const [state, dispatchSelection] = useReducer(
+    selectionReducer,
+    initialSelection,
+  );
+  const [simulation, dispatchSimulation] = useReducer(
     simulationReducer,
     initialSimulation,
   );
   const [sheetOpen, setSheetOpen] = useState(true);
+  const [demoStep, setDemoStep] = useState<number | null>(null);
+  const panel = useRef<HTMLElement>(null);
+  function dispatch(action: SelectionAction) {
+    setDemoStep(null);
+    dispatchSelection(action);
+  }
+  function simulate(action: SimulationAction) {
+    setDemoStep(null);
+    dispatchSimulation(action);
+  }
+  function showDemoStep(index: number) {
+    if (!data) return;
+    const step = demoSteps[index];
+    setDemoStep(index);
+    setSheetOpen(true);
+    dispatchSimulation({ type: 'clear' });
+    if (index === 0) dispatchSelection({ type: 'reset' });
+    else {
+      dispatchSelection({ type: 'preset', places: data.places });
+      dispatchSelection({
+        type: 'result',
+        result: data.router.findRoute({
+          originNodeId: data.places[0].nodeId,
+          destinationNodeId: data.places[1].nodeId,
+        }),
+      });
+      dispatchSimulation({ type: 'scenario', id: step.scenario });
+      if (step.stage) dispatchSimulation({ type: 'start' });
+      for (let stage = 1; stage < step.stage; stage++)
+        dispatchSimulation({ type: 'next' });
+    }
+    requestAnimationFrame(() =>
+      panel.current?.scrollTo({ top: 0, behavior: 'instant' }),
+    );
+  }
   const help = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     let cancelled = false;
@@ -135,6 +177,13 @@ export default function Dashboard() {
   const found = current?.status === 'found' ? current : null;
   return (
     <main className="dashboard">
+      <a
+        className="skip-link"
+        href="#route-controls"
+        onClick={() => setSheetOpen(true)}
+      >
+        Skip to routing controls
+      </a>
       <header className="topbar">
         <Link href="/" className="brand" aria-label="GhostRoute home">
           <span className="brand-icon">
@@ -150,6 +199,14 @@ export default function Dashboard() {
           <span className="region-tag">DEMO REGION</span>
         </div>
         <div className="header-actions">
+          <button
+            className="demo-entry"
+            disabled={!data}
+            aria-pressed={demoStep !== null}
+            onClick={() => showDemoStep(0)}
+          >
+            Demo Mode
+          </button>
           <span className="demo-status">
             <span />
             {simulation.stage ? 'Simulated flood active' : 'Simulation demo'}
@@ -167,6 +224,7 @@ export default function Dashboard() {
         {data ? (
           <MapView
             data={data}
+            overview={demoStep === 0}
             origin={state.origin}
             destination={state.destination}
             result={baseline}
@@ -198,6 +256,7 @@ export default function Dashboard() {
                 : 'Explore. Select. Find your route.'}
         </div>
         <aside
+          ref={panel}
           className={`route-panel ${sheetOpen ? 'expanded' : 'collapsed'}`}
           aria-label="Routing controls"
         >
@@ -216,12 +275,29 @@ export default function Dashboard() {
             </span>
             {sheetOpen ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
           </button>
-          <div id="route-controls" className="panel-content">
-            <div className="panel-heading">
-              <p className="eyebrow">ERNAKULAM EXPLORER</p>
-              <h2>A clearer way forward.</h2>
-              <p>Explore routes through the local road network.</p>
-            </div>
+          <div
+            id="route-controls"
+            tabIndex={-1}
+            className={`panel-content ${demoStep !== null ? 'guided' : ''}`}
+          >
+            {demoStep !== null ? (
+              <DemoGuide
+                step={demoStep}
+                baseline={baseline}
+                current={current}
+                blockedCount={
+                  flood?.status === 'ready' ? flood.metadata.segmentCount : 0
+                }
+                onStep={showDemoStep}
+                onExit={() => setDemoStep(null)}
+              />
+            ) : (
+              <div className="panel-heading">
+                <p className="eyebrow">ERNAKULAM EXPLORER</p>
+                <h2>A clearer way forward.</h2>
+                <p>Explore routes through the local road network.</p>
+              </div>
+            )}
             {loadError ? (
               <div className="notice error" role="alert">
                 {loadError}

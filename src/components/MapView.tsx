@@ -9,6 +9,7 @@ import { EMPTY, localStyle, type MapOverlays } from '../lib/map/style';
 
 interface Props {
   data: MapData;
+  overview?: boolean;
   origin: Selection | null;
   destination: Selection | null;
   result: RouteResult | null;
@@ -34,6 +35,7 @@ function padding(sheetOpen: boolean) {
 }
 export default function MapView({
   data,
+  overview,
   origin,
   destination,
   result,
@@ -207,6 +209,13 @@ export default function MapView({
     }
     map.setPaintProperty('route', 'line-dasharray', overlays ? [2, 1] : [1, 0]);
     const fitRoute = () => {
+      if (overview) {
+        map.fitBounds(data.bounds, {
+          padding: padding(sheetOpen),
+          duration: 0,
+        });
+        return;
+      }
       const coordinates = [
         ...(route?.geometry?.coordinates ?? []),
         ...(overlays?.alternative?.features.flatMap(
@@ -244,7 +253,7 @@ export default function MapView({
       map.off('resize', fitRoute);
       active = false;
     };
-  }, [ready, result, overlays, sheetOpen]);
+  }, [ready, result, overlays, sheetOpen, overview, data.bounds]);
 
   useEffect(() => {
     const map = mapRef.current;

@@ -35,11 +35,11 @@ This template has no application code or required technology stack. The document
 
 GhostRoute is an open-source disaster-aware navigation **simulation** for Kochi–Ernakulam. It demonstrates how a shortest path through real mapped roads changes when a simulated flood makes road segments unavailable.
 
-**Current status: SIM-01 + INT-01 are implemented locally.** Explore real Ernakulam roads, calculate a route, start one of three illustrative flood scenarios, and compare automatic rerouting with the historical baseline. Deterministic expanding stages and explicit unavailable-route feedback work with local datasets, including when remote map tiles fail. Floods are simulated; destinations and emergency safety are unverified.
+**Current status: the complete local flood-routing demo and guided Demo Mode are implemented.** Explore real Ernakulam roads, calculate a route, start one of three illustrative flood scenarios, and compare automatic rerouting with the historical baseline. Deterministic expanding stages and explicit unavailable-route feedback work with local datasets, including when remote map tiles fail. Floods are simulated; destinations and emergency safety are unverified.
 
 - **Project name:** GhostRoute
 - **Team:** Participant names/handles await the team's confirmation; maximum four members.
-- **Working demo:** `pnpm dev` opens the interactive route explorer. The planned product walkthrough is in [DEMO_PLAN](docs/DEMO_PLAN.md).
+- **Working demo:** `pnpm dev` opens the interactive route explorer. The implemented guided walkthrough is in [DEMO_PLAN](docs/DEMO_PLAN.md).
 - **Technology stack:** Next.js App Router, React, strict TypeScript, Tailwind, pnpm, ESLint, Prettier, Vitest and Playwright. MapLibre GL JS and Lucide render the map and icons. Native accessible controls suffice for this screen; Turf and shadcn components remain deferred until needed.
 
 ### Problem and solution
@@ -94,7 +94,7 @@ The local dataset has 1,719 nodes, 3,712 directed edges and 12 components. Run `
 3. Change either endpoint to clear the previous route, calculate again, or **Reset**. On mobile, expand/collapse the routing sheet with its header button. Presets work without map clicks.
 4. If remote street tiles fail or take over 12 seconds, local roads and routing remain usable. WebGL failure leaves named route controls/results available, with a clear error. This is not a complete offline web app: app assets must be served locally or loaded beforehand.
 
-`dev` and `build` copy the installed MapLibre worker and shared module into ignored, versioned local assets; no CDN worker is required. The optional OSM street tiles use normal browser caching, visible attribution and no prefetch. See the [OSMF tile policy](https://operations.osmfoundation.org/policies/tiles/) and [map architecture](docs/ARCHITECTURE.md#map-02-browser-integration). Automated browser tests abort external tile requests. No hosted deployment is claimed. The full future flood walkthrough remains in [DEMO_PLAN](docs/DEMO_PLAN.md).
+`dev` and `build` copy the installed MapLibre worker and shared module into ignored, versioned local assets; no CDN worker is required. The optional OSM street tiles use normal browser caching, visible attribution and no prefetch. See the [OSMF tile policy](https://operations.osmfoundation.org/policies/tiles/) and [map architecture](docs/ARCHITECTURE.md#map-02-browser-integration). Automated browser tests abort external tile requests. No hosted deployment is claimed. The implemented guided walkthrough is in [DEMO_PLAN](docs/DEMO_PLAN.md).
 
 **Simulation only. Hazards and destinations are demonstration data. Routes are not verified safe. Follow local authorities.** The graph is a small, potentially stale extract; the flood model is two-dimensional. Neither an unblocked road nor a synthetic destination establishes actual access, capacity or safety.
 
@@ -117,3 +117,21 @@ See [AI_USAGE.md](AI_USAGE.md) for AI assistance, [CHANGELOG.md](CHANGELOG.md) f
 5. **Reset simulation** restores the baseline. **Reset** clears endpoints and simulation.
 
 Flood conditions are illustrative, not verified live information. Routes are not certified safe for emergency use. All scenarios run locally; public street tiles are optional. Benchmark with `node --experimental-strip-types scripts/benchmark-simulation.ts`.
+
+### Three-minute Demo Mode
+
+Run `pnpm build` then `pnpm start` and choose **Demo Mode** in the header. Advance at your own pace: Ernakulam overview → real baseline → Hospital flood detour → expanding stages → unavailable destination → restored baseline. **Reset demo** returns to the overview in one click. Header **Demo Mode** also restarts the sequence. Manual routing and scenario controls remain available; using them exits the guided sequence while retaining the selected route/scenario. Refresh starts a clean session. Guide statistics use actual results, including on mobile.
+
+[Presenter pitch](docs/PITCH_SCRIPT.md) · [Submission narrative](docs/HACKATHON_SUBMISSION.md) · [Vercel runbook](docs/DEPLOYMENT.md) · [Readiness priorities and stop conditions](docs/ROADMAP.md#final-readiness-priorities-and-explicit-stop-conditions)
+
+### Screenshots from the real production browser run
+
+Desktop and mobile captures below use the actual local graph/router with optional public map tiles deliberately blocked. They are screenshots of illustrative scenarios, not live flood observations.
+
+![Desktop guided flood demo](docs/screenshots/demo-desktop.png)
+
+![Mobile guided flood demo](docs/screenshots/demo-mobile.png)
+
+### Deployment and submission status
+
+Vercel configuration is prepared locally; no public URL or hosted build is claimed. No environment variables are required. Follow DEPLOYMENT.md only after approving the target account/project and publishing actions. The submitted implementation SHA, participant handles/contributions, two timed human rehearsals and venue submission confirmations remain human-owned. New code is MIT; OSM data is ODbL with separate attribution, and inherited organizer-text redistribution terms still need clarification.

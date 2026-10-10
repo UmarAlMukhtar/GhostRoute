@@ -66,3 +66,7 @@ The primary route is solid blue with white casing. A is a circular blue origin m
 The interface displays distance, traversed segment count and Walking demo / shortest-distance profile; no ETA or safety score. Help uses a native modal dialog with Escape dismissal. Loading, invalid asset retry, too-far selection, disconnected route, missing tiles and WebGL failure have explicit copy. No disabled flood teaser or pretend address search is included. Future overlays retain their own layer identities and semantic colors.
 
 Flood controls use a right floating panel on desktops at least 1200 px wide and the existing scrollable control sheet otherwise. Stage controls are manual, deterministic and reversible. Cyan fill/amber dashed outline marks flood geometry, red dashed roads show closures, dashed blue is historical, and green with white casing is currently available. Typed failures remove green lines and distances; unchanged routes explicitly say so.
+
+## Guided Demo Mode
+
+A header entry opens eight presenter-controlled cues in the existing route panel. Progress, next action, calculated metrics and a reset are available on narrow screens; desktop retains the simulation comparison panel. Manual controls remain below the guide and exit it when used. Native keyboard activation is supported, with a skip-to-controls link; camera movement still respects reduced motion. No automatic playback, extra modal or decorative presentation framework is introduced.

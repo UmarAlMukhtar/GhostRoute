@@ -102,3 +102,7 @@ MapLibre requires WebGL. Keep failures visible instead of skipping initializatio
 ## Flood integration coverage
 
 `simulation.test.ts` verifies partial/contained/boundary intersections, bbox false positives, holes, disjoint MultiPolygon, malformed rings/coordinates, multiple zones, deduplication, bidirectional closures, flooded endpoints, deterministic stage expansion, immutable graphs/results, comparison arithmetic and reset. Real expected segment counts: 5, 9, 27; unavailable: 21. Browser tests exercise these actual assets/router in both Chromium projects and assert rendered hazard, blocked-road and alternative layers, stage reversal, endpoint changes, reset and unavailable feedback. Public tile requests are blocked. Screenshots are retained under ignored `test-results/`; inspect them rather than assuming a passing DOM assertion proves visual quality.
+
+## Final readiness regression suite
+
+`readiness.spec.ts` adds the complete eight-step guided sequence, real calculated outcomes, one-click reset, keyboard Enter/focus behavior, manual endpoint handoff, reduced-motion emulation, ten repeated scenario cycles, rapid switching, viewport changes to 320×640 and 640×450, refresh, held/released data requests and production JSON/module-worker responses. Public tile requests remain aborted. The delay test models unavailable/pending responses, not a specific mobile bandwidth profile. Node benchmark timings and Playwright interaction-cycle timings are reported separately in VERIFICATION.

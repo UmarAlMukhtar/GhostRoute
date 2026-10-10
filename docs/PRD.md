@@ -1,6 +1,6 @@
 # GhostRoute product requirements
 
-Status: implementation specification, not a claim of delivered product. Phase 0 supplies documentation and tooling only.
+Status: P0 map, geographic graph, routing, simulation and rerouting are implemented locally; final deployment and human acceptance remain separate. See VERIFICATION for executed evidence.
 
 ## Executive summary
 
@@ -49,9 +49,9 @@ Enable people to understand how changed road availability affects access to an e
 
 ## MVP boundaries and geography
 
-One reviewed, connected mainland Ernakulam extract, one distance-based walking simulation profile, one fixed flood polygon, one default origin and at least two synthetic destinations. Proposed display bounds: west 76.280, south 9.970, east 76.305, north 9.990, approximately 2.7 × 2.2 km. These are a candidate demo rectangle, not administrative or hazard boundaries. Final extent and demo points must be validated during MAP-01. Acquire a small buffer around the rectangle; do not fake connections across canals, bridges or disconnected components.
+The implemented MVP uses a small frozen mainland Ernakulam extract, one distance-based walking profile, three deterministic illustrative flood scenarios and two named demo endpoints. Runtime geometry bounds are west 76.2732579, south 9.9638296, east 76.2936855, north 9.9897189. The graph retains 12 actual connected components; it never fabricates links across disconnected roads. The Hospital Road pair belongs to a connected component with verified alternatives. These bounds are dataset coverage, not administrative or hazard boundaries. See DATA_STRATEGY for source query bounds and access assumptions.
 
-No authentication, database, live feeds, turn-by-turn guidance, vehicle navigation, travel-time promises, geolocation tracking, notification system or full-city routing. Local road fixtures support an already-installed demo, not a complete offline product. No product features are implemented by Phase 0.
+No authentication, database, live feeds, turn-by-turn guidance, vehicle navigation, travel-time promises, geolocation tracking, notification system or full-city routing. Local road fixtures support an already-installed demo, not a complete offline product. Phase 0 was documentation/tooling; subsequent milestones implement the product.
 
 ## Disaster and routing behavior
 

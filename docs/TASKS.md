@@ -242,3 +242,9 @@
 - **Acceptance criteria:** Actual build/demo correspond to recorded implementation SHA; team confirms identities and checklist; no false submission/deployment claim.
 - **Suggested GitHub labels:** `devops, documentation, P0` (suggestions only)
 - **First-time contributor suitability:** Not a first task; requires domain/integration context.
+
+## Final readiness handoff
+
+Guided Demo Mode, production asset checks, delayed-data recovery, keyboard/manual handoff, repeated scenario switching/reset, mobile resizing and refresh are implemented/tested locally. Submission narrative, pitch and Vercel runbook are prepared. Stop conditions and priorities are in ROADMAP.
+
+Remaining release tasks, in order: human keyboard/200%-zoom/target-device accessibility review (A11Y-01/UI-02); two timed rehearsals with the actual presenter, including tile failure (DOC-02/OPS-02); confirm participant handles/contributions and venue instructions; authorize exact push and Vercel account/project deployment (OPS-01); inspect hosted build and judge-accessible demo; record final implementation SHA/URL and submit through the organizer's announced method. Do not claim hosted CI, deployment, human rehearsal or submission from local tests.

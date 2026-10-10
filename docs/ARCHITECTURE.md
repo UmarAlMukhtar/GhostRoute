@@ -149,3 +149,9 @@ flowchart LR
 ```
 
 SIM-01/INT-01 are implemented in `simulation/flood.ts`, `scenarios.ts`, `session.ts`, Dashboard and SimulationPanel. Pure calculations remain independent of React and MapLibre. Invalid flood results suppress alternatives and display a reason.
+
+## Presenter guide and deployment boundary
+
+`lib/map/demo.ts` contains eight ordered cues and existing scenario/stage identifiers, never stored route metrics. `DemoGuide` renders progress and actual baseline/current values. Dashboard batches the existing selection and simulation reducer actions for each presenter step; it retains the same validated graph, flood engine and router. Manual actions exit the guide, preventing narration/state divergence. A one-click restart clears selections/closures and requests a regional camera fit without reconstructing MapLibre. The guide has no timers or additional state library.
+
+`vercel.json` pins install/build commands and uses the standard Next.js framework output. Worker assets are generated before every build. Environment variables are unnecessary. Remote publication is separate from this locally verified configuration; see DEPLOYMENT.md.

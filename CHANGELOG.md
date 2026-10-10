@@ -1,5 +1,12 @@
 # Change log
 
+## Final demo and submission readiness — 2026-10-10T23:45:20+05:30
+
+- Changed: Added presenter-controlled Demo Mode with real calculated metrics, restart/exit/manual handoff and regional reset; improved mobile guide spacing and keyboard access. Prepared Vercel config/runbook, pitch, submission narrative and named team draft; corrected stale foundation-only status; documented priorities and publication stop conditions.
+- Why: Make the verified flood-and-reroute workflow dependable for a three-minute presentation and prepare a concrete deployment/submission handoff without publishing.
+- Validation: Existing SIM-01/INT-01 audit passed all 20 original production browser journeys. Expanded tests cover full guide, keyboard, delayed assets, production workers, rapid switching, repeated reset, resizing and refresh. Final checks, screenshots and measured timings are recorded in VERIFICATION. Pinned deployment install command passed; data regeneration unchanged. Mobile reset clipping found by screenshot/bounds review was corrected.
+- Limitations: Local production proof is not a hosted build or human timed rehearsal. Participant handles/contributions, venue submission method and Vercel account/project approval remain outstanding. No push, deployment, remote settings change or submission; human review pending.
+
 ## SIM-01 + INT-01 — 2026-10-10T23:33:01+05:30
 
 - Changed: Added deterministic Turf polygon/MultiPolygon intersections, immutable segment/node closures, three illustrative Ernakulam scenarios, automatic existing-router recalculation, route comparisons, responsive simulation controls and in-place map overlays. Added geometry/integration/browser tests, benchmark script and ADR-009; updated architecture, design, tasks, testing and demo documentation.

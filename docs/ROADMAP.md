@@ -1,6 +1,6 @@
 # Eight-hour implementation roadmap
 
-Goal: a tested, explainable graph rerouting demonstration, not an operational emergency system. The clock is a relative team budget including Phase 0. The event itself runs from 10 October 18:30 IST to 11 October 10:00 IST; the eight-hour plan does not redefine those organizer times. Current foundation work is recorded in CHANGELOG; later phases remain unimplemented. If foundation work takes longer, subtract that time from stretch work and reduce dataset size, never drop core graph tests or the disclaimer.
+Goal: a tested, explainable graph rerouting demonstration, not an operational emergency system. The clock is a relative team budget including Phase 0. The event itself runs from 10 October 18:30 IST to 11 October 10:00 IST; the eight-hour plan does not redefine those organizer times. Foundation, MAP-01/02, ROUTE-01 and SIM-01/INT-01 are implemented; current work is final demo readiness and deployment preparation. If foundation work takes longer, subtract that time from stretch work and reduce dataset size, never drop core graph tests or the disclaimer.
 
 | Phase                                           | Elapsed budget | Deliverable and exit gate                                                                                                                                  |
 | ----------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -39,4 +39,13 @@ This is a coordination plan, not authorization to spawn agents or create remote 
 
 ## Dependencies and unresolved decisions
 
-Internet is needed once for dependencies, browser binaries and OSM acquisition; normal graph/scenario runtime should be local. Online basemap provider, final bbox/demo nodes, organizer-text licensing, team identities, private reporting contact, deployment target and venue submission procedure remain unresolved. No backend dependency is on the critical path. See [TASKS](TASKS.md) for independently assignable work and [DEMO_PLAN](DEMO_PLAN.md) for presenter steps.
+Internet is needed once for dependencies, browser binaries and OSM acquisition; normal graph/scenario runtime should be local. Basemap, dataset bounds and demo nodes are implemented and documented; Vercel is the selected deployment target. Organizer-text licensing, participant handles/contributions, private reporting contact, Vercel account/project access and venue submission procedure remain unresolved. No backend dependency is on the critical path. See [TASKS](TASKS.md) for independently assignable work and [DEMO_PLAN](DEMO_PLAN.md) for presenter steps.
+
+## Final readiness priorities and explicit stop conditions
+
+1. **P0 correctness:** Preserve real-road routing, polygon closures, baseline comparison, unavailable/reset behavior and honest safety/attribution. Any wrong route, stale green line or changed dataset reproduction stops release; fix it before polish.
+2. **P0 demonstration:** Guided Demo Mode, keyboard/manual controls, readable mobile map, repeatable resets and tile-failure fallback. Stop adding features once the complete journey passes; do not add live feeds, backend services or unrelated scenarios.
+3. **P0 release evidence:** Run lint, types, unit tests, production build, real desktop/mobile browser checks, formatting and deterministic regeneration. A failed critical check blocks a readiness claim. Treat a missing browser/deployment tool as an unverified boundary, not a pass.
+4. **P0 human handoff:** Complete participant-owned fields and two timed presenter rehearsals. Keep unknown handles, contributions, final submitted SHA and submission method unfilled until confirmed; never check organizer attestations for participants.
+5. **Publishing stop:** No push, preview/production deployment, remote project linking/settings change or submission without explicit approval for that action and target. Stop at a clean local commit, reviewed deployment runbook and submission draft. Local build success is not hosted proof.
+6. **Time stop:** Reserve the last 30 minutes before the venue's confirmed deadline for rehearsal and submission. If hosting fails, use the working local production demo; do not spend the remaining presentation time adding infrastructure. Document unfinished human or external checks.

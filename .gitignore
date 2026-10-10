@@ -36,3 +36,6 @@ data/source/*.osm
 
 # Generated local MapLibre worker assets (prepared by dev/build).
 /public/vendor/maplibre/
+
+# Local deployment linkage and downloaded Vercel environment files.
+.vercel/
