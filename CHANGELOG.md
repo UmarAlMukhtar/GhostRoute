@@ -1,5 +1,12 @@
 # Change log
 
+## SIM-01 + INT-01 — 2026-10-10T23:33:01+05:30
+
+- Changed: Added deterministic Turf polygon/MultiPolygon intersections, immutable segment/node closures, three illustrative Ernakulam scenarios, automatic existing-router recalculation, route comparisons, responsive simulation controls and in-place map overlays. Added geometry/integration/browser tests, benchmark script and ADR-009; updated architecture, design, tasks, testing and demo documentation.
+- Why: Complete the central real-road flood-and-detour demonstration without live feeds, backend services or replacing geographic/routing modules.
+- Validation: 135 unit tests, lint and types pass; production browser verification and exact performance/scenario outcomes are recorded in docs/VERIFICATION.md. Offline data regeneration remained byte-identical. Actual desktop/mobile screenshots inspected; corrected control overlap, camera coverage and the destination hazard's visibility.
+- Limitations: Illustrative 2D flooding may block bridges conservatively; geography and emergency access are not verified current conditions. Browser checks use optional-tile failure deliberately. Human review, target-device rehearsal and deployment remain pending. No push or remote changes.
+
 ## MAP-02 — 2026-10-10T23:13:00+05:30
 
 - Changed: Replaced the smoke page with the responsive MapLibre route explorer, local validated asset loader, retained Dijkstra integration, snapped/preset endpoints, route information, reset/help, offline-road fallback and future overlay boundaries. Added MapLibre/Lucide and locally served worker preparation; preserved geographic data and routing modules.

@@ -1,4 +1,9 @@
-import type { FeatureCollection, LineString, Polygon } from 'geojson';
+import type {
+  FeatureCollection,
+  LineString,
+  Polygon,
+  MultiPolygon,
+} from 'geojson';
 import type { StyleSpecification } from 'maplibre-gl';
 import type { RoadGeoJSON } from '../geo/types';
 export const EMPTY: FeatureCollection = {
@@ -6,7 +11,7 @@ export const EMPTY: FeatureCollection = {
   features: [],
 };
 export interface MapOverlays {
-  hazards?: FeatureCollection<Polygon>;
+  hazards?: FeatureCollection<Polygon | MultiPolygon>;
   blockedRoads?: FeatureCollection<LineString>;
   alternative?: FeatureCollection<LineString>;
 }
@@ -31,9 +36,19 @@ export function localStyle(roads: RoadGeoJSON): StyleSpecification {
         type: 'fill',
         source: 'hazards',
         paint: {
-          'fill-color': '#f59e0b',
-          'fill-opacity': 0.2,
+          'fill-color': '#06b6d4',
+          'fill-opacity': 0.25,
           'fill-outline-color': '#b45309',
+        },
+      },
+      {
+        id: 'hazard-boundary',
+        type: 'line',
+        source: 'hazards',
+        paint: {
+          'line-color': '#d97706',
+          'line-width': 2,
+          'line-dasharray': [3, 2],
         },
       },
       {
@@ -87,6 +102,12 @@ export function localStyle(roads: RoadGeoJSON): StyleSpecification {
         source: 'route',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: { 'line-color': '#2563eb', 'line-width': 5 },
+      },
+      {
+        id: 'alternative-casing',
+        type: 'line',
+        source: 'alternative',
+        paint: { 'line-color': '#fff', 'line-width': 8 },
       },
       {
         id: 'alternative',

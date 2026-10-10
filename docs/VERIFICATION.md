@@ -264,3 +264,75 @@ New files (47):
 - `tests/unit/foundation.test.ts`
 - `tsconfig.json`
 - `vitest.config.ts`
+
+## SIM-01 + INT-01 — 10 October 2026
+
+The actual local graph is unchanged: 1,719 nodes, 3,712 directed edges, 1,856 physical segments. `pnpm data:prepare` completed; `git diff --exit-code -- public/data/ernakulam` confirmed byte-identical tracked runtime assets. Organizer rules, original README prefix, instructions and workflows were preserved.
+
+Pure and integration tests verify Hospital Road baseline **944.333 m** and polygon detour **1,411.110 m** (5 segments/10 directions/3 nodes blocked). Expanding stages block **5 → 9 → 27** segments; distances are **1,411.110 → 1,411.110 → 1,731.155 m**. Unavailable blocks **21** segments/42 directions/14 nodes; typed `destination-blocked`, and segment-only routing independently returns `no-route`. No fabricated alternative distance is returned.
+
+### Measured performance
+
+Command: `node --experimental-strip-types scripts/benchmark-simulation.ts`. Node 22.23.1, Linux, AMD Ryzen 7 8845HS; 5 warmups, 30 samples, median / p95 milliseconds. These are local Node measurements, not a browser frame-time or device-wide guarantee.
+
+| Operation                        | Median |   p95 |
+| -------------------------------- | -----: | ----: |
+| Flood engine initialization      |  6.612 | 8.988 |
+| hospital stage 1 intersection    |  0.365 | 0.859 |
+| hospital stage 1 rerouting       |  0.391 | 0.599 |
+| expanding stage 1 intersection   |  0.358 | 0.609 |
+| expanding stage 1 rerouting      |  0.273 | 0.369 |
+| expanding stage 2 intersection   |  0.378 | 0.557 |
+| expanding stage 2 rerouting      |  0.268 | 0.355 |
+| expanding stage 3 intersection   |  0.251 | 0.486 |
+| expanding stage 3 rerouting      |  0.400 | 0.461 |
+| unavailable stage 1 intersection |  0.217 | 0.542 |
+| unavailable stage 1 rerouting    |  0.002 | 0.002 |
+
+### Browser inspection and corrections
+
+Actually rendered production Next.js + MapLibre in Chromium, at 1440×900 desktop and 360×800 mobile, with real local datasets/router. Public OSM tiles were deliberately blocked. Captured Hospital, expanding stage 3 and unavailable screenshots under ignored `test-results/`. Inspected route contrast, cyan/amber polygons, red blocked geometry, mobile sheet, comparison values and unavailable feedback. Found and corrected a desktop zoom-control overlap; updated the existing out-of-range click test because its old click targeted the new panel. Expanded camera bounds to include flood polygons so a destination-centered hazard remains visible. Enlarged the unavailable scenario to keep its cyan extent visible around the destination marker on mobile; remeasured 21 blocked segments. No failed network request to the optional, deliberately aborted tile service is treated as an app exception.
+
+Physical-device touch, Safari/Firefox, screen-reader certification, live tile reliability, deployment, human timed rehearsal and submission are not verified. The engine is conservative 2D geometry: bridges may be overblocked and submeter illustrative boundaries are not geographic accuracy claims. Human review remains pending.
+
+### Final checks
+
+- `pnpm lint`: passed.
+- `pnpm typecheck`: passed.
+- `pnpm test`: 135 tests across 10 files passed (29 added simulation tests).
+- `pnpm build`: passed as the production build invoked by `pnpm test:e2e`.
+- `pnpm test:e2e`: 20 journeys passed, 10 desktop + 10 mobile, including existing MAP-02 regressions and actual flood scenarios. Final run: 14.1 seconds.
+- `pnpm format`: executed successfully; final format check and diff whitespace checked before commit.
+- `pnpm data:prepare`: passed; existing runtime graph/GeoJSON/metadata unchanged.
+- Hospital browser journey captured no unexpected console errors or uncaught page errors. Optional remote tiles were intentionally aborted.
+
+### SIM-01/INT-01 file inventory
+
+- `AI_USAGE.md`
+- `CHANGELOG.md`
+- `README.md`
+- `docs/ARCHITECTURE.md`
+- `docs/DEMO_PLAN.md`
+- `docs/DESIGN_SPEC.md`
+- `docs/FLOOD_SIMULATION.md`
+- `docs/TASKS.md`
+- `docs/TESTING.md`
+- `docs/VERIFICATION.md`
+- `docs/adr/009-flood-integration.md`
+- `docs/adr/README.md`
+- `package.json`
+- `pnpm-lock.yaml`
+- `scripts/benchmark-simulation.ts`
+- `src/app/globals.css`
+- `src/components/Dashboard.tsx`
+- `src/components/MapView.tsx`
+- `src/components/SimulationPanel.tsx`
+- `src/lib/geo/types.ts`
+- `src/lib/map/style.ts`
+- `src/lib/simulation/flood.ts`
+- `src/lib/simulation/scenarios.ts`
+- `src/lib/simulation/session.ts`
+- `tests/e2e/foundation.spec.ts`
+- `tests/e2e/simulation.spec.ts`
+- `tests/unit/map.test.ts`
+- `tests/unit/simulation.test.ts`

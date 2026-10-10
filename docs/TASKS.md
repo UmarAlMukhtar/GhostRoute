@@ -1,6 +1,6 @@
 # Contributor task catalog
 
-**Phase 0, MAP-01, ROUTE-01, ROUTE-02, MAP-02 and QA-01 are implemented.** UI-01 route controls are delivered; simulation controls remain pending. Next: SIM-01, then INT-01. Other tasks remain unassigned/unimplemented. These are local definitions; no GitHub issues, labels or assignments have been created. Estimates are hands-on contributor time, not sequential wall-clock totals. Work follows [ROADMAP](ROADMAP.md); parallel ownership is described there. Small beginner tasks fit inside phase budgets, not in addition to eight hours. Read the relevant ADR and coordinate shared files before starting.
+**Phase 0, MAP-01, ROUTE-01, ROUTE-02, MAP-02 and QA-01 are implemented.** UI-01, SIM-01 and INT-01 are delivered, including three real-graph flood scenarios and desktop/mobile browser journeys. Next: final UI/accessibility polish, demo reliability, deployment and submission. Other tasks remain unassigned/unimplemented. These are local definitions; no GitHub issues, labels or assignments have been created. Estimates are hands-on contributor time, not sequential wall-clock totals. Work follows [ROADMAP](ROADMAP.md); parallel ownership is described there. Small beginner tasks fit inside phase budgets, not in addition to eight hours. Read the relevant ADR and coordinate shared files before starting.
 
 ## UI and design
 
@@ -108,22 +108,26 @@
 
 ### SIM-01 — Fixed flood and intersection blockages
 
+- **Status:** Complete: polygon/MultiPolygon validation, full-line Turf intersection, node blocking and three deterministic real-graph scenarios.
+
 - **Description:** Add minimal Turf modules, validate one synthetic polygon, derive blocked physical segments and flooded nodes using whole-geometry intersection.
 - **Priority:** P0
 - **Dependencies:** MAP-01 contracts; real assets before scenario acceptance
 - **Estimated effort:** 45 min
-- **Relevant modules:** src/lib/simulation/flood.ts; public/data/ernakulam/scenario.json; tests/unit/flood.test.ts
+- **Relevant modules:** src/lib/simulation/flood.ts; src/lib/simulation/scenarios.ts; tests/unit/simulation.test.ts
 - **Acceptance criteria:** Crossing/contained/touching lines block in both directions; disjoint/hole cases correct; invalid rings rejected; graph remains unchanged; one real baseline edge blocked with detour available.
 - **Suggested GitHub labels:** `simulation, geometry, P0` (suggestions only)
 - **First-time contributor suitability:** Not a first task; requires domain/integration context.
 
 ### INT-01 — Automatic reroute and reset integration
 
+- **Status:** Complete: retained baseline, automatic current routes, comparisons, stage controls and reset; desktop/mobile journeys verified.
+
 - **Description:** Use reducer selections/step and derived baseline/current routes. Trigger, reset and selection changes update the correct results atomically.
 - **Priority:** P0
-- **Dependencies:** ROUTE-01, ROUTE-02, SIM-01, UI-01, MAP-02, SHELTER-01
+- **Dependencies:** ROUTE-01, ROUTE-02, SIM-01, UI-01, MAP-02; uses existing unverified endpoint presets (no shelter claim)
 - **Estimated effort:** 60 min
-- **Relevant modules:** src/lib/simulation/state.ts; src/app/page.tsx; tests/unit/simulation.test.ts
+- **Relevant modules:** src/lib/simulation/session.ts; src/components/Dashboard.tsx; tests/unit/simulation.test.ts
 - **Acceptance criteria:** Trigger changes actual path without blocked edges; baseline retained as historical; reset restores identical baseline; active-flood selection change recalculates both; unreachable/endpoint-blocked visible.
 - **Suggested GitHub labels:** `integration, simulation, P0` (suggestions only)
 - **First-time contributor suitability:** Not a first task; requires domain/integration context.
@@ -180,6 +184,8 @@
 
 ### QA-02 — Local end-to-end journey and timing
 
+- **Status:** Automated real-data desktop/mobile journeys and Node intersection/routing timing delivered; target-device interaction timing and human rehearsal remain.
+
 - **Description:** Use the reviewed real dataset and tile-free map; drive select→baseline→flood→reroute→reset, plus unreachable and bad-data states; record performance on demo laptop.
 - **Priority:** P0
 - **Dependencies:** INT-01
@@ -203,6 +209,8 @@
 - **First-time contributor suitability:** Yes; bounded and reviewable with maintainer guidance.
 
 ### DOC-02 — Update three-minute presenter notes
+
+- **Status:** Script updated to actual scenarios and distances; timed human rehearsal remains.
 
 - **Description:** Rehearse the exact built behavior, name the dataset/scenario used and remove claims for incomplete features.
 - **Priority:** P0

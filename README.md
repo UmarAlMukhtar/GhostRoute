@@ -33,9 +33,9 @@ This template has no application code or required technology stack. The document
 
 **Navigate to safety when ordinary routes become unsafe.**
 
-GhostRoute is an open-source disaster-aware navigation **simulation** for Kochi–Ernakulam. It will demonstrate how a shortest path through real mapped roads changes when a simulated flood makes road segments unavailable.
+GhostRoute is an open-source disaster-aware navigation **simulation** for Kochi–Ernakulam. It demonstrates how a shortest path through real mapped roads changes when a simulated flood makes road segments unavailable.
 
-**Current status: MAP-02 is implemented locally.** The interactive Ernakulam map supports clicked or named endpoints, real shortest-distance routes, reset, responsive controls and a local-road fallback. The frozen dataset, Dijkstra engine and snapping are independent of remote tiles. Flood simulation and verified emergency destinations are not implemented.
+**Current status: SIM-01 + INT-01 are implemented locally.** Explore real Ernakulam roads, calculate a route, start one of three illustrative flood scenarios, and compare automatic rerouting with the historical baseline. Deterministic expanding stages and explicit unavailable-route feedback work with local datasets, including when remote map tiles fail. Floods are simulated; destinations and emergency safety are unverified.
 
 - **Project name:** GhostRoute
 - **Team:** Participant names/handles await the team's confirmation; maximum four members.
@@ -85,7 +85,7 @@ In the original Codex workspace, run `cd repository` first; the official clone i
 
 `RULES.md` is excluded from automatic formatting so its inherited bytes remain intact. Do not add npm/yarn lockfiles or competing tool configs. CI runs the same checks; local results are in [VERIFICATION](docs/VERIFICATION.md).
 
-The local dataset has 1,719 nodes, 3,712 directed edges and 12 components. Run `pnpm data:prepare` to reproduce it without network access. [DATA_STRATEGY](docs/DATA_STRATEGY.md) records bounds, access assumptions and the verified alternate-path fixture. The [routing API](docs/ROUTING_ENGINE.md) supports node/edge/physical-road closures. Next implementation: SIM-01 (flood simulation and road intersections), then INT-01 (automatic rerouting).
+The local dataset has 1,719 nodes, 3,712 directed edges and 12 components. Run `pnpm data:prepare` to reproduce it without network access. [DATA_STRATEGY](docs/DATA_STRATEGY.md) records bounds, access assumptions and the verified alternate-path fixture. The [routing API](docs/ROUTING_ENGINE.md) supports node/edge/physical-road closures. Next: final UI/accessibility review, demo rehearsal, deployment verification and participant-owned submission. See [flood simulation](docs/FLOOD_SIMULATION.md).
 
 ### Demo instructions and limitations
 
@@ -107,3 +107,13 @@ Start with [CONTRIBUTOR_GUIDE](docs/CONTRIBUTOR_GUIDE.md), [CONTRIBUTING](CONTRI
 New GhostRoute code/documentation uses [MIT](LICENSE), with the inherited organizer text excluded from that grant pending license clarification. The [template audit](docs/TEMPLATE_AUDIT.md) records provenance. Bundled OSM source/derived assets use [ODbL](https://www.openstreetmap.org/copyright) and [bundled attribution](public/data/ernakulam/ATTRIBUTION.md). The code of conduct adapts [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) under its own license. Dependency versions are pinned in `package.json` and `pnpm-lock.yaml`.
 
 See [AI_USAGE.md](AI_USAGE.md) for AI assistance, [CHANGELOG.md](CHANGELOG.md) for the development record and [SUBMISSION.md](SUBMISSION.md) for the organizer's submission checklist.
+
+### Run the flood demonstration
+
+1. Choose **Try the Hospital Road demo**, then **Find route**: 944.3 m.
+2. **Start simulation**: 5 segments close; the real detour becomes 1.41 km (+49.4%).
+3. Select **Expanding urban flood** and use **Next stage** twice: 27 segments close; the route becomes 1.73 km.
+4. Select **Route unavailable**: 21 segments close around the destination; no alternative is drawn.
+5. **Reset simulation** restores the baseline. **Reset** clears endpoints and simulation.
+
+Flood conditions are illustrative, not verified live information. Routes are not certified safe for emergency use. All scenarios run locally; public street tiles are optional. Benchmark with `node --experimental-strip-types scripts/benchmark-simulation.ts`.

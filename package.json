@@ -23,6 +23,10 @@
     "routes:benchmark": "node --experimental-strip-types scripts/benchmark-routing.ts"
   },
   "dependencies": {
+    "@turf/boolean-intersects": "7.4.0",
+    "@turf/boolean-point-in-polygon": "7.4.0",
+    "@turf/boolean-valid": "7.4.0",
+    "@turf/kinks": "7.4.0",
     "lucide-react": "1.54.0",
     "maplibre-gl": "6.13.0",
     "next": "16.4.0",

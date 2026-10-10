@@ -136,10 +136,12 @@ describe('selection and presentation', () => {
     expect(style.layers.map((layer) => layer.id)).toEqual([
       'background',
       'hazards',
+      'hazard-boundary',
       'road-casing',
       'roads',
       'route-casing',
       'route',
+      'alternative-casing',
       'alternative',
       'blockedRoads',
     ]);

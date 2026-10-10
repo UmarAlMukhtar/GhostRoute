@@ -1,4 +1,9 @@
-import type { FeatureCollection, LineString, Polygon } from 'geojson';
+import type {
+  FeatureCollection,
+  LineString,
+  Polygon,
+  MultiPolygon,
+} from 'geojson';
 
 /** WGS84 decimal degrees, always longitude first. */
 export type GeoPoint = [longitude: number, latitude: number];
@@ -33,13 +38,14 @@ export type RoadGeoJSON = FeatureCollection<
 export interface DisasterZone {
   id: string;
   kind: 'flood';
-  geometry: Polygon;
+  geometry: Polygon | MultiPolygon;
   simulated: true;
 }
 export interface FloodScenario {
   id: string;
   graphVersion: string;
   label: string;
+  description: string;
   steps: DisasterZone[][];
 }
 export interface EmergencyShelter {

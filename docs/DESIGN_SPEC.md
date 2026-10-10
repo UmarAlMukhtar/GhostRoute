@@ -1,6 +1,6 @@
 # Product design specification
 
-Status: MAP-02 dashboard implemented; simulation-specific states below remain planned.
+Status: MAP-02 and SIM-01/INT-01 implemented; actual simulation behavior is documented in FLOOD_SIMULATION.md.
 
 ## Principles and composition
 
@@ -43,7 +43,7 @@ Order: base roads, hazard fill, baseline, blocked roads, updated route, origin/d
 | Origin selector      | Empty, preset selected, snapped, outside radius                   | Keyboard presets; map click uses 100 m maximum snap, show resulting selection and snap distance                     |
 | Destination selector | Empty, synthetic selected, unavailable                            | Labeled native select; unknown availability visible; flooded endpoint reported as unreachable                       |
 | Route panel          | No selection, baseline found, updated found, unreachable, invalid | Show distance in meters/km only; status text and blocked-edge count; baseline remains historical                    |
-| Simulation panel     | Disabled, ready/clear, active flood                               | “Trigger simulated flood” and “Reset simulation”; no live-condition wording                                         |
+| Simulation panel     | Disabled, ready/clear, active flood                               | “Start simulation” and “Reset simulation”; no live-condition wording                                                |
 | Legend/status        | Clear simulation, flood active, no available route                | Always textual with color/pattern key; politely announce result changes                                             |
 | Data error           | Missing/invalid local data                                        | Explain failure and retry; no silent fake graph or successful route                                                 |
 
@@ -57,10 +57,12 @@ Optional line transitions/camera moves should be 150–250 ms and respect `prefe
 
 ## Content and scope
 
-Persistent copy: “Simulation only. Hazards and destinations are demonstration data. Routes are not verified safe. Follow local authorities.” Show dataset date and attribution. Do not show invented ETA, water depth, shelter capacity, live incident count, verified badge or emergency-service affiliation. Rich side-by-side metrics/explanations, replay and extra scenarios remain P1. MAP-02 delivers the route explorer. Simulation panels/legends, automatic rerouting and hazard status remain SIM-01/INT-01.
+Persistent copy: “Simulation only. Hazards and destinations are demonstration data. Routes are not verified safe. Follow local authorities.” Show dataset date and attribution. Do not show invented ETA, water depth, shelter capacity, live incident count, verified badge or emergency-service affiliation. Rich side-by-side metrics/explanations, replay and extra scenarios remain P1. MAP-02 delivers the route explorer. Simulation panels/legends, automatic rerouting, comparisons and three deterministic scenarios are now implemented.
 
 ## Implemented interaction details
 
 The primary route is solid blue with white casing. A is a circular blue origin marker; B is a dark rounded-square destination marker. A small hollow point distinguishes a click more than 2 m from its snapped node; the panel always reports a clicked selection's offset. This is not a walkable approach line. Named demo destinations are geographic test points, not verified shelters.
 
 The interface displays distance, traversed segment count and Walking demo / shortest-distance profile; no ETA or safety score. Help uses a native modal dialog with Escape dismissal. Loading, invalid asset retry, too-far selection, disconnected route, missing tiles and WebGL failure have explicit copy. No disabled flood teaser or pretend address search is included. Future overlays retain their own layer identities and semantic colors.
+
+Flood controls use a right floating panel on desktops at least 1200 px wide and the existing scrollable control sheet otherwise. Stage controls are manual, deterministic and reversible. Cyan fill/amber dashed outline marks flood geometry, red dashed roads show closures, dashed blue is historical, and green with white casing is currently available. Typed failures remove green lines and distances; unchanged routes explicitly say so.

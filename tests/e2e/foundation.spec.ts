@@ -196,7 +196,10 @@ test('out-of-range map click reports snapping failure', async ({ page }) => {
   const box = await canvas.boundingBox();
   expect(box).not.toBeNull();
   await canvas.click({
-    position: { x: box!.width - 90, y: Math.min(220, box!.height / 2) },
+    position: {
+      x: box!.width - (box!.width >= 1200 ? 420 : 90),
+      y: Math.min(220, box!.height / 2),
+    },
   });
   await expect(
     page

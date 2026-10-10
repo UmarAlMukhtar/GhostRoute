@@ -2,7 +2,7 @@
 
 ## Current foundation versus product acceptance
 
-The original static scaffold check now verifies the dashboard's server-rendered loading state and safety copy. MAP-01 tests geographic validity offline; ROUTE-01 tests routing/snapping/heap behavior. MAP-02 adds actual map and routing browser journeys, described below. Flood/intersection and automatic rerouting journeys remain future work.
+The original static scaffold check now verifies the dashboard's server-rendered loading state and safety copy. MAP-01 tests geographic validity offline; ROUTE-01 tests routing/snapping/heap behavior. MAP-02 adds actual map and routing browser journeys, described below. SIM-01/INT-01 add pure intersection and real flood-rerouting journeys.
 
 ## Commands and environment
 
@@ -87,7 +87,7 @@ CI runs format, lint, types, unit tests, production build and Chromium browser t
 
 `routing.test.ts`, `min-heap.test.ts`, `snapping.test.ts` and `real-routing.test.ts` cover weighted/directed shortest paths, decrease-key/tie ordering, identical/invalid/blocked endpoints, isolated components, all closure types together, physical versus directed blocking, immutable inputs/results, shape-point reconstruction, malformed requests/profiles and repeated reset/recalculation. Snapping tests geographic meters, longitude wrap/high latitude, inclusive radius, malformed coordinates/options, origin versus destination eligibility and largest-component restriction.
 
-The real Hospital Road pair has a 944.333 m shortest path and a 980.790 m path after physical segment 768625211:4 is blocked. A separate test-only Bellman-Ford relaxation in integer millimeters verifies these distances and representative additional requests/closures independently of the heap. MAP-01 BFS witnesses remain unchanged; they prove connectivity, not optimal distance. Future SIM-01 must still prove polygon-to-segment blocking, and MAP-02 now checks rendered routes against real results.
+The real Hospital Road pair has a 944.333 m shortest path and a 980.790 m path after physical segment 768625211:4 is blocked. A separate test-only Bellman-Ford relaxation in integer millimeters verifies these distances and representative additional requests/closures independently of the heap. MAP-01 BFS witnesses remain unchanged; they prove connectivity, not optimal distance. SIM-01 now verifies polygon closures separately: Hospital blocks five segments and produces 1,411.110 m, rather than the single-segment closure distance.
 
 `pnpm routes:benchmark` measures 30 samples after 5 warmups on the real graph: private router initialization; full validation + initialization; baseline; rerouting; 100 alternating requests per batch; and snapping. Timings exclude disk reads, JSON parse, network and rendering. Results and machine details are recorded in VERIFICATION, not asserted as brittle timing tests.
 
@@ -97,4 +97,8 @@ The real Hospital Road pair has a 944.333 m shortest path and a 980.790 m path a
 
 `tests/e2e/foundation.spec.ts` now tests the actual dashboard in desktop and 360 × 800 Chromium: real map initialization, tile failure/local-road fallback, named and clicked endpoints, Hospital Road route distance/markers, reset, help, no overflow, disconnected real-node routing, malformed-data retry, too-far clicks, WebGL failure, zero-distance routes and viewport changes. Tests abort OSM tiles so CI neither depends on nor drives public tile services. Worker assets are served locally from the production build. Route screenshots are saved under ignored `test-results/`.
 
-MapLibre requires WebGL. Keep failures visible instead of skipping initialization assertions. Browser-emulated mobile tests are not physical-device touch or assistive-technology certification. Full flood journeys remain QA-02 after SIM-01/INT-01.
+MapLibre requires WebGL. Keep failures visible instead of skipping initialization assertions. Browser-emulated mobile tests are not physical-device touch or assistive-technology certification. The automated flood journey portion of QA-02 is covered by simulation.spec.ts; human presentation and broader accessibility review remain.
+
+## Flood integration coverage
+
+`simulation.test.ts` verifies partial/contained/boundary intersections, bbox false positives, holes, disjoint MultiPolygon, malformed rings/coordinates, multiple zones, deduplication, bidirectional closures, flooded endpoints, deterministic stage expansion, immutable graphs/results, comparison arithmetic and reset. Real expected segment counts: 5, 9, 27; unavailable: 21. Browser tests exercise these actual assets/router in both Chromium projects and assert rendered hazard, blocked-road and alternative layers, stage reversal, endpoint changes, reset and unavailable feedback. Public tile requests are blocked. Screenshots are retained under ignored `test-results/`; inspect them rather than assuming a passing DOM assertion proves visual quality.

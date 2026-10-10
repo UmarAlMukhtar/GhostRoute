@@ -25,7 +25,12 @@ function padding(sheetOpen: boolean) {
         bottom: sheetOpen ? 25 : 110,
         left: 35,
       }
-    : { top: 100, right: 130, bottom: 140, left: 430 };
+    : {
+        top: 100,
+        right: window.innerWidth >= 1200 ? 390 : 130,
+        bottom: 140,
+        left: 430,
+      };
 }
 export default function MapView({
   data,
@@ -96,10 +101,15 @@ export default function MapView({
             .getCanvas()
             .setAttribute('aria-label', 'Interactive Ernakulam road map');
           map.on('idle', () => {
-            if (container.current)
+            if (container.current) {
+              for (const layer of ['hazards', 'blockedRoads', 'alternative'])
+                container.current.dataset[layer] = String(
+                  map.queryRenderedFeatures({ layers: [layer] }).length > 0,
+                );
               container.current.dataset.routeVisible = String(
                 map.queryRenderedFeatures({ layers: ['route'] }).length > 0,
               );
+            }
           });
           map.on('click', (e) => pick.current([e.lngLat.lng, e.lngLat.lat]));
           const fallback = () => {
@@ -195,8 +205,19 @@ export default function MapView({
         .setData(overlays?.[id] ?? EMPTY)
         .catch(handleError);
     }
+    map.setPaintProperty('route', 'line-dasharray', overlays ? [2, 1] : [1, 0]);
     const fitRoute = () => {
-      const coordinates = route?.geometry?.coordinates;
+      const coordinates = [
+        ...(route?.geometry?.coordinates ?? []),
+        ...(overlays?.alternative?.features.flatMap(
+          (f) => f.geometry.coordinates,
+        ) ?? []),
+        ...(overlays?.hazards?.features.flatMap((f) =>
+          f.geometry.type === 'Polygon'
+            ? f.geometry.coordinates.flat()
+            : f.geometry.coordinates.flat(2),
+        ) ?? []),
+      ];
       if (coordinates?.length) {
         const xs = coordinates.map((p) => p[0]),
           ys = coordinates.map((p) => p[1]);

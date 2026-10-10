@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
   ArrowRight,
   ChevronDown,
@@ -15,6 +15,15 @@ import {
   X,
 } from 'lucide-react';
 import MapView from './MapView';
+import SimulationPanel from './SimulationPanel';
+import { createFloodEngine } from '../lib/simulation/flood';
+import { scenarios } from '../lib/simulation/scenarios';
+import {
+  initialSimulation,
+  simulationReducer,
+  reroute,
+} from '../lib/simulation/session';
+import type { MapOverlays } from '../lib/map/style';
 import Link from 'next/link';
 import { loadMapData, type MapData } from '../lib/map/data';
 import {
@@ -32,6 +41,10 @@ export default function Dashboard() {
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [state, dispatch] = useReducer(selectionReducer, initialSelection);
+  const [simulation, simulate] = useReducer(
+    simulationReducer,
+    initialSimulation,
+  );
   const [sheetOpen, setSheetOpen] = useState(true);
   const help = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -65,7 +78,61 @@ export default function Dashboard() {
     dispatch({ type: 'active', role });
     setSheetOpen(false);
   }
-  const found = state.result?.status === 'found' ? state.result : null;
+  const engine = useMemo(
+    () => (data ? createFloodEngine(data.graph) : null),
+    [data],
+  );
+  const flood = useMemo(() => {
+    const scenario = scenarios.find((s) => s.id === simulation.scenarioId)!;
+    if (!engine || !data) return null;
+    return scenario.graphVersion === data.graph.version
+      ? engine.evaluate(scenario.steps[simulation.stage])
+      : {
+          status: 'invalid' as const,
+          reason: 'Scenario does not match this dataset version.',
+        };
+  }, [engine, data, simulation.scenarioId, simulation.stage]);
+  const baseline = useMemo(
+    () =>
+      simulation.enabled && data && state.origin && state.destination
+        ? data.router.findRoute({
+            originNodeId: state.origin.nodeId,
+            destinationNodeId: state.destination.nodeId,
+          })
+        : state.result,
+    [simulation.enabled, data, state.origin, state.destination, state.result],
+  );
+  const current = useMemo(
+    () =>
+      simulation.stage && data && flood
+        ? reroute(data.router, baseline, flood)
+        : baseline,
+    [simulation.stage, data, flood, baseline],
+  );
+  const overlays = useMemo<MapOverlays | undefined>(
+    () =>
+      simulation.stage && flood?.status === 'ready'
+        ? {
+            hazards: flood.hazards,
+            blockedRoads: flood.blockedRoads,
+            alternative: {
+              type: 'FeatureCollection',
+              features:
+                current?.status === 'found' && current.geometry
+                  ? [
+                      {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: current.geometry,
+                      },
+                    ]
+                  : [],
+            },
+          }
+        : undefined,
+    [simulation.stage, flood, current],
+  );
+  const found = current?.status === 'found' ? current : null;
   return (
     <main className="dashboard">
       <header className="topbar">
@@ -85,7 +152,7 @@ export default function Dashboard() {
         <div className="header-actions">
           <span className="demo-status">
             <span />
-            Simulation demo
+            {simulation.stage ? 'Simulated flood active' : 'Simulation demo'}
           </span>
           <button
             className="icon-button help-button"
@@ -102,7 +169,8 @@ export default function Dashboard() {
             data={data}
             origin={state.origin}
             destination={state.destination}
-            result={state.result}
+            result={baseline}
+            overlays={overlays}
             onPick={pick}
             selecting={Boolean(state.active)}
             sheetOpen={sheetOpen}
@@ -122,8 +190,12 @@ export default function Dashboard() {
           {state.active
             ? `Select your ${state.active === 'origin' ? 'starting point' : 'destination'} on the map`
             : found
-              ? 'Your route, on real roads'
-              : 'Explore. Select. Find your route.'}
+              ? simulation.stage
+                ? 'Blue: original · Green: available · Red: blocked'
+                : 'Your route, on real roads'
+              : simulation.stage
+                ? 'No available route · Blue shows the original path'
+                : 'Explore. Select. Find your route.'}
         </div>
         <aside
           className={`route-panel ${sheetOpen ? 'expanded' : 'collapsed'}`}
@@ -138,7 +210,9 @@ export default function Dashboard() {
             <span>
               {found
                 ? `${formatDistance(found.distanceMeters)} · Route available`
-                : 'Plan your route'}
+                : simulation.stage
+                  ? 'No available route · Simulation'
+                  : 'Plan your route'}
             </span>
             {sheetOpen ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
           </button>
@@ -265,6 +339,14 @@ export default function Dashboard() {
                     <ArrowRight size={15} />
                   </button>
                 </div>
+                <SimulationPanel
+                  state={simulation}
+                  dispatch={simulate}
+                  flood={flood}
+                  baseline={baseline}
+                  current={current}
+                  canStart={Boolean(state.origin && state.destination)}
+                />
                 <div
                   className="result-area"
                   aria-live="polite"
@@ -275,9 +357,9 @@ export default function Dashboard() {
                       {state.message}
                     </p>
                   )}
-                  {state.result && !found && (
+                  {current && !found && (
                     <p className="notice error" role="alert">
-                      {routeMessage(state.result)}
+                      {routeMessage(current!)}
                     </p>
                   )}
                   {found ? (
@@ -313,7 +395,7 @@ export default function Dashboard() {
                       )}
                     </div>
                   ) : (
-                    !state.result && (
+                    !current && (
                       <div className="empty-route">
                         <span className="empty-icon">
                           <Route size={22} />
@@ -346,7 +428,12 @@ export default function Dashboard() {
                     <Footprints size={15} />
                     Distance-based routing
                   </span>
-                  <button onClick={() => dispatch({ type: 'reset' })}>
+                  <button
+                    onClick={() => {
+                      dispatch({ type: 'reset' });
+                      simulate({ type: 'clear' });
+                    }}
+                  >
                     <RotateCcw size={14} />
                     Reset
                   </button>
@@ -370,8 +457,24 @@ export default function Dashboard() {
           </span>
           <span>
             <i className="legend-route" />
-            Calculated route
+            {simulation.stage ? 'Original route' : 'Calculated route'}
           </span>
+          {simulation.stage > 0 && (
+            <>
+              <span>
+                <i className="legend-alternative" />
+                Available route
+              </span>
+              <span>
+                <i className="legend-blocked" />
+                Blocked roads
+              </span>
+              <span>
+                <i className="legend-flood" />
+                Simulated flood
+              </span>
+            </>
+          )}
         </div>
         <div className="coverage-label">
           <span>01 / CENTRAL ERNAKULAM</span>
@@ -434,8 +537,10 @@ export default function Dashboard() {
         </p>
         <p>
           The frozen dataset contains 1,719 nodes and 1,856 road segments in
-          central Ernakulam. Flood simulation is not implemented yet. No live
-          hazards, shelter availability or travel-time estimates are provided.
+          central Ernakulam. Start a simulated flood after selecting endpoints.
+          Use the stage arrows to expand or reverse the urban scenario; Reset
+          simulation restores the original route. No live hazards, shelter
+          availability or travel-time estimates are provided.
         </p>
         <p>
           Remote street tiles are optional. Local roads and routing remain

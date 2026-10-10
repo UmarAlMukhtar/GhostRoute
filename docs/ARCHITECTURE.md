@@ -19,22 +19,22 @@ flowchart TB
   Tiles[Optional online basemap] --> Map
 ```
 
-| Planned path                             | Responsibility                                                                    |
-| ---------------------------------------- | --------------------------------------------------------------------------------- |
-| `src/app/` (present)                     | Layout, page, styles; dashboard composition and global styles                     |
-| `src/components/MapView.tsx`             | Map instance, layer/source updates, cleanup and map load/error states             |
-| `src/components/SimulationPanel.tsx`     | Trigger/reset and visible simulation state                                        |
-| `src/components/Dashboard.tsx` (present) | Local asset boundary, selections, actual route results and accessible feedback    |
-| `src/components/ui/`                     | Only shadcn components actually needed; use native controls first when adequate   |
-| `src/lib/geo/types.ts`                   | Contracts below; one authoritative shared module                                  |
-| `src/lib/geo/validate.ts`                | Validate untrusted JSON before exposing a RoadGraph                               |
-| `src/lib/routing/shortest-path.ts`       | Dijkstra, no React/MapLibre imports                                               |
-| `src/lib/simulation/flood.ts`            | Polygon validation/intersection and blocked edge derivation                       |
-| `src/lib/simulation/state.ts`            | Reducer for selections and scenario step; no geometry duplicated in state         |
-| `scripts/prepare-roads.ts`               | Implemented deterministic offline conversion                                      |
-| `data/source/`                           | Compressed normalized OSM source, request URL and manifest (present)              |
-| `public/data/ernakulam/`                 | Graph, GeoJSON, metadata and path fixture (present); scenarios/destinations later |
-| `tests/unit/`, `tests/e2e/` (present)    | Foundation tests now; behavioral suites added with their features                 |
+| Planned path                             | Responsibility                                                                       |
+| ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| `src/app/` (present)                     | Layout, page, styles; dashboard composition and global styles                        |
+| `src/components/MapView.tsx`             | Map instance, layer/source updates, cleanup and map load/error states                |
+| `src/components/SimulationPanel.tsx`     | Trigger/reset and visible simulation state                                           |
+| `src/components/Dashboard.tsx` (present) | Local asset boundary, selections, actual route results and accessible feedback       |
+| `src/components/ui/`                     | Only shadcn components actually needed; use native controls first when adequate      |
+| `src/lib/geo/types.ts`                   | Contracts below; one authoritative shared module                                     |
+| `src/lib/geo/validate.ts`                | Validate untrusted JSON before exposing a RoadGraph                                  |
+| `src/lib/routing/shortest-path.ts`       | Dijkstra, no React/MapLibre imports                                                  |
+| `src/lib/simulation/flood.ts`            | Polygon validation/intersection and blocked edge derivation                          |
+| `src/lib/simulation/session.ts`          | Scenario reducer and route comparison; selection reducer remains in map/selection.ts |
+| `scripts/prepare-roads.ts`               | Implemented deterministic offline conversion                                         |
+| `data/source/`                           | Compressed normalized OSM source, request URL and manifest (present)                 |
+| `public/data/ernakulam/`                 | Graph, GeoJSON, metadata and path fixture (present); scenarios/destinations later    |
+| `tests/unit/`, `tests/e2e/` (present)    | Foundation tests now; behavioral suites added with their features                    |
 
 Map rendering uses separate sources for roads, baseline, current route, blocked segments, flood polygon and destinations. Initialize after mount and clean up on unmount; use `setData`, not repeated map creation. Background tiles are optional; use a local style with background and road layers when offline. Never make routing depend on tile load success. Handle WebGL failure with textual error and route controls/results where possible. Include visible OSM attribution on the local-road fallback too.
 
@@ -74,7 +74,7 @@ flowchart TD
 
 ## Simulation engine and spatial logic
 
-P0 has two deterministic steps: clear and one fixed flood polygon. No random numbers, physical depth model or wall-clock updates. Use Turf `booleanIntersects` on an entire road LineString and the flood Polygon, so endpoints, crossings, boundary contact and a line contained in the polygon are covered. A line entirely within a polygon hole remains unblocked unless it touches a boundary. Cache results per physical segment for the current step; block every directed edge with that segment ID. Use boundary-inclusive point-in-polygon for nodes, including destinations. Reject invalid rings/self-intersections before execution. Ignore elevation deliberately: this is conservative 2D simulation, not hydrology.
+SIM-01 provides three deterministic scenarios: localized Hospital Road, three nested urban extents, and a flooded destination; all include clear stage 0. No random numbers, physical depth model or wall-clock updates. Use Turf `booleanIntersects` on an entire road LineString and the flood Polygon, so endpoints, crossings, boundary contact and a line contained in the polygon are covered. A line entirely within a polygon hole remains unblocked unless it touches a boundary. Index segment bounds once and memoize the current scenario/stage result; block every directed edge with that segment ID. Use boundary-inclusive point-in-polygon for nodes, including destinations. Reject invalid rings/self-intersections before execution. Ignore elevation deliberately: this is conservative 2D simulation, not hydrology.
 
 ```mermaid
 flowchart LR
@@ -95,7 +95,7 @@ flowchart LR
 
 ## State and dynamic recalculation
 
-Use a single page-level reducer for `originNodeId`, `shelterId`, `scenarioId`, `step`. Keep dataset loading/error separate. Derive blocked sets and baseline/current routes from these inputs with memoization; do not maintain duplicate mutable route state. Computation is synchronous for the bounded MVP, avoiding stale async responses. Selection changes derive both routes; step changes reuse the baseline. Trigger is disabled until data and selections are valid; reset sets step 0. The baseline remains visible as historical comparison while the current result is pending/unreachable, never as a recommended route.
+Retain MAP-02’s selection reducer and add a simulation reducer for `scenarioId`, `stage`, `enabled`. This avoids restructuring working endpoint interactions; routes are derived from both at render time. Keep dataset loading/error separate. Derive blocked sets and baseline/current routes from these inputs with memoization; do not maintain duplicate mutable route state. Computation is synchronous for the bounded MVP, avoiding stale async responses. Selection changes derive both routes; step changes reuse the baseline. Trigger is disabled until data and selections are valid; reset sets step 0. The baseline remains visible as historical comparison while the current result is pending/unreachable, never as a recommended route.
 
 ```mermaid
 stateDiagram-v2
@@ -128,7 +128,7 @@ Static manifests can later be replaced by validated, versioned data fetches at t
 - `components/Dashboard.tsx` owns the data-loading boundary, selection reducer, accessible controls and route results. It calls the retained `router.findRoute` directly; there is no routing logic in React. `lib/map/selection.ts` handles state transitions, calls `router.snap` and maps typed results to feedback. Changing an endpoint clears old route geometry; invalid clicks preserve the previous selection and report the failure. Reset clears both endpoints/result.
 - `lib/map/data.ts` fetches local graph, roads and demo fixtures concurrently. It validates the graph once, checks every road feature against validated graph geometry/IDs and verifies preset version/coordinates. The shared promise survives Strict Mode remounts and retries after rejection. Bounds derive from the validated nodes. No runtime Overpass call occurs.
 - `components/MapView.tsx` dynamically imports MapLibre after mount, renders GeoJSON sources, updates data without rebuilding the map and cleans up workers/listeners/markers/observers on unmount. `lib/map/style.ts` supplies the tile-independent style. Origin/destination are two DOM markers, not thousands of React road elements. Route geometry is the real returned LineString; zero-distance routes have a marker and no line.
-- Future `MapOverlays` accepts separate hazard polygons, blocked-road lines and alternative-route lines. These sources start empty. SIM-01 supplies geometry and closures; INT-01 owns baseline/current route state and recalculation, retaining the same router. No flood logic exists in MAP-02.
+- `MapOverlays` now receives Polygon/MultiPolygon hazards, blocked-road lines and alternative-route lines. SIM-01 supplies validated geometry and closures; INT-01 derives baseline/current routes using the retained router. Sources update without rebuilding the map. See [FLOOD_SIMULATION](FLOOD_SIMULATION.md) for contracts, scenarios and limitations.
 - The map first loads local roads, then optional OSM raster tiles. A tile error or 12-second loading timeout removes the raster source and reports local-road mode. Non-tile errors and WebGL context loss are visible; route controls remain usable. Attribution/disclaimer live outside the canvas and sheets.
 - MapLibre 6's module worker cannot use its package-relative URL inside the Next bundle. `scripts/prepare-maplibre.mjs` copies the exact installed worker/shared module and BSD license into `public/vendor/maplibre/<version>/`; `dev`/`build` run it automatically. `setWorkerUrl` selects that same-origin URL. Generated files are ignored. No external worker/CDN dependency.
 - [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/) reviewed for this demonstration: standard browser Referer/cache behavior, visible attribution, no bulk downloads, no tile archives, no automated public-tile traffic. Availability is best effort. [MapLibre raster source documentation](https://maplibre.org/maplibre-gl-js/docs/examples/add-a-raster-tile-source/) informs the source/layer setup.
@@ -147,3 +147,5 @@ flowchart LR
   Local --> Renderer
   Optional[Optional OSM tiles] --> Renderer
 ```
+
+SIM-01/INT-01 are implemented in `simulation/flood.ts`, `scenarios.ts`, `session.ts`, Dashboard and SimulationPanel. Pure calculations remain independent of React and MapLibre. Invalid flood results suppress alternatives and display a reason.
