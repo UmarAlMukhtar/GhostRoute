@@ -1,0 +1,5 @@
+# Only the selected toolchain's native dependency installers may run.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true

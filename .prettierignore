@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+next-env.d.ts
+# Keep inherited organizer rules byte-for-byte.
+RULES.md

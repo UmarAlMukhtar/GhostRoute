@@ -4,11 +4,11 @@ Use Codex during the hackathon and briefly document its actual contribution here
 
 ## Event build log
 
-No participant AI usage has been recorded yet. Replace the placeholder row as you build. Mark human review as pending until someone has reviewed the contribution.
+Participant work below was performed with Codex. Human review remains pending.
 
-| Date and time with timezone | Tool / model, if known | Task | Assistance and affected files | Human review / corrections | Validation and result |
-| --- | --- | --- | --- | --- | --- |
-| TODO | Codex | TODO | TODO | Pending | TODO |
+| Date and time with timezone | Tool / model, if known | Task                                                            | Assistance and affected files                                                                                                         | Human review / corrections                                                  | Validation and result                                                              |
+| --------------------------- | ---------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| 2026-10-10T21:46:05+05:30   | Codex                  | Phase 0 audit, architecture, contributor foundation and tooling | Inspected all inherited files/history; authored docs/ADRs/task plans; extended template documents; added smoke scaffold, CI and tests | Pending; no participant identity, deployment or product completion invented | See docs/VERIFICATION.md for actual commands, failures, recovery and final results |
 
 ## Template preparation
 

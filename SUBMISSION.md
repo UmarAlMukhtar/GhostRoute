@@ -4,31 +4,31 @@ Complete this file during the hackathon and use it to prepare your submission th
 
 ## Project
 
-- **Project name:** TODO
-- **Short description:** TODO — describe the problem, what you built, and who benefits.
-- **Code repository URL:** TODO
+- **Project name:** GhostRoute
+- **Short description:** A planned Ernakulam disaster-aware road-routing simulation for explaining how a flood closure changes access to a demo emergency destination. Current implementation is Phase 0 tooling and documentation only.
+- **Code repository URL:** https://github.com/UmarAlMukhtar/GhostRoute
 - **Final submitted implementation commit SHA:** TODO
-- **Working demo URL or local demo steps:** TODO
-- **Demo access requirements:** TODO — explain any prerequisites without including private credentials.
+- **Working demo URL or local demo steps:** No working navigation demo yet. `pnpm install --frozen-lockfile` and `pnpm dev` show the foundation page only; see [planned demo](docs/DEMO_PLAN.md).
+- **Demo access requirements:** Local Node 22.13+ (22 line) or Node 24, pnpm 11.25.0; no credentials required.
 
 ## Participants
 
 Participate solo or in a team of up to 4. Remove unused rows.
 
 | Participant name | GitHub handle | Contribution |
-| --- | --- | --- |
-| TODO | TODO | TODO |
+| ---------------- | ------------- | ------------ |
+| TODO             | TODO          | TODO         |
 
 ## Run and demonstrate
 
-- **Prerequisites and versions:** TODO
-- **Install command:** TODO
-- **Required environment variable names:** TODO — use a sanitized example file if needed.
-- **Start command:** TODO
-- **Demo walkthrough:** TODO — brief steps showing the implemented features.
-- **Checks performed and results:** TODO
-- **Known limitations or incomplete features:** TODO
-- **Libraries, APIs, and public datasets used:** TODO — link sources and record attribution where required.
+- **Prerequisites and versions:** See [README](README.md) and pinned `package.json`.
+- **Install command:** `pnpm install --frozen-lockfile`
+- **Required environment variable names:** None for Phase 0; `.env.example` contains no secrets.
+- **Start command:** `pnpm dev` (development) or `pnpm build` then `pnpm start` (production).
+- **Demo walkthrough:** Currently verify the foundation heading/status/disclaimer; map/routing/flood workflow is planned, not implemented.
+- **Checks performed and results:** See [verification record](docs/VERIFICATION.md); this is not a product acceptance claim.
+- **Known limitations or incomplete features:** All navigation features remain unimplemented. Participants, final submitted implementation SHA, working demo and venue submission confirmations require team review.
+- **Libraries, APIs, and public datasets used:** [Next.js](https://nextjs.org/), [React](https://react.dev/), [Tailwind](https://tailwindcss.com/), [Vitest](https://vitest.dev/) and [Playwright](https://playwright.dev/); exact versions in package/lockfile. No geographic dataset is bundled yet. Planned OSM attribution/licensing is in [DATA_STRATEGY](docs/DATA_STRATEGY.md).
 - **AI usage record:** [AI_USAGE.md](AI_USAGE.md)
 - **Development change log:** [CHANGELOG.md](CHANGELOG.md)
 

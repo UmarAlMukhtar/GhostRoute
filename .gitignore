@@ -22,3 +22,10 @@ Thumbs.db
 *.log
 
 # Add entries appropriate to your chosen language or framework.
+
+# GhostRoute TypeScript and browser-test outputs.
+*.tsbuildinfo
+next-env.d.ts
+out/
+playwright-report/
+test-results/
