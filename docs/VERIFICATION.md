@@ -527,3 +527,5 @@ Lint/types, 184 unit tests, production build and deterministic regeneration pass
 ## Shared-runner rendering readiness budget — 2026-10-11T08:36:00+05:30
 
 The canceled exact-head CI run completed the real 4× CPU loader/animation test in 57.4 seconds; an ordinary map-ready retry completed in 35.2 seconds. Existing 25-second map-readiness assertions were too short on this runner. Only successful full-map readiness waits now allow 60 seconds; all other assertions, incomplete/error readiness guards, source identity and animation checks remain unchanged. Preserved user submission-documentation commits `19f557d` and `df57fb6`; no submission was sent. New exact-head CI must pass before merge.
+
+CI progression reached roughly 14 of 54 cases after 6.5 minutes of browser execution on the shared runner, so its original 15-minute whole-job limit could not accommodate the complete suite. The job now allows 45 minutes without changing assertions or the cases executed. The line reporter emits exact failure details immediately after retry, avoiding the list reporter delaying diagnostic output until suite completion.
