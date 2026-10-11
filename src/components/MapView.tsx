@@ -69,6 +69,7 @@ export default function MapView({
   }, [onPick, onReposition, onReportClick, selecting]);
   useEffect(() => {
     let cancelled = false;
+    let renderingFailed = false;
     let instance: LibreMap | undefined;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let observer: ResizeObserver | undefined;
@@ -179,12 +180,16 @@ export default function MapView({
           };
           map.on('error', (e) => {
             if ('sourceId' in e && e.sourceId === 'basemap') fallback();
-            else
-              setFailure(
-                'Map rendering failed. You can still calculate routes using the location presets.',
-              );
+            else {
+              renderingFailed = true;
+              if (!cancelled)
+                setFailure(
+                  'Map rendering failed. You can still calculate routes using the location presets.',
+                );
+            }
           });
           map.getCanvas().addEventListener('webglcontextlost', () => {
+            renderingFailed = true;
             if (!cancelled)
               setFailure(
                 'Map graphics were interrupted. Reload the page to restore the map. Routing controls still work.',
@@ -196,13 +201,13 @@ export default function MapView({
                 !(await loadRoadSource(
                   map.getSource('roads') as GeoJSONSource,
                   data.roads,
-                  () => !cancelled,
+                  () => !cancelled && !renderingFailed,
                 ))
               )
                 return;
               // Readiness means every road has been handed off and drawn.
               await Promise.race([map.once('idle'), map.once('remove')]);
-              if (cancelled) return;
+              if (cancelled || renderingFailed) return;
               setReady(true);
               map.addSource('basemap', {
                 type: 'raster',

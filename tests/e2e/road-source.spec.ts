@@ -128,12 +128,18 @@ test('a renderer handoff failure stays visible and a reload recovers', async ({
   page.on('pageerror', (e) => errors.push(e.message));
   await page.addInitScript(() => {
     if (sessionStorage.getItem('rendererFailureInjected')) return;
+    Object.assign(window, { rendererBatchAttempts: 0 });
     const original = Worker.prototype.postMessage;
     Worker.prototype.postMessage = function (message, ...rest) {
       if (message?.data?.source === 'roads' && message.data.dataDiff?.add) {
+        Reflect.set(
+          window,
+          'rendererBatchAttempts',
+          Reflect.get(window, 'rendererBatchAttempts') + 1,
+        );
         sessionStorage.setItem('rendererFailureInjected', 'true');
-        Worker.prototype.postMessage = original;
-        throw new Error('Injected renderer handoff failure');
+        if (Reflect.get(window, 'rendererBatchAttempts') === 1)
+          throw new Error('Injected renderer handoff failure');
       }
       return Reflect.apply(original, this, [message, ...rest]);
     };
@@ -144,6 +150,18 @@ test('a renderer handoff failure stays visible and a reload recovers', async ({
       'Map rendering failed. You can still calculate routes using the location presets.',
     ),
   ).toBeVisible();
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'false');
+  // MapLibre emits this failure and resolves updateData; the loader must still
+  // stop, rather than skip a failed batch and declare incomplete coverage ready.
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
+  expect(
+    await page.evaluate(() => Reflect.get(window, 'rendererBatchAttempts')),
+  ).toBe(1);
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'false');
   await page.reload();
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');

@@ -137,3 +137,9 @@ Record each meaningful project change during the event, newest first. Update thi
 - Added OSM source evidence, ODbL attribution, catalog validation command, tests, documentation and real browser screenshots. No new dependencies or geographic/routing-engine modifications.
 - Validated 169 unit tests, 36 production browser journeys, lint/types/build/format, seven place fixtures and unchanged road regeneration. Fixed mobile focus/reset and overlay stacking issues discovered in the browser. See VERIFICATION for scope and limits.
 - Local commit only; no push or deployment. Human review pending.
+
+## Renderer error fail-stop correction — 2026-10-11T08:01:00+05:30
+
+- Independent review identified MapLibre's emitted-error/resolved-promise behavior. Non-basemap errors and graphics loss now latch preparation failure, stop later batches and prevent incomplete network readiness.
+- Strengthened the real send-failure/reload regression to assert exactly one attempted batch and persistent unready state. Preserved concurrent checkpoint `6850514` and its records; no history rewrite.
+- Final isolated combined verification passed 184 unit tests, 54 desktop/mobile browser cases, lint/types/build/format and unchanged regeneration. Preserved `7fa00d0` reduced-motion pulse and README backup. Final adjacent 4× CPU measurements: longest task 1,349→195 ms; readiness 9,911.7→10,345.4 ms. Independent Codex review approved; human review pending.
