@@ -53,7 +53,7 @@ test('loader keeps painting while the full dataset initializes', async ({
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
 });
 
-test('reduced motion keeps actual loading feedback without rotation', async ({
+test('reduced motion keeps a visible non-rotating loading pulse', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -65,6 +65,9 @@ test('reduced motion keeps actual loading feedback without rotation', async ({
   const ring = page.locator('.map-placeholder .loading-ring');
   await expect(ring).toBeVisible();
   expect(await ring.evaluate((el) => getComputedStyle(el).animationName)).toBe(
+    'loading-pulse',
+  );
+  expect(await ring.evaluate((el) => getComputedStyle(el).transform)).toBe(
     'none',
   );
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');

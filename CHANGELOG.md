@@ -1,5 +1,12 @@
 # Change log
 
+## Reduced-motion loader and readable README — 2026-10-11T08:06:14+05:30
+
+- Changed: the loading ring now pulses without rotation when the browser requests reduced motion; normal-motion rotation is unchanged. Replaced the template-heavy README with a concise product guide and preserved its exact previous bytes in `README.backup.md`.
+- Why: Brave reported reduced motion in both local and public tabs, making the intentionally static ring look frozen even though the map eventually loaded.
+- Validation: production webpack build, TypeScript, formatting, four desktop/mobile loader browser cases, and a real local Brave reload confirmed the pulse and eventual map readiness. No hosted deployment has been updated.
+- Limits: the pulse is visual feedback, not a loading-speed improvement; physical-phone performance remains unmeasured. Human review pending.
+
 ## Responsive map renderer preparation — 2026-10-11T07:57:10+05:30
 
 - Changed: hand the complete road network to MapLibre in awaited batches while keeping the preparation spinner visible until rendering finishes. Navigation cancels the pending handoff; rendering errors show the existing recovery message. Corrected the browser test helper's TypeScript call signature.
