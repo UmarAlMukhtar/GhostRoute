@@ -49,7 +49,9 @@ async function clickCoordinate(page: Page, coordinate: [number, number]) {
 test.beforeEach(async ({ page }) => {
   await page.route('https://tile.openstreetmap.org/**', (r) => r.abort());
   await page.goto('/demo');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
 });
 test('custom multi-hazard routing and separate persistent local report', async ({
   page,

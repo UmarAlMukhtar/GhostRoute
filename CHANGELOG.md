@@ -1,5 +1,24 @@
 # Change log
 
+## Submission draft refresh — 2026-10-11T08:26:09+05:30
+
+- Updated `SUBMISSION.md` with the current multi-hazard demo, public and local access, dependencies, verification, and safety limits. Added participant handles and broad contribution roles supplied by Umar; kept the final submitted SHA pending.
+- Checked the organizer's current Luma page, local links, formatting, and whitespace. No organizer form was submitted and no checklist box was marked on behalf of participants.
+
+## Reduced-motion loader and readable README — 2026-10-11T08:06:14+05:30
+
+- Changed: the loading ring now pulses without rotation when the browser requests reduced motion; normal-motion rotation is unchanged. Replaced the template-heavy README with a concise product guide and preserved its exact previous bytes in `README.backup.md`.
+- Why: Brave reported reduced motion in both local and public tabs, making the intentionally static ring look frozen even though the map eventually loaded.
+- Validation: production webpack build, TypeScript, formatting, four desktop/mobile loader browser cases, and a real local Brave reload confirmed the pulse and eventual map readiness. No hosted deployment has been updated.
+- Limits: the pulse is visual feedback, not a loading-speed improvement; physical-phone performance remains unmeasured. Human review pending.
+
+## Responsive map renderer preparation — 2026-10-11T07:57:10+05:30
+
+- Changed: hand the complete road network to MapLibre in awaited batches while keeping the preparation spinner visible until rendering finishes. Navigation cancels the pending handoff; rendering errors show the existing recovery message. Corrected the browser test helper's TypeScript call signature.
+- Why: one large renderer handoff could freeze the spinner after dataset initialization.
+- Validation: focused unit tests, TypeScript, lint, formatting, production webpack build, and all 10 targeted desktop/mobile browser cases passed, including 4× CPU spinner animation, full road equality, cancellation, failure recovery and reduced motion.
+- Limits: browser checks used emulation rather than a physical phone. Human review pending.
+
 ## Portable loader regression check — 2026-10-11T04:58:58+05:30
 
 - Changed: the deliberately throttled loader test allows slower shared-runner readiness and detects monopolizing preparation with a relative frame-gap assertion plus distinct painted animation states.
@@ -123,3 +142,15 @@ Record each meaningful project change during the event, newest first. Update thi
 - Added OSM source evidence, ODbL attribution, catalog validation command, tests, documentation and real browser screenshots. No new dependencies or geographic/routing-engine modifications.
 - Validated 169 unit tests, 36 production browser journeys, lint/types/build/format, seven place fixtures and unchanged road regeneration. Fixed mobile focus/reset and overlay stacking issues discovered in the browser. See VERIFICATION for scope and limits.
 - Local commit only; no push or deployment. Human review pending.
+
+## Renderer error fail-stop correction — 2026-10-11T08:01:00+05:30
+
+- Independent review identified MapLibre's emitted-error/resolved-promise behavior. Non-basemap errors and graphics loss now latch preparation failure, stop later batches and prevent incomplete network readiness.
+- Strengthened the real send-failure/reload regression to assert exactly one attempted batch and persistent unready state. Preserved concurrent checkpoint `6850514` and its records; no history rewrite.
+- Final isolated combined verification passed 184 unit tests, 54 desktop/mobile browser cases, lint/types/build/format and unchanged regeneration. Preserved `7fa00d0` reduced-motion pulse and README backup. Final adjacent 4× CPU measurements: longest task 1,349→195 ms; readiness 9,911.7→10,345.4 ms. Independent Codex review approved; human review pending.
+
+## Shared-runner rendering readiness budget — 2026-10-11T08:36:00+05:30
+
+The canceled exact-head CI run completed the real 4× CPU loader/animation test in 57.4 seconds; an ordinary map-ready retry completed in 35.2 seconds. Existing 25-second map-readiness assertions were too short on this runner. Only successful full-map readiness waits now allow 60 seconds; all other assertions, incomplete/error readiness guards, source identity and animation checks remain unchanged. Preserved user submission-documentation commits `19f557d` and `df57fb6`; no submission was sent. New exact-head CI must pass before merge.
+
+The immediate CI diagnostic confirmed the expanded journey exceeded its 90-second total test budget at its third map-readiness wait after completed initial navigation, hazard/report interactions and reload (expansion.spec.ts, Demo transition). Only that three-initialization journey now allows 180 seconds total; each successful readiness wait remains 60 seconds and all behavioral assertions are unchanged. Both corresponding desktop/mobile cases passed locally in 46.4 seconds; production build, lint/types/format checks passed. No renderer implementation change was needed.

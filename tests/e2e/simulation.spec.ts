@@ -5,7 +5,9 @@ test.beforeEach(async ({ page }) => {
     route.abort(),
   );
   await page.goto('/demo');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();

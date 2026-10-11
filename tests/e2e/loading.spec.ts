@@ -8,12 +8,19 @@ test('loader keeps painting while the full dataset initializes', async ({
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await page.addInitScript(() => {
-    const samples: { time: number; transform: string }[] = [];
+    const samples: { time: number; transform: string; rendering: boolean }[] =
+      [];
     Object.assign(window, { loadingSamples: samples });
     function frame(time: number) {
-      const ring = document.querySelector('.map-placeholder .loading-ring');
+      const ring = document.querySelector(
+        '.map-placeholder .loading-ring, .map-preparing .loading-ring',
+      );
       if (ring && !ring.hasAttribute('hidden'))
-        samples.push({ time, transform: getComputedStyle(ring).transform });
+        samples.push({
+          time,
+          transform: getComputedStyle(ring).transform,
+          rendering: Boolean(ring.closest('.map-preparing')),
+        });
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
@@ -28,6 +35,7 @@ test('loader keeps painting while the full dataset initializes', async ({
       Reflect.get(window, 'loadingSamples') as {
         time: number;
         transform: string;
+        rendering: boolean;
       }[],
   );
   expect(new Set(samples.map((s) => s.transform)).size).toBeGreaterThan(20);
@@ -35,10 +43,17 @@ test('loader keeps painting while the full dataset initializes', async ({
   // Detect one task monopolizing preparation without assuming runner speed.
   const loadingDuration = samples.at(-1)!.time - samples[0].time;
   expect(Math.max(...gaps) / loadingDuration).toBeLessThan(0.25);
+  const rendering = samples.filter((s) => s.rendering);
+  expect(new Set(rendering.map((s) => s.transform)).size).toBeGreaterThan(10);
+  const renderingGaps = rendering
+    .slice(1)
+    .map((s, i) => s.time - rendering[i].time);
+  const renderingDuration = rendering.at(-1)!.time - rendering[0].time;
+  expect(Math.max(...renderingGaps) / renderingDuration).toBeLessThan(0.5);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
 });
 
-test('reduced motion keeps actual loading feedback without rotation', async ({
+test('reduced motion keeps a visible non-rotating loading pulse', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -50,7 +65,12 @@ test('reduced motion keeps actual loading feedback without rotation', async ({
   const ring = page.locator('.map-placeholder .loading-ring');
   await expect(ring).toBeVisible();
   expect(await ring.evaluate((el) => getComputedStyle(el).animationName)).toBe(
+    'loading-pulse',
+  );
+  expect(await ring.evaluate((el) => getComputedStyle(el).transform)).toBe(
     'none',
   );
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
 });

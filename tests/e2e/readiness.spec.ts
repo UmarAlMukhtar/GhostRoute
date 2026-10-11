@@ -10,7 +10,9 @@ test('guided presentation uses real routes and one-click reset', async ({
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/demo');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await page
     .getByRole('button', { name: 'Demo scenarios', exact: true })
     .click();
@@ -75,7 +77,9 @@ test('keyboard walkthrough, manual handoff and reduced motion', async ({
   page,
 }) => {
   await page.goto('/demo');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await page.keyboard.press('Tab');
   await expect(
     page.getByRole('link', { name: 'Skip to routing controls' }),
@@ -166,7 +170,9 @@ test('rapid switching, repeated reset, viewport resize and refresh', async ({
     ),
   ).toBe(true);
   await page.reload();
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await expect(page.getByTestId('route-distance')).toHaveCount(0);
   await page
     .getByRole('button', { name: 'Demo scenarios', exact: true })
@@ -202,7 +208,9 @@ test('slow local assets recover and production worker assets are served', async 
     fullPage: true,
   });
   release();
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await expect(
     page.getByText('Local roads · basemap unavailable'),
   ).toBeVisible();

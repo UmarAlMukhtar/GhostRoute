@@ -76,6 +76,8 @@ async function search(page: Page, label: string, query: string, name: string) {
 test('expanded Edappally–Vyttila navigation, disasters, local deletion and dedicated demo', async ({
   page,
 }, info) => {
+  // This journey initializes the full map three times, including reload.
+  test.setTimeout(180000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.route('https://tile.openstreetmap.org/**', (route) =>
@@ -83,7 +85,9 @@ test('expanded Edappally–Vyttila navigation, disasters, local deletion and ded
   );
   const started = Date.now();
   await page.goto('/');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await test.info().attach('load-timing', {
     body: JSON.stringify({ readyMilliseconds: Date.now() - started }),
     contentType: 'application/json',
@@ -167,14 +171,18 @@ test('expanded Edappally–Vyttila navigation, disasters, local deletion and ded
   await expect(
     page.getByRole('combobox', { name: 'Theme', exact: true }),
   ).toHaveCount(0);
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await page
     .getByRole('button', { name: 'Report Incident', exact: true })
     .click();
   await expect(page.getByText('1 visible local reports')).toBeVisible();
   await page.getByRole('link', { name: 'Demo', exact: true }).click();
   await expect(page).toHaveURL(/\/demo$/);
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await page.getByRole('button', { name: 'Demo scenarios' }).click();
   await page.getByRole('button', { name: 'Start guided demo' }).click();
   await page
@@ -207,7 +215,11 @@ test('light interface ignores system and old stored themes; page links match and
   );
   for (const path of ['/', '/demo']) {
     await page.goto(path);
-    await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+    await expect(page.getByTestId('map')).toHaveAttribute(
+      'data-ready',
+      'true',
+      { timeout: 60000 },
+    );
     await expect(page.getByLabel('Theme', { exact: true })).toHaveCount(0);
     expect(await page.locator('html').getAttribute('data-theme')).toBeNull();
     expect(
@@ -287,7 +299,9 @@ test('map routing becomes usable while search index is pending and recovers', as
     await route.continue();
   });
   await page.goto('/');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   const input = page.getByRole('combobox', {
     name: 'Starting point',
     exact: true,
@@ -320,7 +334,9 @@ test('failed local search index preserves coordinate routing', async ({
   );
   await page.route('**/data/ernakulam/places.json', (route) => route.abort());
   await page.goto('/');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await expect(
     page
       .getByText(
