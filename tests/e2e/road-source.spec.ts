@@ -164,6 +164,8 @@ test('a renderer handoff failure stays visible and a reload recovers', async ({
   ).toBe(1);
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'false');
   await page.reload();
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   expect(errors).toEqual([]);
 });

@@ -148,3 +148,7 @@ Record each meaningful project change during the event, newest first. Update thi
 - Independent review identified MapLibre's emitted-error/resolved-promise behavior. Non-basemap errors and graphics loss now latch preparation failure, stop later batches and prevent incomplete network readiness.
 - Strengthened the real send-failure/reload regression to assert exactly one attempted batch and persistent unready state. Preserved concurrent checkpoint `6850514` and its records; no history rewrite.
 - Final isolated combined verification passed 184 unit tests, 54 desktop/mobile browser cases, lint/types/build/format and unchanged regeneration. Preserved `7fa00d0` reduced-motion pulse and README backup. Final adjacent 4× CPU measurements: longest task 1,349→195 ms; readiness 9,911.7→10,345.4 ms. Independent Codex review approved; human review pending.
+
+## Shared-runner rendering readiness budget — 2026-10-11T08:36:00+05:30
+
+The canceled exact-head CI run completed the real 4× CPU loader/animation test in 57.4 seconds; an ordinary map-ready retry completed in 35.2 seconds. Existing 25-second map-readiness assertions were too short on this runner. Only successful full-map readiness waits now allow 60 seconds; all other assertions, incomplete/error readiness guards, source identity and animation checks remain unchanged. Preserved user submission-documentation commits `19f557d` and `df57fb6`; no submission was sent. New exact-head CI must pass before merge.

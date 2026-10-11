@@ -70,5 +70,7 @@ test('reduced motion keeps a visible non-rotating loading pulse', async ({
   expect(await ring.evaluate((el) => getComputedStyle(el).transform)).toBe(
     'none',
   );
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
 });

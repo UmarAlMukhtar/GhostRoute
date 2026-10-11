@@ -27,7 +27,9 @@ test('real map, Hospital Road route, reset and responsive controls', async ({
   await expect(
     page.getByRole('heading', { name: 'GhostRoute.' }),
   ).toBeVisible();
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await expect(
     page.getByText('Local roads · basemap unavailable'),
   ).toBeVisible();
@@ -101,7 +103,9 @@ test('named selections and real map clicks snap endpoints', async ({
   page,
 }) => {
   await page.goto('/demo');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await chooseDemoEndpoint(page, 'origin', fixture.origin.nodeId);
   await chooseDemoEndpoint(page, 'destination', fixture.destination.nodeId);
   await page.getByRole('button', { name: 'Find route', exact: true }).click();
@@ -180,7 +184,9 @@ test('invalid dataset is actionable and retries successfully', async ({
 
 test('out-of-range map click reports snapping failure', async ({ page }) => {
   await page.goto('/demo');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await page
     .getByRole('button', { name: 'Select origin on map', exact: true })
     .click();
@@ -234,7 +240,9 @@ test('identical endpoints show zero distance without a line', async ({
   page,
 }) => {
   await page.goto('/demo');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await chooseDemoEndpoint(page, 'origin', fixture.origin.nodeId);
   await chooseDemoEndpoint(page, 'destination', fixture.origin.nodeId);
   await page.getByRole('button', { name: 'Find route', exact: true }).click();

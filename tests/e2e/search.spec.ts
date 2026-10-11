@@ -14,7 +14,9 @@ test.beforeEach(async ({ page }) => {
     route.abort(),
   );
   await page.goto('/');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
 });
 test('coverage, offline defaults, keyboard routes, swapping and clearing', async ({
   page,
@@ -112,7 +114,9 @@ test('mouse and touch suggestions fit the sheet and remain usable during simulat
   page,
 }, info) => {
   await page.goto('/demo');
-  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60000,
+  });
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
