@@ -1,5 +1,9 @@
 # AI usage record
 
+## Submission draft assistance — 2026-10-11T08:26:09+05:30
+
+Codex refreshed `SUBMISSION.md` from the current project and verification record, checked the organizer's public event page and local links, and left participant contributions, final submitted SHA, human rehearsal, and organizer submission unclaimed. Human review pending.
+
 ## Shared-runner test correction — 2026-10-11T04:58:58+05:30
 
 Codex read the actual GitHub CI failure log: 47 browser cases passed and the deliberately 4× throttled desktop loader check exhausted its normal 25-second readiness timeout. It limited the longer timeout to that test and replaced the machine-specific frame-gap limit with a fraction of actual loading duration while retaining distinct painted animation states. All four corrected animation/reduced-motion cases passed locally; product behavior and benchmark evidence are unchanged. Human review pending.

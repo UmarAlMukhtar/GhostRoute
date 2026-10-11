@@ -1,5 +1,10 @@
 # Change log
 
+## Submission draft refresh — 2026-10-11T08:26:09+05:30
+
+- Updated `SUBMISSION.md` with the current multi-hazard demo, public and local access, dependencies, verification, and safety limits. Kept participant handles/contributions and the final submitted SHA pending confirmation.
+- Checked the organizer's current Luma page, local links, formatting, and whitespace. No organizer form was submitted and no checklist box was marked on behalf of participants.
+
 ## Reduced-motion loader and readable README — 2026-10-11T08:06:14+05:30
 
 - Changed: the loading ring now pulses without rotation when the browser requests reduced motion; normal-motion rotation is unchanged. Replaced the template-heavy README with a concise product guide and preserved its exact previous bytes in `README.backup.md`.
