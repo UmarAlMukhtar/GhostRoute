@@ -76,6 +76,8 @@ async function search(page: Page, label: string, query: string, name: string) {
 test('expanded Edappally–Vyttila navigation, disasters, local deletion and dedicated demo', async ({
   page,
 }, info) => {
+  // This journey initializes the full map three times, including reload.
+  test.setTimeout(180000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.route('https://tile.openstreetmap.org/**', (route) =>
