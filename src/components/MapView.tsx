@@ -7,6 +7,7 @@ import type { MapData } from '../lib/map/data';
 import type { IncidentReport } from '../lib/incidents/reports';
 import type { Selection, Role } from '../lib/map/selection';
 import { EMPTY, localStyle, type MapOverlays } from '../lib/map/style';
+import { loadRoadSource } from '../lib/map/roads';
 
 interface Props {
   data: MapData;
@@ -87,7 +88,10 @@ export default function MapView({
           );
           instance = new Map({
             container: container.current,
-            style: localStyle(data.roads, data.bounds),
+            style: localStyle(
+              { type: 'FeatureCollection', features: [] },
+              data.bounds,
+            ),
             bounds: data.bounds,
             fitBoundsOptions: {
               padding: padding(
@@ -186,25 +190,42 @@ export default function MapView({
                 'Map graphics were interrupted. Reload the page to restore the map. Routing controls still work.',
               );
           });
-          map.on('load', () => {
-            if (cancelled) return;
-            setReady(true);
-            map.addSource('basemap', {
-              type: 'raster',
-              tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-              tileSize: 256,
-              maxzoom: 19,
-            });
-            map.addLayer(
-              {
-                id: 'basemap',
+          map.on('load', async () => {
+            try {
+              if (
+                !(await loadRoadSource(
+                  map.getSource('roads') as GeoJSONSource,
+                  data.roads,
+                  () => !cancelled,
+                ))
+              )
+                return;
+              // Readiness means every road has been handed off and drawn.
+              await Promise.race([map.once('idle'), map.once('remove')]);
+              if (cancelled) return;
+              setReady(true);
+              map.addSource('basemap', {
                 type: 'raster',
-                source: 'basemap',
-                paint: { 'raster-saturation': -0.7, 'raster-opacity': 0.65 },
-              },
-              'demo-area',
-            );
-            timeout = setTimeout(fallback, 12000);
+                tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                tileSize: 256,
+                maxzoom: 19,
+              });
+              map.addLayer(
+                {
+                  id: 'basemap',
+                  type: 'raster',
+                  source: 'basemap',
+                  paint: { 'raster-saturation': -0.7, 'raster-opacity': 0.65 },
+                },
+                'demo-area',
+              );
+              timeout = setTimeout(fallback, 12000);
+            } catch {
+              if (!cancelled)
+                setFailure(
+                  'Map rendering failed. You can still calculate routes using the location presets.',
+                );
+            }
           });
           map.on('sourcedata', (e) => {
             if (

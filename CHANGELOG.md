@@ -1,5 +1,12 @@
 # Change log
 
+## Responsive map renderer preparation — 2026-10-11T07:57:10+05:30
+
+- Changed: hand the complete road network to MapLibre in awaited batches while keeping the preparation spinner visible until rendering finishes. Navigation cancels the pending handoff; rendering errors show the existing recovery message. Corrected the browser test helper's TypeScript call signature.
+- Why: one large renderer handoff could freeze the spinner after dataset initialization.
+- Validation: focused unit tests, TypeScript, lint, formatting, production webpack build, and all 10 targeted desktop/mobile browser cases passed, including 4× CPU spinner animation, full road equality, cancellation, failure recovery and reduced motion.
+- Limits: browser checks used emulation rather than a physical phone. Human review pending.
+
 ## Portable loader regression check — 2026-10-11T04:58:58+05:30
 
 - Changed: the deliberately throttled loader test allows slower shared-runner readiness and detects monopolizing preparation with a relative frame-gap assertion plus distinct painted animation states.
