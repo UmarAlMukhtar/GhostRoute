@@ -59,7 +59,6 @@ export default function MapView({
   const callbacks = useRef({ onReposition, onReportClick, selecting });
   const [ready, setReady] = useState(false);
   const [failure, setFailure] = useState('');
-  const [darkMap, setDarkMap] = useState(false);
   const [tiles, setTiles] = useState<'loading' | 'online' | 'fallback'>(
     'loading',
   );
@@ -240,62 +239,6 @@ export default function MapView({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    function applyTheme() {
-      const dark = document.documentElement.dataset.theme === 'dark';
-      setDarkMap(dark);
-      if (container.current)
-        container.current.dataset.theme = dark ? 'dark' : 'light';
-      map!.setPaintProperty(
-        'background',
-        'background-color',
-        dark ? '#102028' : '#edf1ef',
-      );
-      map!.setPaintProperty(
-        'road-casing',
-        'line-color',
-        dark ? '#355363' : '#c3cecb',
-      );
-      map!.setPaintProperty(
-        'roads',
-        'line-color',
-        dark ? '#668a99' : '#ffffff',
-      );
-      map!.setPaintProperty(
-        'route',
-        'line-color',
-        dark ? '#78aaff' : '#2563eb',
-      );
-      map!.setPaintProperty(
-        'alternative',
-        'line-color',
-        dark ? '#71de9c' : '#15803d',
-      );
-      map!.setPaintProperty(
-        'blockedRoads',
-        'line-color',
-        dark ? '#ff7474' : '#dc2626',
-      );
-      for (const layer of ['route-casing', 'alternative-casing'])
-        map!.setPaintProperty(layer, 'line-color', dark ? '#102028' : '#fff');
-      if (map!.getLayer('basemap'))
-        map!.setLayoutProperty(
-          'basemap',
-          'visibility',
-          dark ? 'none' : 'visible',
-        );
-    }
-    applyTheme();
-    const observer = new MutationObserver(applyTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
-    return () => observer.disconnect();
-  }, [ready]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!ready || !map) return;
     map.resize();
     let active = true;
     const handleError = () => {
@@ -467,6 +410,13 @@ export default function MapView({
         data-testid="map"
         data-ready={ready}
       />
+      {!ready && !failure && (
+        <div className="map-preparing" role="status">
+          <span className="loading-ring" aria-hidden="true" />
+          <strong>Preparing GhostRoute map</strong>
+          <span>Drawing the validated local road network…</span>
+        </div>
+      )}
       <div className="map-tools">
         <button
           className="view-demo-area"
@@ -480,10 +430,10 @@ export default function MapView({
       </div>
       <div className="map-status" role="status">
         <Layers size={14} />
-        {!ready && !failure
-          ? 'Loading road map…'
-          : darkMap
-            ? 'Local roads · dark map'
+        {failure
+          ? 'Map unavailable · route controls ready'
+          : !ready
+            ? 'Preparing GhostRoute map…'
             : tiles === 'fallback'
               ? 'Local roads · basemap unavailable'
               : tiles === 'loading'

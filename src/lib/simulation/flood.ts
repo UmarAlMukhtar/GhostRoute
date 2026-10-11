@@ -1,10 +1,11 @@
+import { cooperatively, synchronously } from '../geo/cooperative.ts';
 import { booleanIntersects } from '@turf/boolean-intersects';
 import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { booleanValid } from '@turf/boolean-valid';
 import { kinks } from '@turf/kinks';
 import type { FeatureCollection, LineString, Polygon } from 'geojson';
 import { point, record, text } from '../geo/validate.ts';
-import type { DisasterZone, RoadGraph } from '../geo/types.ts';
+import type { DisasterZone, RoadGraph, RoadNode } from '../geo/types.ts';
 
 function polygon(input: unknown): Polygon {
   if (!Array.isArray(input) || !input.length)
@@ -127,6 +128,15 @@ export interface FloodSnapshot {
 export type FloodResult = FloodSnapshot | { status: 'invalid'; reason: string };
 /** Call once with the already validated graph. All intersections use WGS84 geometry. */
 export function createFloodEngine(graph: RoadGraph) {
+  return synchronously(floodEngineSteps(graph));
+}
+
+export function createFloodEngineAsync(graph: RoadGraph) {
+  return cooperatively(floodEngineSteps(graph));
+}
+
+function* floodEngineSteps(graph: RoadGraph) {
+  let batch = 0;
   const segments = new Map<
     string,
     { geometry: LineString; bounds: number[]; edgeIds: string[] }
@@ -142,8 +152,13 @@ export function createFloodEngine(graph: RoadGraph) {
         bounds: bounds(edge.geometry.coordinates),
         edgeIds: [edge.id],
       });
+    if (++batch % 512 === 0) yield;
   }
-  const nodes = structuredClone(Object.values(graph.nodes));
+  const nodes: RoadNode[] = [];
+  for (const node of Object.values(graph.nodes)) {
+    nodes.push({ id: node.id, coordinate: [...node.coordinate] });
+    if (++batch % 512 === 0) yield;
+  }
   const graphVersion = graph.version;
   return {
     evaluate(

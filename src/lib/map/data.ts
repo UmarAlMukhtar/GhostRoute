@@ -1,7 +1,10 @@
-import { validatePlaces, type SearchPlace } from './places';
+import type { AssetMessage } from './worker-messages';
+import { createFloodEngine, createFloodEngineAsync } from '../simulation/flood';
+import { validatePlacesAsync, type SearchPlace } from './places';
 import type { GeoPoint, RoadGeoJSON, RoadGraph } from '../geo/types';
-import { point, record, text, validateGraph } from '../geo/validate';
-import { createRouter } from '../routing/shortest-path';
+import { parseMapAssets } from './assets';
+export { parseMapAssets } from './assets';
+import { createRouter, createRouterAsync } from '../routing/shortest-path';
 
 export interface Place {
   nodeId: string;
@@ -12,10 +15,9 @@ export interface MapData {
   graph: RoadGraph;
   roads: RoadGeoJSON;
   router: ReturnType<typeof createRouter>;
+  engine: ReturnType<typeof createFloodEngine>;
   bounds: [number, number, number, number];
   places: Place[];
-  searchPlaces?: SearchPlace[];
-  searchError?: string;
 }
 
 export function parseMapData(
@@ -23,129 +25,97 @@ export function parseMapData(
   roadsInput: unknown,
   fixtureInput: unknown,
 ): MapData {
-  const graph = validateGraph(graphInput);
-  const raw = record(roadsInput, 'roads');
-  if (raw.type !== 'FeatureCollection' || !Array.isArray(raw.features))
-    throw new Error('roads: expected FeatureCollection');
-  const seen = new Set<string>();
-  const roads: RoadGeoJSON = {
-    type: 'FeatureCollection',
-    features: raw.features.map((value) => {
-      const f = record(value, 'road'),
-        p = record(f.properties, 'road properties');
-      const segmentId = text(p.segmentId, 'segmentId');
-      const edge =
-        graph.edges[`${segmentId}:forward`] ??
-        graph.edges[`${segmentId}:reverse`];
-      if (
-        f.type !== 'Feature' ||
-        f.id !== segmentId ||
-        seen.has(segmentId) ||
-        !edge ||
-        p.osmWayId !== edge.osmWayId
-      )
-        throw new Error('roads: invalid segment mapping');
-      seen.add(segmentId);
-      const geometry = record(f.geometry, 'road geometry');
-      const coordinates = edge.id.endsWith(':forward')
-        ? edge.geometry.coordinates
-        : [...edge.geometry.coordinates].reverse();
-      if (
-        geometry.type !== 'LineString' ||
-        JSON.stringify(geometry.coordinates) !== JSON.stringify(coordinates)
-      )
-        throw new Error('roads: geometry differs from graph');
-      const edgeIds = [`${segmentId}:forward`, `${segmentId}:reverse`].filter(
-        (id) => graph.edges[id],
-      );
-      if (
-        !Array.isArray(p.edgeIds) ||
-        JSON.stringify([...p.edgeIds].sort()) !== JSON.stringify(edgeIds)
-      )
-        throw new Error('roads: invalid edge IDs');
-      const tags = Object.fromEntries(
-        Object.entries(record(p.tags, 'tags')).map(([k, v]) => [
-          k,
-          text(v, 'tag'),
-        ]),
-      );
-      return {
-        type: 'Feature',
-        id: segmentId,
-        geometry: { type: 'LineString', coordinates },
-        properties: { segmentId, osmWayId: edge.osmWayId, edgeIds, tags },
-      };
-    }),
-  };
-  if (
-    seen.size !==
-    new Set(Object.values(graph.edges).map((e) => e.segmentId)).size
-  )
-    throw new Error('roads: missing segments');
-  const fixture = record(fixtureInput, 'demo fixture');
-  if (fixture.graphVersion !== graph.version)
-    throw new Error('Demo fixture graph version mismatch');
-  const places = ['origin', 'destination'].map((key) => {
-    const p = record(fixture[key], key),
-      nodeId = text(p.nodeId, 'nodeId');
-    const coordinate = point(p.coordinate, 'preset coordinate');
-    if (
-      !Object.hasOwn(graph.nodes, nodeId) ||
-      JSON.stringify(coordinate) !==
-        JSON.stringify(graph.nodes[nodeId].coordinate)
-    )
-      throw new Error('Invalid demo endpoint');
-    return { nodeId, coordinate, label: text(p.label, 'preset label') };
-  });
-  const coordinates = Object.values(graph.nodes).map((n) => n.coordinate);
+  const assets = parseMapAssets(graphInput, roadsInput, fixtureInput);
   return {
-    graph,
-    roads,
-    places,
-    router: createRouter(graph),
-    bounds: [
-      coordinates.reduce((min, p) => Math.min(min, p[0]), Infinity),
-      coordinates.reduce((min, p) => Math.min(min, p[1]), Infinity),
-      coordinates.reduce((max, p) => Math.max(max, p[0]), -Infinity),
-      coordinates.reduce((max, p) => Math.max(max, p[1]), -Infinity),
-    ],
+    ...assets,
+    router: createRouter(assets.graph),
+    engine: createFloodEngine(assets.graph),
   };
 }
 
 // One validated router per browser session, including React Strict Mode remounts.
 let pending: Promise<MapData> | undefined;
 export function loadMapData(): Promise<MapData> {
-  pending ??= Promise.all(
-    ['graph.json', 'roads.geojson', 'demo-paths.json'].map(async (file) => {
-      const response = await fetch(`/data/ernakulam/${file}`);
-      if (!response.ok)
-        throw new Error(`Could not load ${file} (${response.status}).`);
-      return response.json() as Promise<unknown>;
-    }),
+  pending ??= new Promise<Omit<MapData, 'router' | 'engine'>>(
+    (resolve, reject) => {
+      const graph: RoadGraph = {
+        version: '',
+        nodes: {},
+        edges: {},
+        outgoing: {},
+      };
+      const roads: RoadGeoJSON = { type: 'FeatureCollection', features: [] };
+      const worker = new Worker(new URL('./data.worker.ts', import.meta.url));
+      worker.onmessage = (event: MessageEvent<AssetMessage>) => {
+        const message = event.data;
+        if (message.type === 'nodes') {
+          for (const node of message.nodes) {
+            graph.nodes[node.id] = node;
+            graph.outgoing[node.id] = [];
+          }
+        } else if (message.type === 'edges') {
+          for (const edge of message.edges) {
+            graph.edges[edge.id] = edge;
+            graph.outgoing[edge.from].push(edge.id);
+          }
+        } else if (message.type === 'roads') {
+          for (const properties of message.roads) {
+            const edge = graph.edges[properties.edgeIds[0]];
+            const coordinates = edge.id.endsWith(':forward')
+              ? edge.geometry.coordinates
+              : [...edge.geometry.coordinates].reverse();
+            roads.features.push({
+              type: 'Feature',
+              id: properties.segmentId,
+              properties,
+              geometry: { type: 'LineString', coordinates },
+            });
+          }
+        } else {
+          worker.terminate();
+          if (message.type === 'error') reject(new Error(message.error));
+          else {
+            graph.version = message.version;
+            for (const ids of Object.values(graph.outgoing)) ids.sort();
+            resolve({
+              graph,
+              roads,
+              places: message.places,
+              bounds: message.bounds,
+            });
+          }
+        }
+      };
+      worker.onerror = () => {
+        worker.terminate();
+        reject(new Error('Dataset worker failed'));
+      };
+      worker.postMessage(null);
+    },
   )
-    .then(async ([graph, roads, fixture]) => {
-      const data = parseMapData(graph, roads, fixture);
-      try {
-        const response = await fetch('/data/ernakulam/places.json');
-        if (!response.ok)
-          throw new Error(`Place index HTTP ${response.status}`);
-        return {
-          ...data,
-          searchPlaces: validatePlaces(await response.json(), data),
-          searchError: '',
-        };
-      } catch {
-        return {
-          ...data,
-          searchPlaces: [],
-          searchError:
-            'Local place index unavailable. Use coordinates or map selection; reload to retry.',
-        };
-      }
+    .then(async (assets) => {
+      const router = await createRouterAsync(assets.graph);
+      const engine = await createFloodEngineAsync(assets.graph);
+      return { ...assets, router, engine };
     })
     .catch((error) => {
       pending = undefined;
       throw error;
     });
   return pending;
+}
+
+// Search can become ready independently; a failed index never blocks map routing.
+let searchPending: Promise<SearchPlace[]> | undefined;
+export function loadSearchPlaces(data: MapData): Promise<SearchPlace[]> {
+  searchPending ??= fetch('/data/ernakulam/places.json')
+    .then(async (response) => {
+      if (!response.ok) throw new Error(`Place index HTTP ${response.status}`);
+      return validatePlacesAsync(await response.json(), data);
+    })
+    .catch((error) => {
+      searchPending = undefined;
+      throw error;
+    });
+  return searchPending;
 }

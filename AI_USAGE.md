@@ -1,20 +1,20 @@
 # AI usage record
 
-## Extension-safe root hydration — 2026-10-11T04:40:00+05:30
+## Merge: responsive loading and evacuation fallback — 2026-10-11T04:45:00+05:30
 
-Codex diagnosed the reported hydration warning from the injected `__processed_*` body attribute, added a root-body hydration-warning boundary, and verified TypeScript, ESLint and the production build. This does not change map, routing, shelter, or disaster-simulation behavior.
+Codex merged the remote loader/UI refactor with the locally implemented shelter fallback and hydration-warning tolerance, resolving overlapping documentation, root layout and styles without discarding either product path. TypeScript, ESLint, focused shelter/map tests (15 tests) and the production build passed; human review remains pending.
 
-## Visible emergency-shelter guidance — 2026-10-11T04:28:00+05:30
+## Shared-runner test correction — 2026-10-11T04:58:58+05:30
 
-Codex adjusted the evacuation flow after user feedback so available illustrative shelters are shown when any simulated incident is active rather than being hidden until the original destination fails. It added a purple legend key and updated the demo safety wording. TypeScript, ESLint, production build and focused shelter/map tests passed; human review remains pending.
+Codex read the actual GitHub CI failure log: 47 browser cases passed and the deliberately 4× throttled desktop loader check exhausted its normal 25-second readiness timeout. It limited the longer timeout to that test and replaced the machine-specific frame-gap limit with a fraction of actual loading duration while retaining distinct painted animation states. All four corrected animation/reduced-motion cases passed locally; product behavior and benchmark evidence are unchanged. Human review pending.
 
-## Windows verification repair — 2026-10-11T04:10:47+05:30
+## Responsive map loading assistance — 2026-10-11T04:44:13+05:30
 
-Codex diagnosed a failing frozen-data assertion as a Git Windows CRLF checkout mismatch, not a source-data or route change, and made the hash assertion normalize only JSON line endings. The focused dataset test then passed. It also started the production browser suite: the app built, but all Chromium cases were blocked by a missing Playwright browser binary. A browser download was initiated but did not finish; browser verification remains pending.
+Codex traced loading stalls through actual cold Chromium measurements, implemented lossless segment transport and full worker-side geographic validation, batched worker result delivery and existing index construction, and retained synchronous routing/hazard contracts and snapshot isolation. It added exact full-network/reverse-only equivalence, worker failure/retry, catalog equivalence and real animation/reduced-motion tests. A mobile keyboard test was corrected to await the independently loaded catalog enabling its input before programmatic focus; the 47 other initial browser cases passed. Matched three-run before/after evidence and a reproduction script are in `docs/performance`. Lint/types, 181 unit tests, production build and deterministic regeneration passed; the final full browser rerun passed all 48 cases (24 desktop + 24 mobile, 4.1 minutes), with six real loading/readiness screenshots inspected. Authorized publication is pending. Codex performed a separate read-only implementation review; human review remains pending. No dependency, source geographic acquisition, force push, repository setting change or participant submission was introduced.
 
-## Simulated evacuation fallback — 2026-10-11T03:14:23+05:30
+## Light UI consistency and loading — 2026-10-11T02:32:13+05:30
 
-Codex inspected the existing selector, deterministic router, flood closures and MapLibre overlay contracts; then added a small synthetic shelter catalog, closure-aware reachable-shelter ranking, purple map markers, a destination-selection action and focused unit tests. The team should review the evacuation copy and visual behavior before presenting. TypeScript, ESLint, production build and the focused shelter/map tests passed. Full formatting reports existing repository-wide drift; an earlier unfiltered Vitest run also exposed an existing dataset reproducibility failure. No shelter data, capacity, facilities, safety claim, live feed, account or external service was invented as real.
+Codex inspected the existing flows and reference image, kept the map-first layout, implemented matching page navigation, removed theme code and updated current documentation. It separated actual place-index loading from map readiness, added restrained loading feedback and stale/repeated-action guards, and used held browser requests to verify genuine pending states. Final local checks passed lint/types, 175 unit tests, a fresh production build, all 44 desktop/mobile production browser cases, format/format check and diff whitespace. It visually inspected six rendered navigation/demo/preparation screenshots and preserved existing dataset/routing/hazard/report safety boundaries. Human review pending. Publication uses the authorized normal branch/PR/CI/merge workflow; no force push, unrelated settings, fabricated progress or dataset changes.
 
 ## GitHub preview evidence — 2026-10-11T02:07:25+05:30
 

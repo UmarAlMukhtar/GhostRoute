@@ -1,32 +1,32 @@
 # Change log
 
-## Extension-safe root hydration — 2026-10-11T04:40:00+05:30
+## Merge: responsive loading and evacuation fallback — 2026-10-11T04:45:00+05:30
 
-- Changed: allow the root body to tolerate browser-extension attributes added before React hydrates.
-- Why: prevent a development-only hydration warning when an extension injects a `__processed_*` attribute into `<body>`.
-- Checks: TypeScript, ESLint and production build passed.
-- Limits: this suppresses only root-level extension-attribute noise; it does not mask normal component hydration defects.
+- Changed: merged the upstream light-interface and responsive map-loading work with the local simulated evacuation fallback, visible emergency-shelter options and root hydration-warning tolerance.
+- Why: retain the improved worker-based loader while preserving the disaster-to-shelter route flow.
+- Checks: TypeScript, ESLint, focused shelter/map tests (15 tests) and production build passed.
+- Limits: relief points remain illustrative demonstration data, not a verified live shelter directory.
 
-## Visible emergency-shelter guidance — 2026-10-11T04:28:00+05:30
+## Portable loader regression check — 2026-10-11T04:58:58+05:30
 
-- Changed: display emergency shelter options and purple map pins whenever a simulated incident is active, not only once the original destination becomes unreachable. Added a matching map-legend key and context-specific guidance.
-- Why: people need to see evacuation options as soon as a disaster is being assessed, while retaining the original destination route when it remains available.
-- Checks: TypeScript, ESLint, production build and focused shelter/map tests passed (13 tests).
-- Limits: every relief point and facility remains illustrative demo data, not a live or verified camp listing.
+- Changed: the deliberately throttled loader test allows slower shared-runner readiness and detects monopolizing preparation with a relative frame-gap assertion plus distinct painted animation states.
+- Evidence: GitHub CI passed 47/48 cases; the desktop loader case timed out at 25 seconds, while mobile passed. All four corrected desktop/mobile animation and reduced-motion cases passed locally against the unchanged production build.
+- Limits: absolute performance remains documented in matched measurements; no product or geographic data changed. Human review pending.
 
-## Windows dataset-test portability — 2026-10-11T04:10:47+05:30
+## Lossless responsive map loading — 2026-10-11T04:44:13+05:30
 
-- Changed: normalized checked-out JSON line endings before comparing generated asset hashes in the frozen-dataset test.
-- Why: Git checks the versioned JSON assets out as CRLF on this Windows machine, while the generated source hashes correctly record LF bytes. Semantic graph and GeoJSON equality checks remain unchanged.
-- Checks: focused dataset test passed (6 tests); production build, TypeScript and ESLint passed. The complete unit suite was started after the repair and produced no failure report before the runner session ended without a final summary.
-- Limits: the production browser suite built successfully but could not launch because Playwright Chromium is not installed. Its 197.5 MiB browser download began but did not complete in this environment; no browser-pass claim is made.
+- Changed: generated a compact segment transport, bundled worker decoding/full validation with bounded result messages, and cooperative router/connectivity/hazard/catalog initialization. Reused the initialized hazard engine in Dashboard; preserved synchronous route/hazard APIs and private snapshots. Added full-network equivalence, reverse-only geometry, worker failure/retry and animation/reduced-motion tests, reproducible benchmarks and current architecture/data documentation.
+- Why: measured loading contained a 6.36-second UI-thread task that prevented the loader from painting; duplicate downloaded geometry also increased network/memory cost.
+- Evidence: isolated cold 360×800 Chromium runs with 4× CPU emulation improved median map readiness 14.49→9.22 s, data transfer including catalog 9.74→4.59 MB, longest UI task 6.36→1.32 s and coarse reported heap 386→269 MB. Every original node, directed edge, coordinate, tag, component and adjacency is retained. Source/reference graph/roads hashes remain unchanged.
+- Validation: lint/types, 181 unit tests, production build, actual animation/reduced-motion browser tests and deterministic regeneration passed. Final full browser rerun passed all 48 cases (24 desktop + 24 mobile, 4.1 minutes); formatting/whitespace passed and six real loading/readiness screenshots were inspected.
+- Limits: measurements use emulation, not physical phones; rendering still produces approximately 1.3-second tasks at 4× CPU. No new dependency, persistent cache, geographic refresh, safety claim, paid service or submission action. Human review pending; publication evidence is recorded separately.
 
-## Simulated evacuation fallback — 2026-10-11T03:14:23+05:30
+## Light UI consistency and actual loading feedback — 2026-10-11T02:32:13+05:30
 
-- Changed: when a simulated disaster leaves the selected destination unreachable, the navigation panel now displays and maps reachable illustrative relief points, ranks them by the same closure-aware walking route, and lets the user replace the destination with a selected point. Added a deterministic unit test and a MapLibre shelter-marker layer.
-- Why: complete the route-to-safety flow without claiming that an actual camp is open, safe, or has the stated facilities.
-- Checks: TypeScript, ESLint, production build, the new shelter-ranking test and the MapLibre style regression test passed. The full format check reports pre-existing formatting differences throughout the repository. An earlier unfiltered Vitest attempt also exposed an existing dataset reproducibility failure; focused tests passed after correcting the invocation. Human browser review remains pending.
-- Limits: relief-point names, capacity and facilities are synthetic demonstration data. The feature has no live shelter feed, verification, booking, accessibility certification, or emergency-service integration.
+- Changed: matched Navigation/Demo segmented links; removed theme control/persistence/script/dark CSS/map switching. Added branded preparation and independent local-search loading with inline feedback; hide stale suggestions and guard repeated local report submission. Updated current behavior/design/architecture/testing docs and regression cases.
+- Why: make the existing light UI consistent and clarify real waiting states while preserving map/routing/hazard/report behavior.
+- Validation: final lint/types, 175 unit tests, fresh production build and all 44 desktop/mobile browser cases (4.1 minutes), format/format check and diff whitespace passed. Six rendered navigation/demo/preparation screenshots were inspected and saved. Actual held requests and duplicate native form events cover pending/recovery/submission guards.
+- Limits: synchronous routing/hazards and browser-local report storage are unchanged; no fake async spinner, geographic refresh, ETA or physical-phone performance claim. Human review pending.
 
 ## GitHub preview evidence — 2026-10-11T02:07:25+05:30
 

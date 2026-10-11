@@ -15,7 +15,6 @@ import {
   X,
 } from 'lucide-react';
 import MapView from './MapView';
-import ThemeToggle from './ThemeToggle';
 import PlaceSearch from './PlaceSearch';
 import { HazardControls, ReportControls, hazardNames } from './ExploreControls';
 import {
@@ -40,7 +39,6 @@ import DemoGuide from './DemoGuide';
 import { demoSteps } from '../lib/map/demo';
 import type { SimulationAction } from '../lib/simulation/session';
 import type { SelectionAction } from '../lib/map/selection';
-import { createFloodEngine } from '../lib/simulation/flood';
 import { scenarios } from '../lib/simulation/scenarios';
 import {
   initialSimulation,
@@ -50,7 +48,7 @@ import {
 } from '../lib/simulation/session';
 import type { MapOverlays } from '../lib/map/style';
 import Link from 'next/link';
-import { loadMapData, type MapData } from '../lib/map/data';
+import { loadMapData, loadSearchPlaces, type MapData } from '../lib/map/data';
 import {
   formatDistance,
   initialSelection,
@@ -59,6 +57,7 @@ import {
   selectionReducer,
   type Role,
 } from '../lib/map/selection';
+import type { SearchPlace } from '../lib/map/places';
 import type { GeoPoint } from '../lib/geo/types';
 import { findReachableShelters } from '../lib/evacuation/shelters';
 
@@ -71,10 +70,11 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
     coordinate: GeoPoint;
     sequence: number;
   }>();
-  const catalog = {
-    places: data?.searchPlaces ?? [],
-    error: data?.searchError ?? '',
-  };
+  const [catalog, setCatalog] = useState<{
+    places: SearchPlace[];
+    error: string;
+    loading: boolean;
+  }>({ places: [], error: '', loading: true });
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [state, dispatchSelection] = useReducer(
@@ -106,6 +106,7 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
     coordinate: GeoPoint;
     segmentId?: string;
   } | null>(null);
+  const submittedLocation = useRef<typeof reportLocation>(null);
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
   const [filters, setFilters] = useState<ReportFilters>({
     type: '',
@@ -197,7 +198,15 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
     description: string,
     severity: IncidentReport['severity'],
   ) {
-    if (!data || !reportLocation || !reportsReady) return false;
+    if (
+      !data ||
+      !reportLocation ||
+      !reportsReady ||
+      submittedLocation.current === reportLocation
+    )
+      return false;
+    // Storage is synchronous; guard repeated events without pretending it is async.
+    submittedLocation.current = reportLocation;
     try {
       const report = validateReport(
         {
@@ -226,6 +235,7 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
       setReportLocation(null);
       return true;
     } catch (error) {
+      submittedLocation.current = null;
       setReportError(
         error instanceof Error ? error.message : 'Could not save report',
       );
@@ -340,7 +350,21 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
     let cancelled = false;
     loadMapData()
       .then((value) => {
-        if (!cancelled) setData(value);
+        if (cancelled) return;
+        setData(value);
+        loadSearchPlaces(value)
+          .then((places) => {
+            if (!cancelled) setCatalog({ places, error: '', loading: false });
+          })
+          .catch(() => {
+            if (!cancelled)
+              setCatalog({
+                places: [],
+                loading: false,
+                error:
+                  'Local place index unavailable. Use coordinates or map selection; reload to retry.',
+              });
+          });
       })
       .catch(() => {
         if (!cancelled)
@@ -418,10 +442,7 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
     dispatch({ type: 'active', role });
     setSheetOpen(false);
   }
-  const engine = useMemo(
-    () => (data ? createFloodEngine(data.graph) : null),
-    [data],
-  );
+  const engine = data?.engine;
   const individualImpacts = useMemo(
     () =>
       engine
@@ -467,9 +488,9 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
   const shelters = useMemo(
     () =>
       impactActive && data && flood?.status === 'ready' && state.origin
-        ? findReachableShelters(data, state.origin, flood)
+        ? findReachableShelters(data, state.origin, catalog.places, flood)
         : [],
-    [impactActive, data, flood, state.origin],
+    [impactActive, data, flood, state.origin, catalog.places],
   );
   const overlays = useMemo<MapOverlays | undefined>(
     () =>
@@ -541,9 +562,14 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
           <span className="region-tag">DEMO REGION</span>
         </div>
         <div className="header-actions">
-          <Link className="demo-entry" href={demo ? '/' : '/demo'}>
-            {demo ? 'Navigation' : 'Demo'}
-          </Link>
+          <nav className="page-switch" aria-label="Pages">
+            <Link href="/" aria-current={!demo ? 'page' : undefined}>
+              Navigation
+            </Link>
+            <Link href="/demo" aria-current={demo ? 'page' : undefined}>
+              Demo
+            </Link>
+          </nav>
           {demo && (
             <button
               className="secondary"
@@ -553,7 +579,6 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
               Demo scenarios
             </button>
           )}
-          <ThemeToggle />
           <button
             className="secondary"
             onClick={() =>
@@ -602,13 +627,21 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
             sheetOpen={sheetOpen}
           />
         ) : (
-          <div className="map-placeholder">
-            <Route size={40} />
+          <div className="map-placeholder" role="status" aria-live="polite">
+            <span
+              className="loading-ring"
+              aria-hidden="true"
+              hidden={Boolean(loadError)}
+            />
+            {loadError && <Route size={32} />}
             <p>
               {loadError
                 ? 'Road network unavailable'
-                : 'Preparing the Ernakulam road network…'}
+                : 'Preparing GhostRoute map'}
             </p>
+            {!loadError && (
+              <span>Loading and validating the Ernakulam road network…</span>
+            )}
           </div>
         )}
         <div className="map-instruction">
@@ -705,6 +738,7 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
                           data={data}
                           places={catalog.places}
                           error={catalog.error}
+                          loading={catalog.loading}
                           onAction={dispatch}
                           onOpen={setSearching}
                           onFocusPlace={(coordinate) =>
@@ -1216,7 +1250,11 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
               </section>
             )}
             {tab === 'Demo' && demoStep === null && (
-              <button className="primary" onClick={() => showDemoStep(0)}>
+              <button
+                className="primary"
+                disabled={!data}
+                onClick={() => showDemoStep(0)}
+              >
                 Start guided demo
               </button>
             )}

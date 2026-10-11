@@ -1,13 +1,20 @@
+import { synchronously } from './cooperative.ts';
 import type { RoadGraph } from './types.ts';
 
 /** Weak components for reporting; never implies directed reachability. */
 export function connectedComponents(graph: RoadGraph): string[][] {
+  return synchronously(componentSteps(graph));
+}
+
+export function* componentSteps(graph: RoadGraph): Generator<void, string[][]> {
+  let batch = 0;
   const neighbors = new Map(
     Object.keys(graph.nodes).map((id) => [id, new Set<string>()]),
   );
   for (const e of Object.values(graph.edges)) {
     neighbors.get(e.from)!.add(e.to);
     neighbors.get(e.to)!.add(e.from);
+    if (++batch % 512 === 0) yield;
   }
   const seen = new Set<string>(),
     components: string[][] = [];
@@ -15,13 +22,15 @@ export function connectedComponents(graph: RoadGraph): string[][] {
     if (seen.has(id)) continue;
     const queue = [id];
     seen.add(id);
-    for (let i = 0; i < queue.length; i++)
+    for (let i = 0; i < queue.length; i++) {
+      if (++batch % 512 === 0) yield;
       for (const next of neighbors.get(queue[i])!) {
         if (!seen.has(next)) {
           seen.add(next);
           queue.push(next);
         }
       }
+    }
     components.push(queue.sort());
   }
   return components.sort(

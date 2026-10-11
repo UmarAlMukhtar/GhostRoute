@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { findReachableShelters } from '../../src/lib/evacuation/shelters';
 import { createRouter } from '../../src/lib/routing/shortest-path';
+import { createFloodEngine } from '../../src/lib/simulation/flood';
 import type { MapData } from '../../src/lib/map/data';
 
 const graph = {
@@ -72,8 +73,8 @@ const graph = {
   },
 };
 
-function data(): MapData {
-  const searchPlaces = [
+function fixture() {
+  const catalog = [
     { id: 'maharajas', nodeId: 'maharajas', coordinate: [76.21, 9.9] },
     { id: 'marine-drive', nodeId: 'marine', coordinate: [76.22, 9.9] },
     { id: 'high-court', nodeId: 'highCourt', coordinate: [76.23, 9.9] },
@@ -88,21 +89,24 @@ function data(): MapData {
     aliases: [],
     popular: false,
   }));
-  return {
+  const data: MapData = {
     graph,
     roads: { type: 'FeatureCollection', features: [] },
     router: createRouter(graph),
+    engine: createFloodEngine(graph),
     bounds: [76.2, 9.9, 76.23, 9.9],
     places: [],
-    searchPlaces,
   };
+  return { data, catalog };
 }
 
 describe('illustrative shelter finder', () => {
   it('returns only reachable demo shelters ranked by closure-aware route distance', () => {
+    const { data, catalog } = fixture();
     const shelters = findReachableShelters(
-      data(),
+      data,
       { nodeId: 'origin', coordinate: [76.2, 9.9], label: 'Home' },
+      catalog,
       { blockedSegmentIds: new Set(['a']) },
     );
 

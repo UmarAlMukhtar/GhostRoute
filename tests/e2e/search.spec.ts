@@ -38,6 +38,7 @@ test('coverage, offline defaults, keyboard routes, swapping and clearing', async
     exact: true,
   });
   const end = page.getByRole('combobox', { name: 'Destination', exact: true });
+  await expect(start).toBeEnabled();
   await start.focus();
   await expect(
     page.getByText('Popular places in Ernakulam', { exact: true }),

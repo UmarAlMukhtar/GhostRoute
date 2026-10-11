@@ -1,5 +1,6 @@
 import type { RouteResult } from '../geo/types';
 import type { Place, MapData } from '../map/data';
+import type { SearchPlace } from '../map/places';
 import type { Selection } from '../map/selection';
 
 /**
@@ -38,14 +39,13 @@ export interface EvacuationShelter extends Place {
 export function findReachableShelters(
   data: MapData,
   origin: Selection,
+  catalog: readonly SearchPlace[],
   closures: {
     blockedNodeIds?: ReadonlySet<string>;
     blockedSegmentIds?: ReadonlySet<string>;
   },
 ): EvacuationShelter[] {
-  const places = new Map(
-    (data.searchPlaces ?? []).map((place) => [place.id, place]),
-  );
+  const places = new Map(catalog.map((place) => [place.id, place]));
   return shelterDefinitions
     .flatMap((definition) => {
       const place = places.get(definition.placeId);
