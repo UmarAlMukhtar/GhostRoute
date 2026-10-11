@@ -1,5 +1,24 @@
 # Change log
 
+## Submission draft refresh — 2026-10-11T08:26:09+05:30
+
+- Updated `SUBMISSION.md` with the current multi-hazard demo, public and local access, dependencies, verification, and safety limits. Added participant handles and broad contribution roles supplied by Umar; kept the final submitted SHA pending.
+- Checked the organizer's current Luma page, local links, formatting, and whitespace. No organizer form was submitted and no checklist box was marked on behalf of participants.
+
+## Reduced-motion loader and readable README — 2026-10-11T08:06:14+05:30
+
+- Changed: the loading ring now pulses without rotation when the browser requests reduced motion; normal-motion rotation is unchanged. Replaced the template-heavy README with a concise product guide and preserved its exact previous bytes in `README.backup.md`.
+- Why: Brave reported reduced motion in both local and public tabs, making the intentionally static ring look frozen even though the map eventually loaded.
+- Validation: production webpack build, TypeScript, formatting, four desktop/mobile loader browser cases, and a real local Brave reload confirmed the pulse and eventual map readiness. No hosted deployment has been updated.
+- Limits: the pulse is visual feedback, not a loading-speed improvement; physical-phone performance remains unmeasured. Human review pending.
+
+## Responsive map renderer preparation — 2026-10-11T07:57:10+05:30
+
+- Changed: hand the complete road network to MapLibre in awaited batches while keeping the preparation spinner visible until rendering finishes. Navigation cancels the pending handoff; rendering errors show the existing recovery message. Corrected the browser test helper's TypeScript call signature.
+- Why: one large renderer handoff could freeze the spinner after dataset initialization.
+- Validation: focused unit tests, TypeScript, lint, formatting, production webpack build, and all 10 targeted desktop/mobile browser cases passed, including 4× CPU spinner animation, full road equality, cancellation, failure recovery and reduced motion.
+- Limits: browser checks used emulation rather than a physical phone. Human review pending.
+
 ## Use MapLibre projection in expanded browser test — 2026-10-11T09:09:51+05:30
 
 - Changed: added an explicitly enabled E2E-only map projection helper and replaced endpoint-marker interpolation in the expanded navigation test with the exact MapLibre canvas point.

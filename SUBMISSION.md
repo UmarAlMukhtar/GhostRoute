@@ -1,25 +1,25 @@
 # Project submission
 
-Complete this file during the hackathon and use it to prepare your submission through the method announced by the organizers. Do not submit your project to the template repository.
+Submission preparation for the DevDay Exchange Community Hackathon: Kochi. This file records the project information; it is **not** proof that an organizer submission has been sent. Use the method announced by the organizers.
 
 ## Project
 
 - **Project name:** GhostRoute
-- **Short description:** An interactive Ernakulam road-network simulation: illustrative floods block real OSM road segments and Dijkstra automatically finds an alternative route or reports unavailable. Includes a guided three-minute Demo Mode.
+- **Short description:** GhostRoute shows how illustrative floods, landslides, fires, and roadblocks change shortest paths through a frozen OpenStreetMap-derived Kochi–Ernakulam road network. Choose endpoints or follow a guided demo; the app shows the original route, a recalculated route, or an explicit unavailable result. Browser-local incident reports are clearly unverified.
 - **Code repository URL:** https://github.com/UmarAlMukhtar/GhostRoute
-- **Final submitted implementation commit SHA:** TODO
-- **Working demo URL or local demo steps:** [Public GhostRoute demo](https://ghostroute-weld.vercel.app). Local fallback: run `pnpm install --frozen-lockfile`, `pnpm build`, then `pnpm start`; open `http://localhost:3000` and choose **Demo Mode**. See [demo plan](docs/DEMO_PLAN.md) and [deployment runbook](docs/DEPLOYMENT.md).
+- **Final submitted implementation commit SHA:** **Pending final merge and submission.** Record the exact `main` commit used by the demonstrated deployment here before sending the organizer form. Current loader changes are in [PR #12](https://github.com/UmarAlMukhtar/GhostRoute/pull/12), not yet merged into `main`.
+- **Working demo URL or local demo steps:** [Public GhostRoute demo](https://ghostroute-weld.vercel.app) · [Guided demo](https://ghostroute-weld.vercel.app/demo). For a local fallback, run `pnpm install --frozen-lockfile`, `pnpm build`, then `pnpm start`; open `http://localhost:3000/demo`. The public site reflects its deployed `main` commit and may lag this branch until PR #12 is merged and deployment is checked.
 - **Demo access requirements:** Public demo requires a WebGL-capable browser, no login. Local fallback requires Node 22.13+ (22 line) or Node 24, pnpm 11.25.0; no credentials required.
 
 ## Participants
 
-Participate solo or in a team of up to 4. Remove unused rows.
+Umar confirmed these names, GitHub handles, and broad contribution roles. The team should review the wording before sending the organizer submission.
 
-| Participant name | GitHub handle | Contribution |
-| ---------------- | ------------- | ------------ |
-| Umar Al Mukhtar  | TODO          | TODO         |
-| Sanjay KP        | TODO          | TODO         |
-| Alphons N J      | TODO          | TODO         |
+| Participant name | GitHub handle                                         | Actual contribution               |
+| ---------------- | ----------------------------------------------------- | --------------------------------- |
+| Umar Al Mukhtar  | [umaralmukhtar](https://github.com/umaralmukhtar)     | Primary project implementation    |
+| Sanjay KP        | [sanjay-sanju-03](https://github.com/sanjay-sanju-03) | Debugging                         |
+| Alphons N J      | [alphonsnj](https://github.com/alphonsnj)             | Demo presentation and explanation |
 
 ## Run and demonstrate
 
@@ -27,10 +27,10 @@ Participate solo or in a team of up to 4. Remove unused rows.
 - **Install command:** `pnpm install --frozen-lockfile`
 - **Required environment variable names:** None; `.env.example` contains no secrets.
 - **Start command:** `pnpm dev` (development) or `pnpm build` then `pnpm start` (production).
-- **Demo walkthrough:** Advance Demo Mode through the real baseline, Hospital flood detour, expanding flood, unavailable destination and reset. Manual controls remain available. See [pitch](docs/PITCH_SCRIPT.md).
-- **Checks performed and results:** See [verification record](docs/VERIFICATION.md); local automated checks and rendered browser evidence are recorded separately from hosted verification and human rehearsal.
-- **Known limitations or incomplete features:** Simulation only; no verified live hazards or safe-route certification. Small frozen dataset, conservative 2D intersections, unverified destination access and WebGL dependency. Participant handles/contributions, final submitted SHA, publishing and venue submission confirmations require team review.
-- **Libraries, APIs, and public datasets used:** [Next.js](https://nextjs.org/), [React](https://react.dev/), [Tailwind](https://tailwindcss.com/), [Vitest](https://vitest.dev/) and [Playwright](https://playwright.dev/); exact versions in package/lockfile. MapLibre GL JS, Turf and a frozen OpenStreetMap-derived Ernakulam graph are bundled. OSM attribution/licensing is in [DATA_STRATEGY](docs/DATA_STRATEGY.md).
+- **Demo walkthrough:** Open `/demo` and advance through the Ernakulam overview, Hospital Road baseline, illustrative flood detour, expanding flood, unavailable route, and restored baseline. Then use Navigation to choose endpoints and Simulation to add or remove illustrative hazards. [Presenter script](docs/PITCH_SCRIPT.md)
+- **Checks performed and results:** [VERIFICATION.md](docs/VERIFICATION.md) records actual unit, browser, build, data, and hosted checks with their dates and limits. PR #12's candidate passed 184 unit tests and 54 production browser cases in an isolated copy; its public production behavior must be checked after merge. Human rehearsal remains unconfirmed.
+- **Known limitations or incomplete features:** This is a simulation, not an emergency navigation service. Hazards and browser-local reports are unverified; reports are not shared across users. Destinations are not verified shelters, and routes are not certified safe. The frozen OSM data can be incomplete or stale; 2D hazard intersections ignore depth and elevation. Map graphics require WebGL, and optional street tiles need network access. Physical-phone performance and human geographic review remain unverified.
+- **Libraries, APIs, and public datasets used:** Next.js, React, TypeScript, Tailwind CSS, MapLibre GL JS, Turf, Lucide, Vitest, and Playwright; exact versions are pinned in [`package.json`](package.json) and the lockfile. A frozen OpenStreetMap-derived Kochi–Ernakulam road graph and local place index are bundled; source, licensing, and attribution are documented in [DATA_STRATEGY.md](docs/DATA_STRATEGY.md) and [ATTRIBUTION.md](public/data/ernakulam/ATTRIBUTION.md). Optional street tiles come from OpenStreetMap.
 - **AI usage record:** [AI_USAGE.md](AI_USAGE.md)
 - **Development change log:** [CHANGELOG.md](CHANGELOG.md)
 

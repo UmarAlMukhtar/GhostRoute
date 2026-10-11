@@ -2003,9 +2003,14 @@ svg {
     transform: rotate(360deg);
   }
 }
+@keyframes loading-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .loading-ring {
-    animation: none;
+    animation: loading-pulse 1.6s ease-in-out infinite !important;
   }
 }
 @media (max-width: 1250px) {
