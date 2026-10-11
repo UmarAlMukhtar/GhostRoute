@@ -1,5 +1,9 @@
 # AI usage record
 
+## Stable MapLibre browser placement — 2026-10-11T08:47:03+05:30
+
+Codex used the CI failure evidence to replace a fixed timing delay in the expanded browser test with a bounded endpoint-pin stability check. It preserves the real MapLibre click interaction and adds no production hook. The focused desktop and mobile regression journeys completed without a failure artifact, and the changed file passes Prettier. Human review pending.
+
 ## Mobile map-anchor test repair — 2026-10-11T08:31:28+05:30
 
 Codex inspected the failed browser assertion and corrected the test-only coordinate projection to use the MapLibre marker bottom-center anchors. This retains the actual user map-click flow rather than adding a production-only test hook. The focused mobile regression completed without a failure artifact, and the changed file passes Prettier. Human review pending.

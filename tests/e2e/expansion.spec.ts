@@ -48,11 +48,33 @@ const center = baseline
     );
   });
 if (!center) throw new Error('Need a real cross-region detour fixture');
+async function waitForStablePin(page: Page, selector: string) {
+  let previous: { x: number; y: number } | undefined;
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const box = await page.locator(selector).boundingBox();
+    if (box) {
+      const current = {
+        x: Math.round((box.x + box.width / 2) * 10) / 10,
+        y: Math.round((box.y + box.height) * 10) / 10,
+      };
+      if (
+        previous &&
+        Math.abs(current.x - previous.x) < 0.5 &&
+        Math.abs(current.y - previous.y) < 0.5
+      )
+        return;
+      previous = current;
+    }
+    await page.waitForTimeout(100);
+  }
+  throw new Error(`Map pin did not stabilize: ${selector}`);
+}
 async function pick(page: Page, coordinate: number[]) {
   // Placing a hazard collapses the mobile route sheet and refits the map.
   // Wait for that fit before deriving a screen position from the endpoint pins.
   await expect(page.getByTestId('map')).not.toHaveClass(/sheet-open/);
-  await page.waitForTimeout(700);
+  await waitForStablePin(page, '.map-pin.origin');
+  await waitForStablePin(page, '.map-pin.destination');
   const origin = (await page.locator('.map-pin.origin').boundingBox())!,
     destination = (await page.locator('.map-pin.destination').boundingBox())!;
   // MapLibre anchors endpoint markers at their bottom center, not their box center.

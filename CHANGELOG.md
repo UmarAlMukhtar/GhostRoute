@@ -1,5 +1,12 @@
 # Change log
 
+## Stabilize expanded navigation map-placement test — 2026-10-11T08:47:03+05:30
+
+- Changed: replaced the fixed map-refit pause with a bounded wait for stable MapLibre endpoint-pin anchors before deriving a hazard click coordinate.
+- Why: CI showed that the camera could still be moving after the fixed delay, causing the simulated flood click to miss the deterministic route fixture in both browser projects.
+- Checks: the focused expanded-navigation Playwright journey completed for desktop Chromium and mobile Chromium without a failure artifact; the changed file passes Prettier.
+- Limits: this remains a UI-level map-click regression test; it does not expose a production test hook or change routing behavior.
+
 ## Stabilize mobile hazard-placement browser test — 2026-10-11T08:31:28+05:30
 
 - Changed: calculate map-click coordinates from the bottom-center anchors of the origin and destination pins in the expanded navigation browser test.
