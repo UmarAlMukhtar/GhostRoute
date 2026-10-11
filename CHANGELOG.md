@@ -1,5 +1,12 @@
 # Change log
 
+## Stabilize mobile hazard-placement browser test — 2026-10-11T08:31:28+05:30
+
+- Changed: calculate map-click coordinates from the bottom-center anchors of the origin and destination pins in the expanded navigation browser test.
+- Why: MapLibre anchors the endpoint pins at their bottoms; using visual box centers could place a 50 m simulated flood away from the deterministic route fixture on mobile.
+- Checks: the focused mobile expanded-navigation Playwright regression completed without a failure artifact; the changed test file passes Prettier.
+- Limits: the test still validates the real map click path and does not add a production test hook.
+
 ## Remove startup report marker — 2026-10-11T05:50:00+05:30
 
 - Changed: stopped creating the illustrative startup incident report and remove any earlier seeded demo marker from browser storage.

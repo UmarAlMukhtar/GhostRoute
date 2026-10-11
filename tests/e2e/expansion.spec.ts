@@ -55,19 +55,22 @@ async function pick(page: Page, coordinate: number[]) {
   await page.waitForTimeout(700);
   const origin = (await page.locator('.map-pin.origin').boundingBox())!,
     destination = (await page.locator('.map-pin.destination').boundingBox())!;
+  // MapLibre anchors endpoint markers at their bottom center, not their box center.
+  const originX = origin.x + origin.width / 2,
+    originY = origin.y + origin.height,
+    destinationX = destination.x + destination.width / 2,
+    destinationY = destination.y + destination.height;
   const mercator = (lat: number) =>
     Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
   await page.mouse.click(
-    origin.x +
-      origin.width / 2 +
+    originX +
       ((coordinate[0] - a.coordinate[0]) /
         (b.coordinate[0] - a.coordinate[0])) *
-        (destination.x + destination.width / 2 - origin.x - origin.width / 2),
-    origin.y +
-      origin.height / 2 +
+        (destinationX - originX),
+    originY +
       ((mercator(coordinate[1]) - mercator(a.coordinate[1])) /
         (mercator(b.coordinate[1]) - mercator(a.coordinate[1]))) *
-        (destination.y + destination.height / 2 - origin.y - origin.height / 2),
+        (destinationY - originY),
   );
 }
 async function search(page: Page, label: string, query: string, name: string) {

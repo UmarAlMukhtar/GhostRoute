@@ -1,5 +1,9 @@
 # AI usage record
 
+## Mobile map-anchor test repair — 2026-10-11T08:31:28+05:30
+
+Codex inspected the failed browser assertion and corrected the test-only coordinate projection to use the MapLibre marker bottom-center anchors. This retains the actual user map-click flow rather than adding a production-only test hook. The focused mobile regression completed without a failure artifact, and the changed file passes Prettier. Human review pending.
+
 ## Remove startup report marker — 2026-10-11T05:50:00+05:30
 
 Codex removed the automatic illustrative report that created an ambiguous startup map pin, while preserving user-created browser-local reports. Existing seeded demo markers are cleaned up on load. TypeScript, ESLint, focused report tests (17 tests) and production build passed.
