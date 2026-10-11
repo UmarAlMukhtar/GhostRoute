@@ -1,5 +1,12 @@
 # Change log
 
+## Remove startup report marker — 2026-10-11T05:50:00+05:30
+
+- Changed: stopped creating the illustrative startup incident report and remove any earlier seeded demo marker from browser storage.
+- Why: prevent the purple report marker from being mistaken for an emergency shelter.
+- Checks: TypeScript, ESLint, focused reports regression tests (17 tests) and production build passed.
+- Limits: user-created local reports remain browser-local and unverified.
+
 ## Merge: responsive loading and evacuation fallback — 2026-10-11T04:45:00+05:30
 
 - Changed: merged the upstream light-interface and responsive map-loading work with the local simulated evacuation fallback, visible emergency-shelter options and root hydration-warning tolerance.

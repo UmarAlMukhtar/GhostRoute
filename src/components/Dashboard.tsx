@@ -129,28 +129,10 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
     Promise.resolve().then(() => {
       if (cancelled) return;
       try {
-        let saved = loadReports(localStorage, data.bounds, segments);
-        if (localStorage.getItem(REPORT_KEY) === null) {
-          saved = [
-            validateReport(
-              {
-                source: 'local-report',
-                id: 'illustrative-seed',
-                type: 'Other obstruction',
-                coordinate: data.places[0].coordinate,
-                description:
-                  'Example report for learning the interface. This is not an observed incident.',
-                severity: 'Unspecified',
-                submittedAt: '2026-10-10T00:00:00Z',
-                status: 'Unverified',
-                seeded: true,
-              },
-              data.bounds,
-              segments,
-            ),
-          ];
+        const loaded = loadReports(localStorage, data.bounds, segments);
+        const saved = loaded.filter((report) => !report.seeded);
+        if (saved.length !== loaded.length)
           localStorage.setItem(REPORT_KEY, JSON.stringify(saved));
-        }
         setReports(saved);
         setReportsReady(true);
       } catch {

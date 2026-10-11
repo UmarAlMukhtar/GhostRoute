@@ -1,5 +1,9 @@
 # AI usage record
 
+## Remove startup report marker — 2026-10-11T05:50:00+05:30
+
+Codex removed the automatic illustrative report that created an ambiguous startup map pin, while preserving user-created browser-local reports. Existing seeded demo markers are cleaned up on load. TypeScript, ESLint, focused report tests (17 tests) and production build passed.
+
 ## Merge: responsive loading and evacuation fallback — 2026-10-11T04:45:00+05:30
 
 Codex merged the remote loader/UI refactor with the locally implemented shelter fallback and hydration-warning tolerance, resolving overlapping documentation, root layout and styles without discarding either product path. TypeScript, ESLint, focused shelter/map tests (15 tests) and the production build passed; human review remains pending.
