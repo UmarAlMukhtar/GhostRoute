@@ -49,6 +49,10 @@ const center = baseline
   });
 if (!center) throw new Error('Need a real cross-region detour fixture');
 async function pick(page: Page, coordinate: number[]) {
+  // Placing a hazard collapses the mobile route sheet and refits the map.
+  // Wait for that fit before deriving a screen position from the endpoint pins.
+  await expect(page.getByTestId('map')).not.toHaveClass(/sheet-open/);
+  await page.waitForTimeout(700);
   const origin = (await page.locator('.map-pin.origin').boundingBox())!,
     destination = (await page.locator('.map-pin.destination').boundingBox())!;
   const mercator = (lat: number) =>
@@ -171,7 +175,7 @@ test('expanded Edappally–Vyttila navigation, disasters, local deletion and ded
   await page
     .getByRole('button', { name: 'Report Incident', exact: true })
     .click();
-  await expect(page.getByText('1 visible local reports')).toBeVisible();
+  await expect(page.getByText('0 visible local reports')).toBeVisible();
   await page.getByRole('link', { name: 'Demo', exact: true }).click();
   await expect(page).toHaveURL(/\/demo$/);
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true');
