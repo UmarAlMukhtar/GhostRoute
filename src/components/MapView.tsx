@@ -8,6 +8,13 @@ import type { IncidentReport } from '../lib/incidents/reports';
 import type { Selection, Role } from '../lib/map/selection';
 import { EMPTY, localStyle, type MapOverlays } from '../lib/map/style';
 
+type E2EWindow = Window & {
+  __ghostRouteE2E?: boolean;
+  __ghostRouteProject?: (
+    coordinate: GeoPoint,
+  ) => Promise<{ x: number; y: number }>;
+};
+
 interface Props {
   data: MapData;
   overview?: boolean;
@@ -235,6 +242,22 @@ export default function MapView({
       mapRef.current = null;
     };
   }, [data]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const target = window as E2EWindow;
+    if (!ready || !map || !target.__ghostRouteE2E) return;
+    target.__ghostRouteProject = async (coordinate) => {
+      if (map.isMoving())
+        await new Promise<void>((resolve) => map.once('idle', () => resolve()));
+      const point = map.project(coordinate);
+      const canvas = map.getCanvas().getBoundingClientRect();
+      return { x: canvas.left + point.x, y: canvas.top + point.y };
+    };
+    return () => {
+      delete target.__ghostRouteProject;
+    };
+  }, [ready]);
 
   useEffect(() => {
     const map = mapRef.current;

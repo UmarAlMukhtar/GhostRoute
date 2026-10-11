@@ -1,5 +1,9 @@
 # AI usage record
 
+## Exact MapLibre projection for E2E — 2026-10-11T09:09:51+05:30
+
+Codex reviewed the repeated CI evidence and replaced the fragile endpoint-pin interpolation with an explicitly enabled E2E-only MapLibre projection helper. Playwright now clicks the exact canvas position of the deterministic fixture while retaining the real map click handler. TypeScript, Prettier, focused desktop/mobile regression coverage, and the complete 48-case production browser matrix completed without failure artifacts. Human review pending.
+
 ## Stable MapLibre browser placement — 2026-10-11T08:47:03+05:30
 
 Codex used the CI failure evidence to replace a fixed timing delay in the expanded browser test with a bounded endpoint-pin stability check. It preserves the real MapLibre click interaction and adds no production hook. The focused desktop and mobile regression journeys completed without a failure artifact, and the changed file passes Prettier. Human review pending.

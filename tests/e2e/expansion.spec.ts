@@ -4,6 +4,12 @@ import { parseMapData } from '../../src/lib/map/data';
 import { validatePlaces, filterPlaces } from '../../src/lib/map/places';
 import { createFloodEngine } from '../../src/lib/simulation/flood';
 import { hazardInputs } from '../../src/lib/simulation/hazards';
+type E2EWindow = Window & {
+  __ghostRouteE2E?: boolean;
+  __ghostRouteProject?: (
+    coordinate: [number, number],
+  ) => Promise<{ x: number; y: number }>;
+};
 const read = (name: string): unknown =>
   JSON.parse(readFileSync(`public/data/ernakulam/${name}`, 'utf8'));
 const data = parseMapData(
@@ -48,53 +54,21 @@ const center = baseline
     );
   });
 if (!center) throw new Error('Need a real cross-region detour fixture');
-async function waitForStablePin(page: Page, selector: string) {
-  let previous: { x: number; y: number } | undefined;
-  for (let attempt = 0; attempt < 30; attempt++) {
-    const box = await page.locator(selector).boundingBox();
-    if (box) {
-      const current = {
-        x: Math.round((box.x + box.width / 2) * 10) / 10,
-        y: Math.round((box.y + box.height) * 10) / 10,
-      };
-      if (
-        previous &&
-        Math.abs(current.x - previous.x) < 0.5 &&
-        Math.abs(current.y - previous.y) < 0.5
-      )
-        return;
-      previous = current;
-    }
-    await page.waitForTimeout(100);
-  }
-  throw new Error(`Map pin did not stabilize: ${selector}`);
-}
-async function pick(page: Page, coordinate: number[]) {
-  // Placing a hazard collapses the mobile route sheet and refits the map.
-  // Wait for that fit before deriving a screen position from the endpoint pins.
+async function pick(page: Page, coordinate: readonly number[]) {
   await expect(page.getByTestId('map')).not.toHaveClass(/sheet-open/);
-  await waitForStablePin(page, '.map-pin.origin');
-  await waitForStablePin(page, '.map-pin.destination');
-  const origin = (await page.locator('.map-pin.origin').boundingBox())!,
-    destination = (await page.locator('.map-pin.destination').boundingBox())!;
-  // MapLibre anchors endpoint markers at their bottom center, not their box center.
-  const originX = origin.x + origin.width / 2,
-    originY = origin.y + origin.height,
-    destinationX = destination.x + destination.width / 2,
-    destinationY = destination.y + destination.height;
-  const mercator = (lat: number) =>
-    Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
-  await page.mouse.click(
-    originX +
-      ((coordinate[0] - a.coordinate[0]) /
-        (b.coordinate[0] - a.coordinate[0])) *
-        (destinationX - originX),
-    originY +
-      ((mercator(coordinate[1]) - mercator(a.coordinate[1])) /
-        (mercator(b.coordinate[1]) - mercator(a.coordinate[1]))) *
-        (destinationY - originY),
-  );
+  const point = await page.evaluate(async (value) => {
+    const project = (window as E2EWindow).__ghostRouteProject;
+    if (!project) throw new Error('Map projection helper unavailable');
+    if (value.length !== 2) throw new Error('Expected a two-value coordinate');
+    return project([value[0]!, value[1]!]);
+  }, coordinate);
+  await page.mouse.click(point.x, point.y);
 }
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as E2EWindow).__ghostRouteE2E = true;
+  });
+});
 async function search(page: Page, label: string, query: string, name: string) {
   const input = page.getByRole('combobox', { name: label, exact: true });
   await input.fill(query);

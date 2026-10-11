@@ -1,5 +1,12 @@
 # Change log
 
+## Use MapLibre projection in expanded browser test — 2026-10-11T09:09:51+05:30
+
+- Changed: added an explicitly enabled E2E-only map projection helper and replaced endpoint-marker interpolation in the expanded navigation test with the exact MapLibre canvas point.
+- Why: repeated CI failures showed that marker interpolation could register a hazard away from the deterministic route fixture after a map refit.
+- Checks: TypeScript and Prettier passed; the focused desktop/mobile expanded-navigation regression and a full production build plus 48-case browser matrix completed without failure artifacts.
+- Limits: the helper is unavailable unless the test page enables `__ghostRouteE2E`; it does not expose live hazard data or change product routing behavior.
+
 ## Stabilize expanded navigation map-placement test — 2026-10-11T08:47:03+05:30
 
 - Changed: replaced the fixed map-refit pause with a bounded wait for stable MapLibre endpoint-pin anchors before deriving a hazard click coordinate.
