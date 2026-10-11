@@ -159,9 +159,7 @@ test('custom multi-hazard routing and separate persistent local report', async (
     path: info.outputPath('local-report.png'),
     fullPage: true,
   });
-  await page
-    .getByRole('button', { name: '! Flooded road Unverified' })
-    .click();
+  await page.getByRole('button', { name: '! Flooded road Unverified' }).click();
   await clickCoordinate(page, roadPoint);
   await expect(
     page.getByText('Observed obstruction; browser demonstration report.'),
