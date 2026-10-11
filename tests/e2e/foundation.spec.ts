@@ -274,6 +274,9 @@ test('viewport changes preserve visible route and narrow reflow', async ({
   page,
 }) => {
   await page.goto('/demo');
+  await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
+    timeout: 60_000,
+  });
   await page
     .getByRole('button', { name: 'Try the Hospital Road demo' })
     .click();
