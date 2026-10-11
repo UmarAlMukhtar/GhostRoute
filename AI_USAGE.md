@@ -2,7 +2,7 @@
 
 ## Submission draft assistance — 2026-10-11T08:26:09+05:30
 
-Codex refreshed `SUBMISSION.md` from the current project and verification record, checked the organizer's public event page and local links, and left participant contributions, final submitted SHA, human rehearsal, and organizer submission unclaimed. Human review pending.
+Codex refreshed `SUBMISSION.md` from the current project and verification record, checked the organizer's public event page and local links, and added participant handles and broad contribution roles supplied by Umar. Final submitted SHA, human rehearsal, and organizer submission remain unclaimed. Human review pending.
 
 ## Shared-runner test correction — 2026-10-11T04:58:58+05:30
 

@@ -13,13 +13,13 @@ Submission preparation for the DevDay Exchange Community Hackathon: Kochi. This 
 
 ## Participants
 
-Three participant names are recorded in the project narrative. Handles and individual contributions await the participants' confirmation; do not submit this table as complete until they are filled in.
+Umar confirmed these names, GitHub handles, and broad contribution roles. The team should review the wording before sending the organizer submission.
 
-| Participant name | GitHub handle         | Actual contribution   |
-| ---------------- | --------------------- | --------------------- |
-| Umar Al Mukhtar  | Awaiting confirmation | Awaiting confirmation |
-| Sanjay KP        | Awaiting confirmation | Awaiting confirmation |
-| Alphons N J      | Awaiting confirmation | Awaiting confirmation |
+| Participant name | GitHub handle                                         | Actual contribution               |
+| ---------------- | ----------------------------------------------------- | --------------------------------- |
+| Umar Al Mukhtar  | [umaralmukhtar](https://github.com/umaralmukhtar)     | Primary project implementation    |
+| Sanjay KP        | [sanjay-sanju-03](https://github.com/sanjay-sanju-03) | Debugging                         |
+| Alphons N J      | [alphonsnj](https://github.com/alphonsnj)             | Demo presentation and explanation |
 
 ## Run and demonstrate
 
