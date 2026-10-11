@@ -19,6 +19,41 @@
 - Validation: focused unit tests, TypeScript, lint, formatting, production webpack build, and all 10 targeted desktop/mobile browser cases passed, including 4× CPU spinner animation, full road equality, cancellation, failure recovery and reduced motion.
 - Limits: browser checks used emulation rather than a physical phone. Human review pending.
 
+## Use MapLibre projection in expanded browser test — 2026-10-11T09:09:51+05:30
+
+- Changed: added an explicitly enabled E2E-only map projection helper and replaced endpoint-marker interpolation in the expanded navigation test with the exact MapLibre canvas point.
+- Why: repeated CI failures showed that marker interpolation could register a hazard away from the deterministic route fixture after a map refit.
+- Checks: TypeScript and Prettier passed; the focused desktop/mobile expanded-navigation regression and a full production build plus 48-case browser matrix completed without failure artifacts.
+- Limits: the helper is unavailable unless the test page enables `__ghostRouteE2E`; it does not expose live hazard data or change product routing behavior.
+
+## Stabilize expanded navigation map-placement test — 2026-10-11T08:47:03+05:30
+
+- Changed: replaced the fixed map-refit pause with a bounded wait for stable MapLibre endpoint-pin anchors before deriving a hazard click coordinate.
+- Why: CI showed that the camera could still be moving after the fixed delay, causing the simulated flood click to miss the deterministic route fixture in both browser projects.
+- Checks: the focused expanded-navigation Playwright journey completed for desktop Chromium and mobile Chromium without a failure artifact; the changed file passes Prettier.
+- Limits: this remains a UI-level map-click regression test; it does not expose a production test hook or change routing behavior.
+
+## Stabilize mobile hazard-placement browser test — 2026-10-11T08:31:28+05:30
+
+- Changed: calculate map-click coordinates from the bottom-center anchors of the origin and destination pins in the expanded navigation browser test.
+- Why: MapLibre anchors the endpoint pins at their bottoms; using visual box centers could place a 50 m simulated flood away from the deterministic route fixture on mobile.
+- Checks: the focused mobile expanded-navigation Playwright regression completed without a failure artifact; the changed test file passes Prettier.
+- Limits: the test still validates the real map click path and does not add a production test hook.
+
+## Remove startup report marker — 2026-10-11T05:50:00+05:30
+
+- Changed: stopped creating the illustrative startup incident report and remove any earlier seeded demo marker from browser storage.
+- Why: prevent the purple report marker from being mistaken for an emergency shelter.
+- Checks: TypeScript, ESLint, focused reports regression tests (17 tests) and production build passed.
+- Limits: user-created local reports remain browser-local and unverified.
+
+## Merge: responsive loading and evacuation fallback — 2026-10-11T04:45:00+05:30
+
+- Changed: merged the upstream light-interface and responsive map-loading work with the local simulated evacuation fallback, visible emergency-shelter options and root hydration-warning tolerance.
+- Why: retain the improved worker-based loader while preserving the disaster-to-shelter route flow.
+- Checks: TypeScript, ESLint, focused shelter/map tests (15 tests) and production build passed.
+- Limits: relief points remain illustrative demonstration data, not a verified live shelter directory.
+
 ## Portable loader regression check — 2026-10-11T04:58:58+05:30
 
 - Changed: the deliberately throttled loader test allows slower shared-runner readiness and detects monopolizing preparation with a relative frame-gap assertion plus distinct painted animation states.
@@ -142,15 +177,3 @@ Record each meaningful project change during the event, newest first. Update thi
 - Added OSM source evidence, ODbL attribution, catalog validation command, tests, documentation and real browser screenshots. No new dependencies or geographic/routing-engine modifications.
 - Validated 169 unit tests, 36 production browser journeys, lint/types/build/format, seven place fixtures and unchanged road regeneration. Fixed mobile focus/reset and overlay stacking issues discovered in the browser. See VERIFICATION for scope and limits.
 - Local commit only; no push or deployment. Human review pending.
-
-## Renderer error fail-stop correction — 2026-10-11T08:01:00+05:30
-
-- Independent review identified MapLibre's emitted-error/resolved-promise behavior. Non-basemap errors and graphics loss now latch preparation failure, stop later batches and prevent incomplete network readiness.
-- Strengthened the real send-failure/reload regression to assert exactly one attempted batch and persistent unready state. Preserved concurrent checkpoint `6850514` and its records; no history rewrite.
-- Final isolated combined verification passed 184 unit tests, 54 desktop/mobile browser cases, lint/types/build/format and unchanged regeneration. Preserved `7fa00d0` reduced-motion pulse and README backup. Final adjacent 4× CPU measurements: longest task 1,349→195 ms; readiness 9,911.7→10,345.4 ms. Independent Codex review approved; human review pending.
-
-## Shared-runner rendering readiness budget — 2026-10-11T08:36:00+05:30
-
-The canceled exact-head CI run completed the real 4× CPU loader/animation test in 57.4 seconds; an ordinary map-ready retry completed in 35.2 seconds. Existing 25-second map-readiness assertions were too short on this runner. Only successful full-map readiness waits now allow 60 seconds; all other assertions, incomplete/error readiness guards, source identity and animation checks remain unchanged. Preserved user submission-documentation commits `19f557d` and `df57fb6`; no submission was sent. New exact-head CI must pass before merge.
-
-The immediate CI diagnostic confirmed the expanded journey exceeded its 90-second total test budget at its third map-readiness wait after completed initial navigation, hazard/report interactions and reload (expansion.spec.ts, Demo transition). Only that three-initialization journey now allows 180 seconds total; each successful readiness wait remains 60 seconds and all behavioral assertions are unchanged. Both corresponding desktop/mobile cases passed locally in 46.4 seconds; production build, lint/types/format checks passed. No renderer implementation change was needed.

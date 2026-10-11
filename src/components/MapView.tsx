@@ -9,6 +9,13 @@ import type { Selection, Role } from '../lib/map/selection';
 import { EMPTY, localStyle, type MapOverlays } from '../lib/map/style';
 import { loadRoadSource } from '../lib/map/roads';
 
+type E2EWindow = Window & {
+  __ghostRouteE2E?: boolean;
+  __ghostRouteProject?: (
+    coordinate: GeoPoint,
+  ) => Promise<{ x: number; y: number }>;
+};
+
 interface Props {
   data: MapData;
   overview?: boolean;
@@ -138,6 +145,7 @@ export default function MapView({
                 'hazards',
                 'blockedRoads',
                 'alternative',
+                'shelters',
                 'reports',
                 'demo-boundary',
               ])
@@ -263,6 +271,22 @@ export default function MapView({
 
   useEffect(() => {
     const map = mapRef.current;
+    const target = window as E2EWindow;
+    if (!ready || !map || !target.__ghostRouteE2E) return;
+    target.__ghostRouteProject = async (coordinate) => {
+      if (map.isMoving())
+        await new Promise<void>((resolve) => map.once('idle', () => resolve()));
+      const point = map.project(coordinate);
+      const canvas = map.getCanvas().getBoundingClientRect();
+      return { x: canvas.left + point.x, y: canvas.top + point.y };
+    };
+    return () => {
+      delete target.__ghostRouteProject;
+    };
+  }, [ready]);
+
+  useEffect(() => {
+    const map = mapRef.current;
     if (!ready || !map) return;
     map.resize();
     let active = true;
@@ -280,7 +304,12 @@ export default function MapView({
           : EMPTY,
       )
       .catch(handleError);
-    for (const id of ['hazards', 'blockedRoads', 'alternative'] as const) {
+    for (const id of [
+      'hazards',
+      'blockedRoads',
+      'alternative',
+      'shelters',
+    ] as const) {
       (map.getSource(id) as GeoJSONSource)
         .setData(overlays?.[id] ?? EMPTY)
         .catch(handleError);
@@ -304,6 +333,8 @@ export default function MapView({
             ? f.geometry.coordinates.flat()
             : f.geometry.coordinates.flat(2),
         ) ?? []),
+        ...(overlays?.shelters?.features.map((f) => f.geometry.coordinates) ??
+          []),
       ];
       if (coordinates?.length) {
         const xs = coordinates.map((p) => p[0]),

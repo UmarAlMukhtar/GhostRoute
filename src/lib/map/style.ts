@@ -3,6 +3,7 @@ import type {
   LineString,
   Polygon,
   MultiPolygon,
+  Point,
 } from 'geojson';
 import type { StyleSpecification } from 'maplibre-gl';
 import type { RoadGeoJSON } from '../geo/types';
@@ -15,6 +16,7 @@ export interface MapOverlays {
   hazards?: FeatureCollection<Polygon | MultiPolygon>;
   blockedRoads?: FeatureCollection<LineString>;
   alternative?: FeatureCollection<LineString>;
+  shelters?: FeatureCollection<Point>;
 }
 export function localStyle(
   roads: RoadGeoJSON,
@@ -32,6 +34,7 @@ export function localStyle(
       hazards: { type: 'geojson', data: EMPTY },
       blockedRoads: { type: 'geojson', data: EMPTY },
       alternative: { type: 'geojson', data: EMPTY },
+      shelters: { type: 'geojson', data: EMPTY },
     },
     layers: [
       {
@@ -156,6 +159,17 @@ export function localStyle(
           'line-color': '#dc2626',
           'line-width': 5,
           'line-dasharray': [2, 1],
+        },
+      },
+      {
+        id: 'shelters',
+        type: 'circle',
+        source: 'shelters',
+        paint: {
+          'circle-radius': 9,
+          'circle-color': '#7e22ce',
+          'circle-stroke-color': '#fff',
+          'circle-stroke-width': 3,
         },
       },
       {

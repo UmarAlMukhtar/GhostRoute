@@ -236,6 +236,7 @@ describe('selection and presentation', () => {
       'alternative-casing',
       'alternative',
       'blockedRoads',
+      'shelters',
       'reports',
     ]);
     expect(formatDistance(1234)).toBe('1.23 km');

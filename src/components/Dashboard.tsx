@@ -59,6 +59,7 @@ import {
 } from '../lib/map/selection';
 import type { SearchPlace } from '../lib/map/places';
 import type { GeoPoint } from '../lib/geo/types';
+import { findReachableShelters } from '../lib/evacuation/shelters';
 
 export default function Dashboard({ demo = false }: { demo?: boolean }) {
   const locationRequest = useRef(0);
@@ -128,28 +129,10 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
     Promise.resolve().then(() => {
       if (cancelled) return;
       try {
-        let saved = loadReports(localStorage, data.bounds, segments);
-        if (localStorage.getItem(REPORT_KEY) === null) {
-          saved = [
-            validateReport(
-              {
-                source: 'local-report',
-                id: 'illustrative-seed',
-                type: 'Other obstruction',
-                coordinate: data.places[0].coordinate,
-                description:
-                  'Example report for learning the interface. This is not an observed incident.',
-                severity: 'Unspecified',
-                submittedAt: '2026-10-10T00:00:00Z',
-                status: 'Unverified',
-                seeded: true,
-              },
-              data.bounds,
-              segments,
-            ),
-          ];
+        const loaded = loadReports(localStorage, data.bounds, segments);
+        const saved = loaded.filter((report) => !report.seeded);
+        if (saved.length !== loaded.length)
           localStorage.setItem(REPORT_KEY, JSON.stringify(saved));
-        }
         setReports(saved);
         setReportsReady(true);
       } catch {
@@ -484,6 +467,13 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
         : baseline,
     [impactActive, data, flood, baseline],
   );
+  const shelters = useMemo(
+    () =>
+      impactActive && data && flood?.status === 'ready' && state.origin
+        ? findReachableShelters(data, state.origin, catalog.places, flood)
+        : [],
+    [impactActive, data, flood, state.origin, catalog.places],
+  );
   const overlays = useMemo<MapOverlays | undefined>(
     () =>
       impactActive && flood?.status === 'ready'
@@ -503,9 +493,17 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
                     ]
                   : [],
             },
+            shelters: {
+              type: 'FeatureCollection',
+              features: shelters.map((shelter) => ({
+                type: 'Feature',
+                properties: { id: shelter.id, name: shelter.name },
+                geometry: { type: 'Point', coordinates: shelter.coordinate },
+              })),
+            },
           }
         : undefined,
-    [impactActive, flood, current],
+    [impactActive, flood, current, shelters],
   );
   const affectingHazards =
     baseline?.status === 'found'
@@ -927,6 +925,72 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
                       {routeMessage(current!)}
                     </p>
                   )}
+                  {impactActive &&
+                    state.origin &&
+                    flood?.status === 'ready' && (
+                      <section
+                        className="evacuation-assistance"
+                        aria-labelledby="evacuation-title"
+                      >
+                        <p className="eyebrow">EVACUATION ASSISTANCE</p>
+                        <h3 id="evacuation-title">Emergency shelters</h3>
+                        <p>
+                          {current?.status === 'found'
+                            ? 'Your destination still has an available simulated route. These nearby fallback options are ranked by closure-aware walking distance.'
+                            : 'Your destination cannot be reached through the current simulated closures. Choose a reachable fallback below.'}
+                        </p>
+                        {shelters.length ? (
+                          <ol className="shelter-list">
+                            {shelters.map((shelter, index) => (
+                              <li key={shelter.id}>
+                                <div>
+                                  <strong>
+                                    {index === 0 ? 'Recommended: ' : ''}
+                                    {shelter.name}
+                                  </strong>
+                                  <span>
+                                    {formatDistance(
+                                      shelter.route.distanceMeters,
+                                    )}{' '}
+                                    · {shelter.capacityLabel}
+                                  </span>
+                                  <small>
+                                    {shelter.facilities.join(' · ')}
+                                  </small>
+                                </div>
+                                <button
+                                  className="secondary"
+                                  onClick={() =>
+                                    dispatch({
+                                      type: 'select',
+                                      role: 'destination',
+                                      selection: {
+                                        nodeId: shelter.nodeId,
+                                        coordinate: shelter.coordinate,
+                                        label: shelter.name,
+                                      },
+                                    })
+                                  }
+                                >
+                                  Route here
+                                </button>
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <p className="notice error">
+                            No illustrative relief point is reachable in this
+                            simulation. Move the origin or adjust the simulated
+                            hazards.
+                          </p>
+                        )}
+                        <p className="shelter-disclaimer">
+                          Demonstration-only relief points, facilities and
+                          capacity. They are not verified shelters or live
+                          availability information.
+                        </p>
+                      </section>
+                    )}
                   {found ? (
                     <div className="route-result">
                       <div className="result-header">
@@ -1205,6 +1269,12 @@ export default function Dashboard({ demo = false }: { demo?: boolean }) {
                 <i className="legend-flood" />
                 Illustrative hazard
               </span>
+              {shelters.length > 0 && (
+                <span>
+                  <i className="legend-shelter" />
+                  Emergency shelters
+                </span>
+              )}
             </>
           )}
         </div>

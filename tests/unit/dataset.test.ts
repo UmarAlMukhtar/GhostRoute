@@ -14,6 +14,15 @@ import metadata from '../../public/data/ernakulam/metadata.json';
 
 const load = (name: string): unknown =>
   JSON.parse(readFileSync(`public/data/ernakulam/${name}`, 'utf8'));
+const generatedJsonHash = (name: string) =>
+  createHash('sha256')
+    .update(
+      readFileSync(`public/data/ernakulam/${name}`, 'utf8').replace(
+        /\r\n/g,
+        '\n',
+      ),
+    )
+    .digest('hex');
 const source = gunzipSync(readFileSync('data/source/ernakulam.osm.json.gz'));
 const graph = validateGraph(load('graph.json'));
 const envelope: [number, number, number, number] = [76.1, 9.8, 76.6, 10.3];
@@ -31,11 +40,7 @@ describe('frozen real Ernakulam dataset', () => {
     expect(converted.graph).toEqual(graph);
     expect(converted.roads).toEqual(load('roads.geojson'));
     for (const [file, hash] of Object.entries(metadata.outputSha256))
-      expect(
-        createHash('sha256')
-          .update(readFileSync(`public/data/ernakulam/${file}`))
-          .digest('hex'),
-      ).toBe(hash);
+      expect(generatedJsonHash(file)).toBe(hash);
   });
   it('fits local loading budgets and reports every component without inventing joins', () => {
     const report = validateDataset(graph, load('roads.geojson'), envelope);

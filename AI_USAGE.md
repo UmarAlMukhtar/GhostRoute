@@ -4,6 +4,26 @@
 
 Codex refreshed `SUBMISSION.md` from the current project and verification record, checked the organizer's public event page and local links, and added participant handles and broad contribution roles supplied by Umar. Final submitted SHA, human rehearsal, and organizer submission remain unclaimed. Human review pending.
 
+## Exact MapLibre projection for E2E — 2026-10-11T09:09:51+05:30
+
+Codex reviewed the repeated CI evidence and replaced the fragile endpoint-pin interpolation with an explicitly enabled E2E-only MapLibre projection helper. Playwright now clicks the exact canvas position of the deterministic fixture while retaining the real map click handler. TypeScript, Prettier, focused desktop/mobile regression coverage, and the complete 48-case production browser matrix completed without failure artifacts. Human review pending.
+
+## Stable MapLibre browser placement — 2026-10-11T08:47:03+05:30
+
+Codex used the CI failure evidence to replace a fixed timing delay in the expanded browser test with a bounded endpoint-pin stability check. It preserves the real MapLibre click interaction and adds no production hook. The focused desktop and mobile regression journeys completed without a failure artifact, and the changed file passes Prettier. Human review pending.
+
+## Mobile map-anchor test repair — 2026-10-11T08:31:28+05:30
+
+Codex inspected the failed browser assertion and corrected the test-only coordinate projection to use the MapLibre marker bottom-center anchors. This retains the actual user map-click flow rather than adding a production-only test hook. The focused mobile regression completed without a failure artifact, and the changed file passes Prettier. Human review pending.
+
+## Remove startup report marker — 2026-10-11T05:50:00+05:30
+
+Codex removed the automatic illustrative report that created an ambiguous startup map pin, while preserving user-created browser-local reports. Existing seeded demo markers are cleaned up on load. TypeScript, ESLint, focused report tests (17 tests) and production build passed.
+
+## Merge: responsive loading and evacuation fallback — 2026-10-11T04:45:00+05:30
+
+Codex merged the remote loader/UI refactor with the locally implemented shelter fallback and hydration-warning tolerance, resolving overlapping documentation, root layout and styles without discarding either product path. TypeScript, ESLint, focused shelter/map tests (15 tests) and the production build passed; human review remains pending.
+
 ## Shared-runner test correction — 2026-10-11T04:58:58+05:30
 
 Codex read the actual GitHub CI failure log: 47 browser cases passed and the deliberately 4× throttled desktop loader check exhausted its normal 25-second readiness timeout. It limited the longer timeout to that test and replaced the machine-specific frame-gap limit with a fraction of actual loading duration while retaining distinct painted animation states. All four corrected animation/reduced-motion cases passed locally; product behavior and benchmark evidence are unchanged. Human review pending.
@@ -49,14 +69,6 @@ Use Codex during the hackathon and briefly document its actual contribution here
 
 Participant work below was performed with Codex. Human review remains pending.
 
-## Responsive map renderer assistance — 2026-10-11T07:57:10+05:30
-
-Codex inspected the existing loading path and in-progress renderer batch change, corrected a browser test TypeScript mismatch, and verified the complete road handoff, cancellation, failure recovery and animated loader in desktop/mobile Chromium. Focused unit tests, types, lint, formatting, production webpack build and 10 targeted browser cases passed. The check used emulation; human review remains pending.
-
-## Reduced-motion loader and README assistance — 2026-10-11T08:06:14+05:30
-
-Codex read the user's local and public Brave tabs, confirmed `prefers-reduced-motion: reduce` made the spinner static while the map later loaded, changed that state to a non-rotating pulse, and verified a real local reload plus four desktop/mobile browser cases. It rewrote the README and preserved an exact backup of the previous file. Production build, TypeScript and formatting passed. Human review and public deployment are pending.
-
 | Date and time with timezone | Tool / model, if known | Task                                                            | Assistance and affected files                                                                                                         | Human review / corrections                                                  | Validation and result                                                              |
 | --------------------------- | ---------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | 2026-10-10T21:46:05+05:30   | Codex                  | Phase 0 audit, architecture, contributor foundation and tooling | Inspected all inherited files/history; authored docs/ADRs/task plans; extended template documents; added smoke scaffold, CI and tests | Pending; no participant identity, deployment or product completion invented | See docs/VERIFICATION.md for actual commands, failures, recovery and final results |
@@ -94,13 +106,3 @@ Codex inspected the existing completed milestones and organizer rules, extended 
 ## Coverage and place-search assistance — 2026-10-11T00:26:02+05:30
 
 Codex inspected the existing application and organizer instructions, acquired a bounded OSM source extract, checked actual source coordinates and road membership, rejected a disconnected candidate and validated every catalog pair with the existing router. It implemented local filtering, accessible selection and dataset extent layers, adapted existing browser selectors without replacing route/hazard algorithms, and added source evidence and tests. Actual production screenshots and browser failures led to mobile focus/reset/scrolling and overlay fixes. Verification records distinguish automated desktop/mobile evidence from untested physical keyboards and hosted services. No public Nominatim autocomplete, new dependencies, push, deployment or remote resources. Human review remains pending.
-
-## Renderer review correction — 2026-10-11T08:01:00+05:30
-
-An independent read-only Codex review found that MapLibre can emit a worker-update error while resolving its incremental update promise. Codex added an effect-local failure latch, stopped subsequent road batches after rendering errors/graphics loss, and guarded final readiness. The actual injected-send browser regression now asserts one attempted batch and persistent unready state before successful reload. The concurrent user task “Fix the loaders” committed the shared implementation as `6850514`; its commit and verification record are preserved. The coordinated release also preserves `7fa00d0` (reduced-motion opacity pulse and concise README with byte-identical backup). Final isolated production verification passed 184 unit tests, 54 desktop/mobile browser cases, lint, types, build, formatting and unchanged data regeneration. Independent Codex review approved the combined changes. Human review remains pending.
-
-## Shared-runner rendering readiness budget — 2026-10-11T08:36:00+05:30
-
-The canceled exact-head CI run completed the real 4× CPU loader/animation test in 57.4 seconds; an ordinary map-ready retry completed in 35.2 seconds. Existing 25-second map-readiness assertions were too short on this runner. Only successful full-map readiness waits now allow 60 seconds; all other assertions, incomplete/error readiness guards, source identity and animation checks remain unchanged. Preserved user submission-documentation commits `19f557d` and `df57fb6`; no submission was sent. New exact-head CI must pass before merge.
-
-The immediate CI diagnostic confirmed the expanded journey exceeded its 90-second total test budget at its third map-readiness wait after completed initial navigation, hazard/report interactions and reload (expansion.spec.ts, Demo transition). Only that three-initialization journey now allows 180 seconds total; each successful readiness wait remains 60 seconds and all behavioral assertions are unchanged. Both corresponding desktop/mobile cases passed locally in 46.4 seconds; production build, lint/types/format checks passed. No renderer implementation change was needed.

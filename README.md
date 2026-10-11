@@ -9,7 +9,7 @@ GhostRoute is an interactive Kochi–Ernakulam road-routing **simulation**. Choo
 ## What you can do
 
 - **Navigate:** Search the offline place index, enter coordinates, pick a point on the map, or use your location if you grant browser permission. Compare the route and distance through the mapped road network.
-- **Simulate:** Add and edit illustrative flood, landslide, fire, and roadblock hazards. GhostRoute excludes affected road segments and recalculates a route, or clearly reports when none is available in this dataset.
+- **Simulate:** Add and edit illustrative flood, landslide, fire, and roadblock hazards. GhostRoute excludes affected road segments and recalculates a route, or clearly reports when none is available in this dataset. During a simulated incident, it can rank reachable illustrative relief points; their names, facilities, and capacity are synthetic demonstration data, not live shelter information.
 - **Report:** Save and delete unverified observations in this browser. Reports are not shared with other users or emergency services and do not alter routes by default.
 - **Demo:** Walk through the Hospital Road baseline, flood detour, expanding flood, unavailable route, and reset at `/demo`.
 

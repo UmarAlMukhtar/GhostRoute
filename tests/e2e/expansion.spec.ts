@@ -4,6 +4,12 @@ import { parseMapData } from '../../src/lib/map/data';
 import { validatePlaces, filterPlaces } from '../../src/lib/map/places';
 import { createFloodEngine } from '../../src/lib/simulation/flood';
 import { hazardInputs } from '../../src/lib/simulation/hazards';
+type E2EWindow = Window & {
+  __ghostRouteE2E?: boolean;
+  __ghostRouteProject?: (
+    coordinate: [number, number],
+  ) => Promise<{ x: number; y: number }>;
+};
 const read = (name: string): unknown =>
   JSON.parse(readFileSync(`public/data/ernakulam/${name}`, 'utf8'));
 const data = parseMapData(
@@ -48,24 +54,21 @@ const center = baseline
     );
   });
 if (!center) throw new Error('Need a real cross-region detour fixture');
-async function pick(page: Page, coordinate: number[]) {
-  const origin = (await page.locator('.map-pin.origin').boundingBox())!,
-    destination = (await page.locator('.map-pin.destination').boundingBox())!;
-  const mercator = (lat: number) =>
-    Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
-  await page.mouse.click(
-    origin.x +
-      origin.width / 2 +
-      ((coordinate[0] - a.coordinate[0]) /
-        (b.coordinate[0] - a.coordinate[0])) *
-        (destination.x + destination.width / 2 - origin.x - origin.width / 2),
-    origin.y +
-      origin.height / 2 +
-      ((mercator(coordinate[1]) - mercator(a.coordinate[1])) /
-        (mercator(b.coordinate[1]) - mercator(a.coordinate[1]))) *
-        (destination.y + destination.height / 2 - origin.y - origin.height / 2),
-  );
+async function pick(page: Page, coordinate: readonly number[]) {
+  await expect(page.getByTestId('map')).not.toHaveClass(/sheet-open/);
+  const point = await page.evaluate(async (value) => {
+    const project = (window as E2EWindow).__ghostRouteProject;
+    if (!project) throw new Error('Map projection helper unavailable');
+    if (value.length !== 2) throw new Error('Expected a two-value coordinate');
+    return project([value[0]!, value[1]!]);
+  }, coordinate);
+  await page.mouse.click(point.x, point.y);
 }
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as E2EWindow).__ghostRouteE2E = true;
+  });
+});
 async function search(page: Page, label: string, query: string, name: string) {
   const input = page.getByRole('combobox', { name: label, exact: true });
   await input.fill(query);
@@ -177,7 +180,7 @@ test('expanded Edappally–Vyttila navigation, disasters, local deletion and ded
   await page
     .getByRole('button', { name: 'Report Incident', exact: true })
     .click();
-  await expect(page.getByText('1 visible local reports')).toBeVisible();
+  await expect(page.getByText('0 visible local reports')).toBeVisible();
   await page.getByRole('link', { name: 'Demo', exact: true }).click();
   await expect(page).toHaveURL(/\/demo$/);
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true', {
